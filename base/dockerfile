@@ -1,0 +1,32 @@
+FROM ubuntu:16.04
+
+#setup app folder
+WORKDIR /app
+
+#Install packages
+RUN apt-get update && apt-get install apt-utils -y 
+	
+# pete.makeclever() - fixes headless install issues
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+	&& apt-get upgrade -y \
+	&& apt-get install \
+		wget \
+		libgl1-mesa-glx \
+		python3 \
+		build-essential \
+		software-properties-common \
+		python-software-properties \
+		unzip -y
+		
+# Install Miniconda
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+	&& bash Miniconda3-latest-Linux-x86_64.sh -p /app/miniconda -b \
+	&& rm Miniconda3-latest-Linux-x86_64.sh \
+	&& ln -s /app/miniconda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+	
+# Install arcsi
+COPY config/create-env.sh ./
+RUN bash ./create-env.sh 
+

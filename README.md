@@ -21,7 +21,7 @@ docker push jncc/s2-ard-processor-base
 
 #### Run image interactivly
 
-    docker run -i -t s2-ard-processor-base /bin/bash
+    docker run -i -v <local mount point>:/data -t s2-ard-processor-base /bin/bash
 
 #### Run Arcsi ineractivly:
 

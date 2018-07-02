@@ -29,7 +29,7 @@ From docker console:
 
 ```
 source /etc/profile.d/conda.sh
-conda activate arcsi361
+conda activate arcsienv
 arcsi.py --version
 ```
 

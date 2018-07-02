@@ -7,16 +7,23 @@ A base docker image with arcsi installed
 
 ### Build and run instaructions
 
-Build image:
+#### Build image:
 
     docker build -t s2-ard-processor-base .
 
+### Push images to JNCC docker hub repo
 
-Run image interactivly
+```
+docker login --username=<dockerhub username>
+docker tag s2-ard-processor-base jncc/s2-ard-processor-base:<Arcsi version>
+docker push jncc/s2-ard-processor-base
+```
+
+#### Run image interactivly
 
     docker run -i -t s2-ard-processor-base /bin/bash
 
-Run Arcsi ineractivly:
+#### Run Arcsi ineractivly:
 
 From docker console:
 

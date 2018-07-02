@@ -16,4 +16,14 @@ Run image interactivly
 
     docker run -i -t s2-ard-processor-base /bin/bash
 
+Run Arcsi ineractivly:
+
+From docker console:
+
+```
+source /etc/profile.d/conda.sh
+conda activate arcsi361
+arcsi.py --version
+```
+
 

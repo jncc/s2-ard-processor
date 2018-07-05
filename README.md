@@ -28,7 +28,7 @@ Based on the official ContinuumIO Miniconda3 release with python 3.5, base packa
 
 To run a container and get help on ARCSI commandline options do:
 
-`docker run -t mundialis/arcsi arcsi.py -h`
+`docker run -t jncc/arcsi-base arcsi.py -h`
 
 See below under "Docker example" for a more detailed Sentinel-2 example.
 

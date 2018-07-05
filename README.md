@@ -35,7 +35,6 @@ See below under "Docker example" for a more detailed Sentinel-2 example.
 ### Docker example
 
 ``` bash
-# run ARCSI (we use volume mapping to make S2 and DEM visible inside the docker container)
 docker run -i -t -v ${local_data}:/data jncc/arcsi-base \
     arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA FOOTPRINT \
     --interp near --outwkt /data/${PATH_TO_OUTPUT_PROJ_WKT} --projabbv ${PROJ_ABBREVIATION} -t /data/tmp/ -o /data/output/ \

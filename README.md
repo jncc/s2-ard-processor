@@ -1,6 +1,6 @@
 # S2 ARD Processor
 
-Docker based sentinel 2 Analysis ready production system, based on https://github.com/mundialis/docker-arcsi
+Docker based sentinel 2 Analysis ready production system.
 
 ## Base
 
@@ -43,4 +43,4 @@ docker run -i -t -v ${local_data}:/data jncc/arcsi-base \
 
 ### See also
 
-Thanks to Markus Neteler, Edward P. Morris and Angelos Tzotsos for their work on the orignal ARCSI Dockerfile.
+Thanks to Markus Neteler (https://github.com/mundialis/docker-arcsi), Edward P. Morris and Angelos Tzotsos for their work on the orignal ARCSI Dockerfile.

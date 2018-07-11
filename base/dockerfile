@@ -11,15 +11,14 @@ RUN apt-get update && apt-get install apt-utils -y
 
 # add debian packages required by arcsi
 RUN apt-get update && \
-apt-get install -y libmpfr4 libgfortran3 libglib2.0-0 libsm6 libxrender1 libfontconfig1 libxext6 libopenblas-base libgl1-mesa-glx
+apt-get install -y libmpfr4 libgl1-mesa-glx
 
 # update conda and install arcsi using conda package manager and clean up (rm tar packages to save space)
 RUN conda update -n base conda
-RUN conda config --add channels conda-forge && \
-#conda config --add channels au-eoed && \
-conda update --yes conda && \
-conda install --yes python=3.5 arcsi && \
-conda clean --yes -t
+RUN conda update --yes -c conda-forge conda && \
+    conda install --yes -c conda-forge python=3.5 arcsi && \
+    conda update -c conda-forge --all && \
+    conda clean --yes -t
 
 # Ugly fixes for dependency versions
 #RUN cd /opt/conda/lib && \

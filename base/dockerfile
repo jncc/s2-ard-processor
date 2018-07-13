@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install apt-utils -y
 
 # add debian packages required by arcsi
 RUN apt-get update && \
-apt-get install -y libmpfr4 libgl1-mesa-glx
+    apt-get install -y \
+        libmpfr4 \
+        libgl1-mesa-glx && \
+    apt-get clean
 
 # update conda and install arcsi using conda package manager and clean up (rm tar packages to save space)
 RUN conda update -n base conda

@@ -37,4 +37,6 @@ RUN mkdir -p /data
 
 # copy test for docker build
 COPY /config/test.txt .
+COPY /config/test2.txt .
+
 

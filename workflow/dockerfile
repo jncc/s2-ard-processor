@@ -1,0 +1,34 @@
+FROM jncc/arcsi-base:latest
+
+# Setup app folder
+WORKDIR /app
+
+# Configure apt
+RUN apt-get update && apt-get -y install \ 
+    apt-utils 
+
+
+
+# --------- Place machine build layers before this line ---------
+
+# Create processing paths
+RUN mkdir -p /incoming/raw/ \
+    && mkdir -p /internal/state/ \
+    && mkdir -p /internal/ard/ \
+    && mkdir -p /output/tmp/
+
+# Copy workflows
+COPY /app/workflows ./workflows
+
+# Install workflow dependencies
+RUN pip install -r /app/workflows/requirements.txt
+
+# Copy workflow config
+COPY config/app/workflows/luigi.cfg ./workflows
+RUN chmod +r ./workflows/luigi.cfg
+
+#Initialise startup script
+COPY app/exec.sh ./
+RUN chmod +rx /app/exec.sh
+
+ENTRYPOINT ["/app/exec.sh"]

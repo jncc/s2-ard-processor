@@ -5,23 +5,26 @@ WORKDIR /app
 
 # Configure apt
 RUN apt-get update && apt-get -y install \ 
-    apt-utils 
-
+    apt-utils \
+    unzip
 
 
 # --------- Place machine build layers before this line ---------
 
 # Create processing paths
-RUN mkdir -p /incoming/raw/ \
-    && mkdir -p /internal/state/ \
-    && mkdir -p /internal/ard/ \
-    && mkdir -p /output/tmp/
+RUN mkdir -p /input/ \
+    && mkdir -p /state/ \
+    && mkdir -p /working/ \
+    && mkdir -p /output/
 
-# Copy workflows
-COPY /app/workflows ./workflows
+# Copy workflow requirements
+COPY /app/workflows/requirements.txt ./workflows/
 
 # Install workflow dependencies
 RUN pip install -r /app/workflows/requirements.txt
+
+# Copy workflows
+COPY /app/workflows ./workflows
 
 # Copy workflow config
 COPY config/app/workflows/luigi.cfg ./workflows

@@ -11,3 +11,4 @@ import process_s2_swath.BuildPyramid
 import process_s2_swath.BuildPyramids
 import process_s2_swath.CheckOutputFilesExist
 import process_s2_swath.GenerateMetadata
+import process_s2_swath.TransferArdToOutput

@@ -12,10 +12,11 @@ RUN apt-get update && apt-get -y install \
 # --------- Place machine build layers before this line ---------
 
 # Create processing paths
-RUN mkdir -p /input/ \
-    && mkdir -p /state/ \
-    && mkdir -p /working/ \
-    && mkdir -p /output/
+RUN mkdir /input/ \
+    && mkdir /static/ \
+    && mkdir /state/ \
+    && mkdir /working/ \
+    && mkdir /output/
 
 # Copy workflow requirements
 COPY /app/workflows/requirements.txt ./workflows/
@@ -29,6 +30,9 @@ COPY /app/workflows ./workflows
 # Copy workflow config
 COPY config/app/workflows/luigi.cfg ./workflows
 RUN chmod +r ./workflows/luigi.cfg
+
+# Copy wkt file
+COPY /app/BritishNationalGrid.wkt ./
 
 #Initialise startup script
 COPY app/exec.sh ./

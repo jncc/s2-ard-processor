@@ -1,7 +1,9 @@
 # keep this list in run order
 
+import process_s2_swath.common
 import process_s2_swath.PrepareWorkingFolder
 import process_s2_swath.UnzipRaw
+import process_s2_swath.ReadManifests
 import process_s2_swath.BuildFileList
 import process_s2_swath.RunArcsi
 import process_s2_swath.CheckFileExists

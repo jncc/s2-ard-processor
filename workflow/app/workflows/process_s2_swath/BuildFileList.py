@@ -3,14 +3,15 @@ import os
 import subprocess
 import logging
 import json
+import process_s2_swath.common as common
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.UnzipRaw import UnzipRaw
+from process_s2_swath.ReadManifests import ReadManifests
 from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger('luigi-interface')
 
-@requires(UnzipRaw)
+@requires(ReadManifests)
 class BuildFileList(luigi.Task):
     pathRoots = luigi.DictParameter()
 
@@ -26,29 +27,30 @@ class BuildFileList(luigi.Task):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=True)
-
+        # todo: logging probably doesn't work
         process_output, _ =  command_line_process.communicate()
         log.info(process_output)
 
-        tasks = []
+        
         fileListPath = os.path.join(self.pathRoots["temp"], self.getOutputFileName())
-        tasks.append(CheckFileExists(filePath=fileListPath))
-        yield tasks
+        yield CheckFileExists(filePath=fileListPath)
 
         output = {
             "fileListPath": fileListPath
         }
 
         with self.output().open('w') as o:
-            o.write(json.dumps(output))
+            o.write(common.getFormattedJson(output))
 
     def getOutputFileName(self):
-        products = os.listdir(self.pathRoots["extracted"])
+        with self.input().open('r') as i:
+            readManifestsOutput = json.loads(i.read())
+        
+        metadata = readManifestsOutput["metadata"][0]
 
-        # potentially read this from the metadata instead
-        basename = "File_Sentinel2"
-        satelliteLetter = products[0][2:3]
-        date = products[0][11:19]
+        basename = "File_Sentinel"
+        satelliteLetter = metadata["satelliteNumber"]
+        date = metadata["date"]
 
         return basename + satelliteLetter + "_" + date + ".txt"
 

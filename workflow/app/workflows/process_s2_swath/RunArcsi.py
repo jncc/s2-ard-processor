@@ -9,10 +9,12 @@ from process_s2_swath.BuildFileList import BuildFileList
 
 log = logging.getLogger('luigi-interface')
 
+# require ReadManifests to get the metadata bits for the output filenames
 @requires(BuildFileList)
 class RunArcsi(luigi.Task):
     pathRoots = luigi.DictParameter()
     dem = luigi.Parameter()
+    testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
         buildFileListOutput = {}
@@ -32,15 +34,20 @@ class RunArcsi(luigi.Task):
                 fileListPath
             )
 
-        try:
-            log.info("Running cmd: " + cmd)
-            subprocess.check_output(cmd, shell=True) 
-        except subprocess.CalledProcessError as e:
-            errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
-            log.error(errStr)
-            raise RuntimeError(errStr)
+        if not self.testProcessing:
+            try:
+                log.info("Running cmd: " + cmd)
+                subprocess.check_output(cmd, shell=True) 
+            except subprocess.CalledProcessError as e:
+                errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
+                log.error(errStr)
+                raise RuntimeError(errStr)
+        else:
+            log.info("Generating mock output files")
+            # make test files, see examples: http://gws-access.ceda.ac.uk/public/defra_eo/sentinel/2/processed/ard/NaturalEngland/
+            # for each input granule I think we're expecting a file ending in clouds.tif, meta.json, sat.tif, toposhad.tif, valid.tif, vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif, and vmsk_sharp_rad_srefdem_stdsref.tif
 
-        # Create list of expected output files
+        # CheckFileExistsWithPattern for all outputs
 
         with self.output().open('w') as o:
             o.write('some files')

@@ -3,9 +3,11 @@
 import process_s2_swath.common
 import process_s2_swath.PrepareWorkingFolder
 import process_s2_swath.UnzipRaw
-import process_s2_swath.ReadManifests
+import process_s2_swath.GetInputFileInfo
+import process_s2_swath.GetInputFileInfos
+import process_s2_swath.GetSatelliteAndOrbitNumber
 import process_s2_swath.BuildFileList
-import process_s2_swath.RunArcsi
+import process_s2_swath.ProcessRawToArd
 import process_s2_swath.CheckFileExists
 import process_s2_swath.GdalTranslate
 import process_s2_swath.ConvertToTif

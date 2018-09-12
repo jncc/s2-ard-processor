@@ -31,7 +31,7 @@ class PrepareWorkingFolder(luigi.Task):
         self.makePath(self.pathRoots['temp'])
     
         with self.output().open('w') as o:
-            o.write('\{\}')
+            o.write('{}')
 
     def output(self):
         outFile = os.path.join(self.pathRoots['state'], 'PrepareWorkingFolder_SUCCESS.json')

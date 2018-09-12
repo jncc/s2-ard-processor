@@ -2,9 +2,9 @@ import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.RunArcsi import RunArcsi
+from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
-@requires(RunArcsi)
+@requires(ProcessRawToArd)
 class ConvertToTif(luigi.Task):
     pathRoots = luigi.DictParameter()
 

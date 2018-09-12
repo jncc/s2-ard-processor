@@ -2,6 +2,7 @@ import luigi
 import os
 import subprocess
 import json
+import glob
 import process_s2_swath.common as common
 from luigi import LocalTarget
 from luigi.util import requires
@@ -22,7 +23,7 @@ class UnzipRaw(luigi.Task):
             stderr=subprocess.STDOUT,
             shell=True)
 
-        extractedProducts = os.listdir(self.pathRoots["extracted"])
+        extractedProducts = glob.glob(os.path.join(self.pathRoots["extracted"], "*"))
 
         output = {
             "products": extractedProducts

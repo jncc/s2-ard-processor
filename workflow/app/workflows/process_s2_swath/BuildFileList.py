@@ -5,15 +5,23 @@ import logging
 import json
 import process_s2_swath.common as common
 from luigi import LocalTarget
-from luigi.util import requires
-from process_s2_swath.ReadManifests import ReadManifests
+from luigi.util import inherits
+from process_s2_swath.GetInputFileInfos import GetInputFileInfos
+from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger('luigi-interface')
 
-@requires(ReadManifests)
+@inherits(GetInputFileInfos)
+@inherits(GetSatelliteAndOrbitNumber)
 class BuildFileList(luigi.Task):
     pathRoots = luigi.DictParameter()
+
+    def requires(self):
+        t = []
+        t.append(self.clone(GetInputFileInfos))
+        t.append(self.clone(GetSatelliteAndOrbitNumber))
+        return t
 
     def run(self):
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \
@@ -31,7 +39,6 @@ class BuildFileList(luigi.Task):
         process_output, _ =  command_line_process.communicate()
         log.info(process_output)
 
-        
         fileListPath = os.path.join(self.pathRoots["temp"], self.getOutputFileName())
         yield CheckFileExists(filePath=fileListPath)
 
@@ -43,14 +50,14 @@ class BuildFileList(luigi.Task):
             o.write(common.getFormattedJson(output))
 
     def getOutputFileName(self):
-        with self.input().open('r') as i:
-            readManifestsOutput = json.loads(i.read())
-        
-        metadata = readManifestsOutput["metadata"][0]
+        with self.input()[0].open('r') as inputFileInfosFile, \
+            self.input()[1].open('r') as satelliteAndOrbitNoFile:
+            getInputFileInfosOutput = json.loads(inputFileInfosFile.read())
+            getSatelliteAndOrbitNoOutput = json.loads(satelliteAndOrbitNoFile.read())
 
         basename = "File_Sentinel"
-        satelliteLetter = metadata["satelliteNumber"]
-        date = metadata["date"]
+        satelliteLetter = getSatelliteAndOrbitNoOutput["satelliteNumber"]
+        date = getInputFileInfosOutput["products"][0]["date"] # date should be the same for all
 
         return basename + satelliteLetter + "_" + date + ".txt"
 

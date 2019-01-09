@@ -1,0 +1,16 @@
+BootStrap: docker
+From: continuumio/miniconda3:latest
+
+%files
+    post.sh
+
+%environment
+    GDAL_DRIVER_PATH /opt/conda/lib/gdalplugins:$GDAL_DRIVER_PATH
+    GDAL_DATA /opt/conda/share/gdal
+    export GDAL_DRIVER_PATH GDAL_DATA
+
+%post
+    chmod +x post.sh
+    ./post.sh
+
+

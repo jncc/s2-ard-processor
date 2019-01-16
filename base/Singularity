@@ -1,0 +1,8 @@
+BootStrap: docker
+From: jncc/arcsi-base
+
+%runscript
+    #!/bin/bash
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate base
+    $@

@@ -19,7 +19,7 @@ RUN apt-get update && \
 # update conda and install arcsi using conda package manager and clean up (rm tar packages to save space)
 RUN conda update -n base conda
 RUN conda update --yes -c conda-forge conda && \
-    conda install --yes -c conda-forge python=3.5 arcsi && \
+    conda install --yes -c conda-forge python=3.7 arcsi && \
     conda update -c conda-forge --all && \
     conda clean --yes -t
 

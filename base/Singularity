@@ -1,5 +1,5 @@
 BootStrap: docker
-From: jncc/arcsi-base
+From: jncc/arcsi-base:latest
 
 %runscript
     #!/bin/bash

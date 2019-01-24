@@ -18,15 +18,17 @@ RUN apt-get update && \
     apt-get clean
 
 # update conda and install arcsi using conda package manager and clean up (rm tar packages to save space)
-RUN conda update -n base conda
+# RUN conda update -n base conda
 
-RUN conda update --yes -c conda-forge conda && \
-    conda create --yes -n arcsienv python=3.5
+# RUN conda update --yes -c conda-forge conda && \
+#     conda create --yes -n arcsienv python=3.5
 
-RUN /bin/bash -c ". activate arcsienv && \
-    conda install --yes -c conda-forge arcsi && \
-    conda update -c conda-forge --all && \
-    conda clean --yes -t"
+# RUN /bin/bash -c ". activate arcsienv && \
+#     conda install --yes -c conda-forge gdal=2.2.4 libgcc-ng=7.2.0 arcsi openblas && \
+#     conda update -c conda-forge --all && \
+#     conda clean --yes -t"
+
+RUN conda create --yes -c conda-forge -n arcsienv python=3.5 libgcc-ng=7.2.0 arcsi openblas
 
 # set gdal paths
 ENV GDAL_DRIVER_PATH /opt/conda/lib/gdalplugins:$GDAL_DRIVER_PATH

@@ -24,10 +24,11 @@ RUN apt-get update && \
 #     conda create --yes -n arcsienv python=3.5
 
 # RUN /bin/bash -c ". activate arcsienv && \
-#     conda install --yes -c conda-forge gdal=2.2.4 libgcc-ng=7.2.0 arcsi openblas && \
+#     conda install --yes -c conda-forge python=3.5 arcsi && \
 #     conda update -c conda-forge --all && \
 #     conda clean --yes -t"
 
+# TEMPORARY FIX FOR CONDA ARCSI BUILD
 RUN conda create --yes -c conda-forge -n arcsienv python=3.5 libgcc-ng=7.2.0 arcsi openblas
 
 # set gdal paths

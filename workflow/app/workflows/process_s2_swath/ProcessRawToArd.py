@@ -11,7 +11,7 @@ from process_s2_swath.GetInputFileInfos import GetInputFileInfos
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
 
-log = logging.getLogger('luigi-interface')
+log = logging.getLogger("luigi-interface")
 
 @requires(BuildFileList, GetInputFileInfos, GetSatelliteAndOrbitNumber)
 class ProcessRawToArd(luigi.Task):
@@ -20,6 +20,9 @@ class ProcessRawToArd(luigi.Task):
     testProcessing = luigi.BoolParameter(default = False)
     
     def run(self):
+        # Create / cleanout output directory
+        common.createDirectory(self.pathRoots["output"])
+
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:
             buildFileListOutput = json.loads(buildFileListFile.read())
@@ -32,7 +35,7 @@ class ProcessRawToArd(luigi.Task):
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
                 self.pathRoots["temp"],
-                self.pathRoots["temp"],
+                self.pathRoots["output"],
                 demFilePath,
                 fileListPath
             )

@@ -13,21 +13,12 @@ from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPatte
 
 log = logging.getLogger('luigi-interface')
 
-@inherits(BuildFileList)
-@inherits(GetInputFileInfos)
-@inherits(GetSatelliteAndOrbitNumber)
+@requires(BuildFileList, GetInputFileInfos, GetSatelliteAndOrbitNumber)
 class ProcessRawToArd(luigi.Task):
     pathRoots = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
-
-    def requires(self):
-        t = []
-        t.append(self.clone(BuildFileList))
-        t.append(self.clone(GetInputFileInfos))
-        t.append(self.clone(GetSatelliteAndOrbitNumber))
-        return t
-
+    
     def run(self):
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:

@@ -12,16 +12,9 @@ from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger('luigi-interface')
 
-@inherits(GetInputFileInfos)
-@inherits(GetSatelliteAndOrbitNumber)
+@requires(GetInputFileInfos, GetSatelliteAndOrbitNumber)
 class BuildFileList(luigi.Task):
     pathRoots = luigi.DictParameter()
-
-    def requires(self):
-        t = []
-        t.append(self.clone(GetInputFileInfos))
-        t.append(self.clone(GetSatelliteAndOrbitNumber))
-        return t
 
     def run(self):
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \

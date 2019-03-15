@@ -45,7 +45,7 @@ class ConvertToTif(luigi.Task):
 
         with self.output().open('w') as o:
             o.write(getFormattedJson(json.dumps({
-                "generatedThumbnails": convertedFileOutput
+                "convertedFiles": convertedFileOutput
             })))
 
     def output(self):

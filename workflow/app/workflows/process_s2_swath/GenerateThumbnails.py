@@ -1,24 +1,40 @@
+import json
 import luigi
 import os
+import process_s2_swath.common as common
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.ConvertToTif import ConvertToTif
+from process_s2_swath.GenerateThumbnail import GenerateThumbnail
 
 @requires(ConvertToTif)
 class GenerateThumbnails(luigi.Task):
     pathRoots = luigi.DictParameter()
 
     def run(self):
-        # TODO: make list of files to create thumbnails for
+        with self.input().open('r') as convertToTifFile:
+            convertToTifJson = json.loads(convertToTifFile)
 
-        # TODO: make thumbnail for images
+            tasks = []
+            # TODO: make list of files to create thumbnails for vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif ...
+            # Only interested in one file right now
+            for filename in filter(lambda x: x.endswith("vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif"), list(convertToTifJson["convertedFiles"])):
+                tasks.append(GenerateThumbnail(pathRoots=self.pathRoots, inputFile=filename))
+            
+            # Make thumbnail for images 
+            yield tasks
 
-        # TODO: check thumbnail(s) have been created
+            generatedThumbnails = []
+
+            # TODO: check thumbnail(s) have been created
+            for task in tasks:
+                generatedThumbnails.append(task.output().fn)
 
         with self.output().open('w') as o:
-            # write out processed file list
-            o.write('some files')
+            o.write(common.getFormattedJson({
+                "generatedThumbnails": generatedThumbnails
+            }))
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'GenerateThumbnails.json')
+        outFile = os.path.join(self.pathRoots["state"], "GenerateThumbnails.json")
         return LocalTarget(outFile)

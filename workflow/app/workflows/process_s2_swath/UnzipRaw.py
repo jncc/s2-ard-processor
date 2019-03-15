@@ -12,9 +12,7 @@ class UnzipRaw(luigi.Task):
 
     def run(self):
         # Create / cleanout extracted folder to store extracted zip files
-        if (os.path.exists(self.pathRoots['extracted'])):
-            self.clearFolder(self.pathRoots['extracted'])
-        self.makePath(self.pathRoots['extracted'])
+        common.createDirectory(self.pathRoots['extracted'])))
 
         # Extract data to extracted folder
         cmd = "arcsiextractdata.py -i {} -o {}" \

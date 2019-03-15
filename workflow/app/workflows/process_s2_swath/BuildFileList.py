@@ -18,9 +18,7 @@ class BuildFileList(luigi.Task):
 
     def run(self):
         # Create / cleanout temporary folder
-        if (os.path.exists(self.pathRoots['temp'])):
-            self.clearFolder(self.pathRoots['temp'])
-        self.makePath(self.pathRoots['temp'])
+        common.createDirectory(self.pathRoots['temp'])
 
         # Build filelist for processing
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \

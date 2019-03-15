@@ -6,13 +6,17 @@ import glob
 import process_s2_swath.common as common
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.PrepareWorkingFolder import PrepareWorkingFolder
 
-@requires(PrepareWorkingFolder)
 class UnzipRaw(luigi.Task):
     pathRoots = luigi.DictParameter()
 
     def run(self):
+        # Create / cleanout extracted folder to store extracted zip files
+        if (os.path.exists(self.pathRoots['extracted'])):
+            self.clearFolder(self.pathRoots['extracted'])
+        self.makePath(self.pathRoots['extracted'])
+
+        # Extract data to extracted folder
         cmd = "arcsiextractdata.py -i {} -o {}" \
             .format(
                 self.pathRoots["input"],

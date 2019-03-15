@@ -4,11 +4,12 @@ from luigi import LocalTarget
 from luigi.util import inherits
 from process_s2_swath.BuildPyramids import BuildPyramids
 from process_s2_swath.GenerateMetadata import GenerateMetadata
+from process_s2_swath.GenerateThumbnails import GenerateThumbnails
 
-@requires(BuildPyramids, GenerateMetadata)
+@requires(BuildPyramids, GenerateMetadata, GenerateThumbnails)
 class TransferArdToOutput(luigi.Task):
     pathRoots = luigi.DictParameter()
-    
+
     def run(self):
         # take the files we want to keep and move them to the output folder
         # files to keep: .tif, .json, and any of our metadata files 

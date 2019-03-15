@@ -8,10 +8,12 @@ import process_s2_swath.GetSatelliteAndOrbitNumber
 import process_s2_swath.BuildFileList
 import process_s2_swath.ProcessRawToArd
 import process_s2_swath.CheckFileExists
-import process_s2_swath.GdalTranslate
+import process_s2_swath.GdalTranslateKeaToTif
 import process_s2_swath.ConvertToTif
 import process_s2_swath.BuildPyramid
 import process_s2_swath.BuildPyramids
 import process_s2_swath.CheckOutputFilesExist
 import process_s2_swath.GenerateMetadata
+import process_s2_swath.GenerateThumbnail
+import process_s2_swath.GenerateThumbnails
 import process_s2_swath.TransferArdToOutput

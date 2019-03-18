@@ -11,7 +11,8 @@ import process_s2_swath.CheckFileExists
 import process_s2_swath.GdalTranslateKeaToTif
 import process_s2_swath.ConvertToTif
 import process_s2_swath.BuildPyramid
-import process_s2_swath.BuildPyramids
+import process_s2_swath.BuildPyramidsAndCalculateStats
+import process_s2_swath.CalculateStats
 import process_s2_swath.CheckOutputFilesExist
 import process_s2_swath.GenerateMetadata
 import process_s2_swath.GenerateThumbnail

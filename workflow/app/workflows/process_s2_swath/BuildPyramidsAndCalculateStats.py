@@ -9,7 +9,7 @@ from process_s2_swath.ConvertToTif import ConvertToTif
 
 
 @requires(ConvertToTif)
-class BuildPyramidsAndStats(luigi.Task):
+class BuildPyramidsAndCalculateStats(luigi.Task):
     pathRoots = luigi.DictParameter()
 
     def run(self):
@@ -33,5 +33,5 @@ class BuildPyramidsAndStats(luigi.Task):
             json.dump(convertToTifJson)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'BuildPyramidsAndStats.json')
+        outFile = os.path.join(self.pathRoots['state'], 'BuildPyramidsAndCalculateStats.json')
         return LocalTarget(outFile)

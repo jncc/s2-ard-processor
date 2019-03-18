@@ -3,7 +3,7 @@ import subprocess
 from luigi import LocalTarget
 from process_s2_swath.CheckFileExists import CheckFileExists
 
-class BuildPyramid(luigi.Task):
+class CalculateStats(luigi.Task):
     pathRoots = luigi.DictParameter()
     inputFile = luigi.Parameter()
 

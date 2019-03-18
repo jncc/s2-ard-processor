@@ -34,8 +34,8 @@ A folder containing the input granule files as zip files directly downloaded fro
 
 A folder containing the static input files for this processing chain, two files will exist here;
 
-    - DEM file - a digital elevation model converted and stored as a KEA file in the required output projection format
-    - Projection WKT - a WKT representation of the request output projection as OGC WKT
+ - DEM file - a digital elevation model converted and stored as a KEA file in the required output projection format
+ - Projection WKT - a WKT representation of the request output projection as OGC WKT
 
 ### state
 
@@ -48,4 +48,3 @@ A folder that will contain the state files for this job, this can be output at t
 `/workflow/output`
 
 A folder that will contain the requested output files, converted to tif with thumbnails, metdata, etc...
-

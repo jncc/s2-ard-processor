@@ -18,6 +18,8 @@ class ProcessRawToArd(luigi.Task):
     pathRoots = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
+    projwkt = luigi.Parameter()
+    projabbv = luigi.Parameter(default = "osgb")
     
     def run(self):
         # Create / cleanout output directory
@@ -28,14 +30,17 @@ class ProcessRawToArd(luigi.Task):
             buildFileListOutput = json.loads(buildFileListFile.read())
 
         demFilePath = os.path.join(self.pathRoots["static"], self.dem)
+        projectionWktPath = os.path.join(self.pathRoots["static"], self.projwkt)
         fileListPath = buildFileListOutput["fileListPath"]
 
         cmd = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA \
-            --interpresamp near --interp cubic -t {} -o {} --projabbv osgb --outwkt /app/BritishNationalGrid.wkt --dem {} \
+            --interpresamp near --interp cubic -t {} -o {} --projabbv {} --outwkt {} --dem {} \
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
                 self.pathRoots["temp"],
                 self.pathRoots["output"],
+                self.projabbv,
+                projectionWktPath,
                 demFilePath,
                 fileListPath
             )
@@ -54,7 +59,7 @@ class ProcessRawToArd(luigi.Task):
             for product in expectedFilePatterns["products"]:
                 for filePattern in product["files"]:
                     testFilename = filePattern.replace("*", "TEST")
-                    testFilepath = os.path.join(self.pathRoots["temp"], testFilename)
+                    testFilepath = os.path.join(self.pathRoots["output"], testFilename)
 
                     if not os.path.exists(testFilepath):
                         with open(testFilepath, "w") as testFile:
@@ -63,7 +68,7 @@ class ProcessRawToArd(luigi.Task):
         tasks = []
         for product in expectedFilePatterns["products"]:
             for filePattern in product["files"]:
-                tasks.append(CheckFileExistsWithPattern(dirPath=self.pathRoots["temp"], pattern=filePattern))
+                tasks.append(CheckFileExistsWithPattern(dirPath=self.pathRoots["output"], pattern=filePattern))
         yield tasks
 
         output = {
@@ -94,19 +99,20 @@ class ProcessRawToArd(luigi.Task):
                 "files": []
             }
 
-            basename = "SEN2_%s_*_%s_ORB%s_*_osgb_" % \
+            basename = "SEN2_%s_*_%s_ORB%s_*%s" % \
                 (
                     product["date"],
                     product["tileId"],
-                    satelliteAndOrbitNoOutput["orbitNumber"]
+                    satelliteAndOrbitNoOutput["orbitNumber"],
+                    self.projectionAbbreviation
                 )
-            productFiles["files"].append(basename + "clouds.tif")
+            productFiles["files"].append(basename + "clouds.kea")
             productFiles["files"].append(basename + "meta.json")
-            productFiles["files"].append(basename + "sat.tif")
-            productFiles["files"].append(basename + "toposhad.tif")
-            productFiles["files"].append(basename + "valid.tif")
-            productFiles["files"].append(basename + "vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif")
-            productFiles["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.tif")
+            productFiles["files"].append(basename + "sat.kea")
+            productFiles["files"].append(basename + "toposhad.kea")
+            productFiles["files"].append(basename + "valid.kea")
+            productFiles["files"].append(basename + "vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea")
+            productFiles["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.kea")
 
             expectedFiles["products"].append(productFiles)
         

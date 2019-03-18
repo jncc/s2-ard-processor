@@ -2,9 +2,9 @@ import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.BuildPyramids import BuildPyramids
+from process_s2_swath.BuildPyramidsAndCalculateStats import BuildPyramidsAndCalculateStats
 
-@requires(BuildPyramids)
+@requires(BuildPyramidsAndCalculateStats)
 class CheckOutputFilesExist(luigi.Task):
     pathRoots = luigi.DictParameter()
 

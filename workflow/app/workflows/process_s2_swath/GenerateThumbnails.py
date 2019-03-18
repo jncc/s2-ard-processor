@@ -4,10 +4,10 @@ import os
 import process_s2_swath.common as common
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.ConvertToTif import ConvertToTif
+from process_s2_swath.CheckOutputFilesExist import CheckOutputFilesExist
 from process_s2_swath.GenerateThumbnail import GenerateThumbnail
 
-@requires(ConvertToTif)
+@requires(CheckOutputFilesExist)
 class GenerateThumbnails(luigi.Task):
     pathRoots = luigi.DictParameter()
 

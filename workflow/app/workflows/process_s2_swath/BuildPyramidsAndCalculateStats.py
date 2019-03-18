@@ -4,7 +4,7 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.BuildPyramid import BuildPyramid
-from process_s2_swath.BuildStats import BuildStats
+from process_s2_swath.CalculateStats import CalculateStats
 from process_s2_swath.ConvertToTif import ConvertToTif
 
 
@@ -22,7 +22,7 @@ class BuildPyramidsAndCalculateStats(luigi.Task):
 
             for filename in convertToTifJson["convertedFiles"]:
                 addoTasks.append(BuildPyramid(pathRoots=self.pathRoots, inputFile=filename))
-                statTasks.append(BuildStats(pathRoots=self.pathRoots, inputFile=filename))
+                statTasks.append(CalculateStats(pathRoots=self.pathRoots, inputFile=filename))
 
             yield addoTasks
             yield statTasks

@@ -74,5 +74,5 @@ Each section (seperated by ------------) is a functional step or (set of steps t
 | GenerateMetadata               |                                 |
 | GenerateThumbnails             | GenerateThumbnail*?             |
 |--------------------------------|---------------------------------|
-| FinalizeOutputs                |                                 |
+| FinaliseOutputs                |                                 |
 

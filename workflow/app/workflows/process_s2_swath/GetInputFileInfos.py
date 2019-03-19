@@ -9,6 +9,28 @@ from process_s2_swath.GetInputFileInfo import GetInputFileInfo
 
 @requires(UnzipRaw)
 class GetInputFileInfos(luigi.Task):
+    """
+    Creates a list of the products that we will be processing and some basic infor extracted from the
+    product name, this will be in the form of;
+
+    {
+        "products": [
+            {
+                "productPath": "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
+                "productName": "S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
+                "date": "20190226",
+                "tileId": "T30UXD"
+            },
+            {
+                "productPath": "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
+                "productName": "S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
+                "date": "20190226",
+                "tileId": "T31UCT"
+            },
+            ...
+        ]
+    }
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):

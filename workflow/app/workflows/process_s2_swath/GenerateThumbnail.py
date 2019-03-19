@@ -6,19 +6,21 @@ from luigi import LocalTarget
 from process_s2_swath.CheckFileExists import CheckFileExists
 
 class GenerateThumbnail(luigi.Task):
-    # Luigi input variables
-    pathRoots = luigi.DictParameter()
-    inputFile = luigi.Parameter()
+    """
+    Creates a thumbnail using the provided input file using gdal_translate
+    to create a jpg version of the input file at the specified output file 
+    path (image will use bands 3,2,1 and output at 5% of original image size)
 
-    # Local variables    
-    outputFile = ""
+    Outputs a LocalTarget pointing at the created output file
+    """
+    # Luigi input variables
+    inputFile = luigi.Parameter()
+    outputFile = luigi.Parameter()
 
     def run(self):
         t = CheckFileExists(self.inputFile)
         yield t
         
-        self.outputFile = "{}.jpg".format(os.path.splitext(self.inputFile)[0])
-
         #'gdal_translate -b 3 -b 2 -b 1 -ot Byte -of JPEG -outsize 5%% 5%% %s %s' % (input_path, output_path)
         cmd = "gdal_translate -of JPEG -ot Byte -outsize 5%% 5%% -b 3 -b 2 -b 1 {} {}".format(self.inputFile, self.outputFile)
         command_line_process = subprocess.Popen(

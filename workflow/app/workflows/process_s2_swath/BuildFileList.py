@@ -14,6 +14,16 @@ log = logging.getLogger('luigi-interface')
 
 @requires(GetInputFileInfos, GetSatelliteAndOrbitNumber)
 class BuildFileList(luigi.Task):
+    """
+    Builds files lists for arcsi to process using the arcsibuildmultifilelists.py command, it
+    iterates over the extracted folder to find all products that can be processed as one and passes
+    them to the the next step to be processed, the output of this step will give a single file, 
+    which is the config for the ProcessToArd step, an example of this is shown below;
+
+    {
+        "fileListPath": "/app/temp/File_Sentinel2B_137_20190226.txt"
+    }
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):

@@ -12,12 +12,50 @@ log = logging.getLogger('luigi-interface')
 
 @requires(CheckOutputFilesExist)
 class ConvertFilesToTif(luigi.Task):
+    """
+    Converts all KEA files into GeoTIFF's, extracts a list of files to convert,
+    and then create a task for each of those files, the scheduler then decides
+    when to run the conversions (upto a limit of workers in this case)
+
+    Outputs for this will be similar to the previous ProcessToArd outputs;
+
+    {
+        "products": [
+            {
+                "productName": "SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
+                "convertedFiles": [
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_clouds.tif",
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_sat.tif",
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_toposhad.tif",
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_valid.tif",
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif",
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif"                    
+                ]
+            },
+            {
+                "productName": "SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
+                "convertedFiles": [
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_clouds.tif",
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_sat.tif",
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_toposhad.tif",
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_valid.tif",
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif",
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif"
+                ]                
+            },
+            ...
+        ]
+    }
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):
 
         with self.input().open('r') as checkOutputFilesExistFile:
             checkOutputFilesExistJson = json.load(checkOutputFilesExistFile)
+            # TODO: This doesn't actually do what its supposed to do anymore pending with changes from previous ProcessToArd step, but we
+            # will need to work with that structure i.e.;
+            # for each product -> extract list of kea files (minus json metadata file) -> convert to tif -> store in final output directory
             filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == 'kea', checkOutputFilesExistJson['files']))
 
             convertTasks = []

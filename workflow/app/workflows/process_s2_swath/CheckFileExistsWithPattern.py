@@ -4,6 +4,16 @@ import glob
 from luigi import LocalTarget
 
 class CheckFileExistsWithPattern(luigi.ExternalTask):
+    """
+    Checks that a file exists as long as it conforms to a certain pattern 
+    provided at initialisation of the task using glob;
+
+    Each pattern MUST only return a single result, otherwise the code will
+    raise an exception, this result must exist on the filepath and have some
+    content (size > 0)
+
+    The task returns a LocalTarget pointing at the file
+    """
     dirPath = luigi.Parameter()
     pattern = luigi.Parameter()
 

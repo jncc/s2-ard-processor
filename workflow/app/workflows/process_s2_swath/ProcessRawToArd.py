@@ -15,6 +15,58 @@ log = logging.getLogger("luigi-interface")
 
 @requires(BuildFileList, GetInputFileInfos, GetSatelliteAndOrbitNumber)
 class ProcessRawToArd(luigi.Task):
+    """
+    Main processing task, takes the input file from the BuildFileList and 
+    processes the raw data pointed to by that file as a single job to ensure
+    there are no edge effects.
+
+    DEM
+    ---
+    The DEM filename needs to be supplied as the `dem` parameter and the file
+    itself needs to be in the defined `static` folder as a KEA file in the
+    correct output projection (not required but beneficial during processing).
+
+    Output Projection
+    -----------------
+    The project of the file can be modified by supplying a different projection
+    represented by an OGC WKT file (filename as projwkt and that file in the 
+    defined `static` folder) as `projwkt` and an abbreviation for that 
+    projection as `projabbv`.
+
+    Returns a list of files that have been output by the process (as KEA files,
+    etc...) in the form of;
+
+    TODO: finalize outputs here currently suggest;
+    {
+        "products": [
+            {
+                "productName": "SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
+                "files": [
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_clouds.kea",
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta.json",
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_sat.kea",
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_toposhad.kea",
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_valid.kea",
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea",
+                    "/app/temp/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.kea"
+                ]
+            },
+            {
+                "productName": "SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
+                "files": [
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_clouds.kea",
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta.json",
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_sat.kea",
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_toposhad.kea",
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_valid.kea",
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea",
+                    "/app/temp/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_vmsk_sharp_rad_srefdem_stdsref.kea"
+                ]
+            },
+            ...
+        ]
+    }
+    """
     pathRoots = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
@@ -23,7 +75,7 @@ class ProcessRawToArd(luigi.Task):
     
     def run(self):
         # Create / cleanout output directory
-        common.createDirectory(self.pathRoots["output"])
+        common.createDirectory(os.path.join(self.pathRoots["temp"], "output"))
 
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:
@@ -38,7 +90,7 @@ class ProcessRawToArd(luigi.Task):
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
                 self.pathRoots["temp"],
-                self.pathRoots["output"],
+                os.path.join(self.pathRoots["temp"], "output"),
                 self.projabbv,
                 projectionWktPath,
                 demFilePath,
@@ -68,7 +120,7 @@ class ProcessRawToArd(luigi.Task):
         tasks = []
         for product in expectedFilePatterns["products"]:
             for filePattern in product["files"]:
-                tasks.append(CheckFileExistsWithPattern(dirPath=self.pathRoots["output"], pattern=filePattern))
+                tasks.append(CheckFileExistsWithPattern(dirPath=os.path.join(self.pathRoots["temp"], "output"), pattern=filePattern))
         yield tasks
 
         output = {
@@ -80,7 +132,17 @@ class ProcessRawToArd(luigi.Task):
         
         # TODO: make this output sensible again? probably more in line with the ExpectedFilePatterns JSON object            
         with self.output().open('w') as o:
-            o.write(common.getFormattedJson(output))
+            #o.write(common.getFormattedJson(output))
+            o.write(common.getFormattedJson(expectedFilePatterns)) # TODO: make a decision here, just have a giant list of files isn't massively helpful later on
+
+    def getBaseNameFromFilename(self, filename):
+        return "SEN2_%s_*_%s_ORB%s_*%s" % \
+            (
+                product["date"],
+                product["tileId"],
+                satelliteAndOrbitNoOutput["orbitNumber"],
+                self.projectionAbbreviation
+            )
 
     def getExpectedFilePatterns(self):
         inputFileInfosOutput = {}

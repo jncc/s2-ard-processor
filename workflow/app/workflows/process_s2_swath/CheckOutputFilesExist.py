@@ -7,6 +7,13 @@ from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
 @requires(ProcessRawToArd)
 class CheckOutputFilesExist(luigi.Task):
+    """
+    Runs after the process raw to ard task? 
+    TODO: Is this actually needed, we check expected file patterns in that
+    step already
+
+    outputs previous step input with outputsExist = True flag?
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):
@@ -20,12 +27,12 @@ class CheckOutputFilesExist(luigi.Task):
             checkFileTasks = []
 
             for outputFilename in processedRawToArdJson["outputFiles"]:
-                checkFileTasks.append(CheckFileExists(pathRoots=self.pathRoots, inputFile=outputFilename))
+                checkFileTasks.append(CheckFileExists(inputFile=outputFilename))
 
             yield checkFileTasks
 
             for task in checkFileTasks:
-                # TODO: do something?        
+                # TODO: do something?
 
         with self.output().open('w') as o:
             # write out input file list

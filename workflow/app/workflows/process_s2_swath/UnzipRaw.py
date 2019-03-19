@@ -8,6 +8,18 @@ from luigi import LocalTarget
 from luigi.util import requires
 
 class UnzipRaw(luigi.Task):
+    """
+    Unzips all zip files inside a given folder using the arcsiextractdata.py command,
+    creates a list of extracted products and outputs to the following standard;
+
+    {
+        "products": [
+            "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
+            "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
+            "..."
+        ]
+    }
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):
@@ -32,7 +44,7 @@ class UnzipRaw(luigi.Task):
         }
 
         with self.output().open('w') as o:
-            o.write(common.getFormattedJson(output))
+            json.dump(output, o)
     
     def output(self):
         outFile = os.path.join(self.pathRoots['state'], 'UnzipRaw.json')

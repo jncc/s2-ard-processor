@@ -9,6 +9,19 @@ from process_s2_swath.UnzipRaw import UnzipRaw
 
 @requires(UnzipRaw)
 class GetSatelliteAndOrbitNumber(luigi.Task):
+    """
+    Extracts the satellite and orbit number of the incomming products (only 
+    extractsthe first product in the list as they MUST all be the same)
+
+    TODO: Enforce check that all files have the same satellite and orbit?
+
+    This returns an limited extraction of the raw product metadata in the form;
+    
+    {
+        "satelliteNumber": "2B",
+        "orbitNumber": "137"
+    }
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):

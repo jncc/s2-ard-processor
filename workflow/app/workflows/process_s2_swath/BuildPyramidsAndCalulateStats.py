@@ -4,8 +4,14 @@ from luigi import LocalTarget
 from process_s2_swath.CheckFileExists import CheckFileExists
 
 class BuildPyramidsAndCalulateStats(luigi.Task):
+    """
+    Runs an RSGISLib helper function to populate image stats and build pyramids
+    in a converted GeoTIFF file.
+
+    Outputs a LocalTarget pointing at the optimised GeoTIFF intput path (will
+    be the same file path)
+    """
     pathRoots = luigi.DictParameter()
-    pyramidLevels = luigi.Parameter()
     inputFile = luigi.Parameter()
 
     def run(self):

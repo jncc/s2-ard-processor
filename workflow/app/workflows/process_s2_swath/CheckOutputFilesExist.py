@@ -3,9 +3,9 @@ import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.OptimiseFiles import OptimiseFiles
+from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
-@requires(OptimiseFiles)
+@requires(ProcessRawToArd)
 class CheckOutputFilesExist(luigi.Task):
     pathRoots = luigi.DictParameter()
 
@@ -14,12 +14,12 @@ class CheckOutputFilesExist(luigi.Task):
         #  for each file
         #    create task to check file
         #  yield to tasks
-        with self.input().open("r") as optimisedFilesFile:
-            optimisedFilesJson = json.read(optimisedFilesFile)
+        with self.input().open("r") as processedRawToArdFile:
+            processedRawToArdJson = json.read(processedRawToArdFile)
 
             checkFileTasks = []
 
-            for outputFilename in optimisedFilesJson["convertedFiles"]:
+            for outputFilename in processedRawToArdJson["outputFiles"]:
                 checkFileTasks.append(CheckFileExists(pathRoots=self.pathRoots, inputFile=outputFilename))
 
             yield checkFileTasks

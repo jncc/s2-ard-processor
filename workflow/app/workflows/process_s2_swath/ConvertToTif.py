@@ -5,20 +5,20 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.common import getFormattedJson
-from process_s2_swath.ProcessRawToArd import ProcessRawToArd
+from process_s2_swath.CheckOutputFilesExist import CheckOutputFilesExist
 from process_s2_swath.GdalTranslateKeaToTif import GdalTranslateKeaToTif
 
 log = logging.getLogger('luigi-interface')
 
-@requires(ProcessRawToArd)
-class ConvertToTif(luigi.Task):
+@requires(CheckOutputFilesExist)
+class ConvertFilesToTif(luigi.Task):
     pathRoots = luigi.DictParameter()
 
     def run(self):
 
-        with self.input().open('r') as processRawToArdFile:
-            processRawToArdJson = json.load(processRawToArdFile)
-            filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == 'kea', processRawToArdJson['files']))
+        with self.input().open('r') as checkOutputFilesExistFile:
+            checkOutputFilesExistJson = json.load(checkOutputFilesExistFile)
+            filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == 'kea', checkOutputFilesExistJson['files']))
 
             convertTasks = []
             for filename in filesToConvert:

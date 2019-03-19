@@ -77,7 +77,8 @@ class ProcessRawToArd(luigi.Task):
 
         for task in tasks:
             output["files"].append(task.output().fn)
-            
+        
+        # TODO: make this output sensible again? probably more in line with the ExpectedFilePatterns JSON object            
         with self.output().open('w') as o:
             o.write(common.getFormattedJson(output))
 

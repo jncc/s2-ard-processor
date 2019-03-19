@@ -7,7 +7,6 @@ from process_s2_swath.BuildPyramidsAndCalulateStats import BuildPyramidsAndCalul
 from process_s2_swath.CalculateStats import CalculateStats
 from process_s2_swath.ConvertToTif import ConvertToTif
 
-
 @requires(ConvertToTif)
 class OptimiseFiles(luigi.Task):
     pathRoots = luigi.DictParameter()

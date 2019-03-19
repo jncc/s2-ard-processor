@@ -2,12 +2,12 @@ import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import inherits
-from process_s2_swath.BuildPyramidsAndCalculateStats import BuildPyramidsAndCalculateStats
+from process_s2_swath.OptimiseFiles import OptimiseFiles
 from process_s2_swath.GenerateMetadata import GenerateMetadata
 from process_s2_swath.GenerateThumbnails import GenerateThumbnails
 
-@requires(BuildPyramidsAndCalculateStats, GenerateMetadata, GenerateThumbnails)
-class TransferArdToOutput(luigi.Task):
+@requires(OptimiseFiles, GenerateMetadata, GenerateThumbnails)
+class FinaliseOutputs(luigi.Task):
     pathRoots = luigi.DictParameter()
 
     def run(self):

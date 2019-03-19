@@ -3,13 +3,13 @@ import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.BuildPyramid import BuildPyramid
+from process_s2_swath.BuildPyramidsAndCalulateStats import BuildPyramidsAndCalulateStats
 from process_s2_swath.CalculateStats import CalculateStats
 from process_s2_swath.ConvertToTif import ConvertToTif
 
 
 @requires(ConvertToTif)
-class BuildPyramidsAndCalculateStats(luigi.Task):
+class OptimiseFiles(luigi.Task):
     pathRoots = luigi.DictParameter()
 
     def run(self):
@@ -17,15 +17,12 @@ class BuildPyramidsAndCalculateStats(luigi.Task):
         with self.input().open("r") as convertToTifFile:
             convertToTifJson = json.load(convertToTifFile)
 
-            addoTasks = []
-            statTasks = []
+            optimiseTasks = []
 
             for filename in convertToTifJson["convertedFiles"]:
-                addoTasks.append(BuildPyramid(pathRoots=self.pathRoots, inputFile=filename))
-                statTasks.append(CalculateStats(pathRoots=self.pathRoots, inputFile=filename))
+                optimiseTasks.append(BuildPyramidsAndCalulateStats(pathRoots=self.pathRoots, inputFile=filename))
 
-            yield addoTasks
-            yield statTasks
+            yield optimiseTasks
 
         with self.output().open('w') as o:
             convertToTifJson["builtPyramids"] = True
@@ -33,5 +30,5 @@ class BuildPyramidsAndCalculateStats(luigi.Task):
             json.dump(convertToTifJson)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'BuildPyramidsAndCalculateStats.json')
+        outFile = os.path.join(self.pathRoots['state'], 'OptimiseFiles.json')
         return LocalTarget(outFile)

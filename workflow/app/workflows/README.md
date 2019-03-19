@@ -75,3 +75,22 @@ Each section (seperated by ------------) is a functional step or (set of steps t
 |--------------------------------|---------------------------------|
 | FinaliseOutputs                |                                 |
 
+## Calling the workflow (job-specs) - subject to change
+
+Given a 'complete' swath we should be able to start up multiple jobs at the same time with little effort, so assuming a complete swath we can generate a job-spec to run this in a production environment
+
+```json
+{
+    "product": "name-of-product [can just be a process time name or id for the job]",
+    "processor": "name-of-processor [i.e. jncc/s2-ard-process@0.0.1]",
+    "input-path": [
+        "a list of paths for each of the raw data files that are needed for this process to run",
+        "may be already local to a machine, but the instigator of the job should move these files",
+        "so that they are accessible as a folder mount to a docker container",
+        "x",
+        "y",
+        "z"
+    ],
+    "attempted": "0 # Count of the number of attempts have been made to process this product"
+}
+```

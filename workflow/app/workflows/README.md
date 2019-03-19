@@ -53,26 +53,26 @@ A folder that will contain the requested output files, converted to tif with thu
 
 Each section (seperated by ------------) is a functional step or (set of steps that can be run concurrently) that depends on the task in the above section giving a sort of dependency graph
 
-| Task                           | Spawns (one or more*)      |
-|--------------------------------|----------------------------|
-| UnzipRaw                       |                            |
-|--------------------------------|----------------------------|
-| GetInputFileInfos              | GetInfputFileInfo*         |
-| GetSatelliteAndOrbitNumber     |                            |
-|--------------------------------|----------------------------|
-| BuildFileList                  |                            |
-|--------------------------------|----------------------------|
-| ProcessRawToArd                | CheckFileExistsWithPattern*|
-|--------------------------------|----------------------------|
-| ConvertToTif                   | GdalTranslateKeaToTif*     |
-|--------------------------------|----------------------------|
-| BuildPyramidsAndCalculateStats | BuildPyramids*             |
-|                                | CalculateStats*            |
-|--------------------------------|----------------------------|
-| CheckOutputFilesExist          | ?                          |
-|--------------------------------|----------------------------|
-| GenerateMetadata               |                            |
-| GenerateThumbnails             | GenerateThumbnail*?        |
-|--------------------------------|----------------------------|
-| FinalizeOutputs                |                            |
+| Task                           | Spawns (one or more*)           |
+|--------------------------------|---------------------------------|
+| UnzipRaw                       |                                 |
+|--------------------------------|---------------------------------|
+| GetInputFileInfos              | GetInfputFileInfo*              |
+| GetSatelliteAndOrbitNumber     |                                 |
+|--------------------------------|---------------------------------|
+| BuildFileList                  |                                 |
+|--------------------------------|---------------------------------|
+| ProcessRawToArd                | CheckFileExistsWithPattern*     |
+|--------------------------------|---------------------------------|
+| ConvertToTif                   | GdalTranslateKeaToTif*          |
+|--------------------------------|---------------------------------|
+| OptimiseOutputs                | BuildPyramidsAndCalculateStats* |
+|                                |                                 |
+|--------------------------------|---------------------------------|
+| CheckOutputFilesExist          | ?                               |
+|--------------------------------|---------------------------------|
+| GenerateMetadata               |                                 |
+| GenerateThumbnails             | GenerateThumbnail*?             |
+|--------------------------------|---------------------------------|
+| FinalizeOutputs                |                                 |
 

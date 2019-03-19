@@ -48,3 +48,31 @@ A folder that will contain the state files for this job, this can be output at t
 `/workflow/output`
 
 A folder that will contain the requested output files, converted to tif with thumbnails, metdata, etc...
+
+## Task Dependencies
+
+Each section (seperated by ------------) is a functional step or (set of steps that can be run concurrently) that depends on the task in the above section giving a sort of dependency graph
+
+| Task                           | Spawns (one or more*)           |
+|--------------------------------|---------------------------------|
+| UnzipRaw                       |                                 |
+|--------------------------------|---------------------------------|
+| GetInputFileInfos              | GetInfputFileInfo*              |
+| GetSatelliteAndOrbitNumber     |                                 |
+|--------------------------------|---------------------------------|
+| BuildFileList                  |                                 |
+|--------------------------------|---------------------------------|
+| ProcessRawToArd                | CheckFileExistsWithPattern*     |
+|--------------------------------|---------------------------------|
+| ConvertToTif                   | GdalTranslateKeaToTif*          |
+|--------------------------------|---------------------------------|
+| OptimiseOutputs                | BuildPyramidsAndCalculateStats* |
+|                                |                                 |
+|--------------------------------|---------------------------------|
+| CheckOutputFilesExist          | ?                               |
+|--------------------------------|---------------------------------|
+| GenerateMetadata               |                                 |
+| GenerateThumbnails             | GenerateThumbnail*?             |
+|--------------------------------|---------------------------------|
+| FinaliseOutputs                |                                 |
+

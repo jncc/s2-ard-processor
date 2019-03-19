@@ -1,10 +1,11 @@
+import json
 import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.BuildPyramidsAndCalculateStats import BuildPyramidsAndCalculateStats
+from process_s2_swath.OptimiseFiles import OptimiseFiles
 
-@requires(BuildPyramidsAndCalculateStats)
+@requires(OptimiseFiles)
 class CheckOutputFilesExist(luigi.Task):
     pathRoots = luigi.DictParameter()
 
@@ -13,13 +14,25 @@ class CheckOutputFilesExist(luigi.Task):
         #  for each file
         #    create task to check file
         #  yield to tasks
+        with self.input().open("r") as optimisedFilesFile:
+            optimisedFilesJson = json.read(optimisedFilesFile)
+
+            checkFileTasks = []
+
+            for outputFilename in optimisedFilesJson["convertedFiles"]:
+                checkFileTasks.append(CheckFileExists(pathRoots=self.pathRoots, inputFile=outputFilename))
+
+            yield checkFileTasks
+
+            for task in checkFileTasks:
+                # TODO: do something?        
 
         with self.output().open('w') as o:
             # write out input file list
-            o.write('some files')
+            optimisedFilesJson["outputsExist"] = True
+            json.dump(optimisedFilesJson, o)
 
     def output(self):
         # some loigc to determin actual arcsi filelist file name
-
         outFile = os.path.join(self.pathRoots['state'], 'CheckOutputFilesExist.json')
         return LocalTarget(outFile)

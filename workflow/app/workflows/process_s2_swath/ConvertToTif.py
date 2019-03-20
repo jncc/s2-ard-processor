@@ -5,12 +5,12 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.common import getFormattedJson
-from process_s2_swath.CheckOutputFilesExist import CheckOutputFilesExist
 from process_s2_swath.GdalTranslateKeaToTif import GdalTranslateKeaToTif
+from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
 log = logging.getLogger('luigi-interface')
 
-@requires(CheckOutputFilesExist)
+@requires(ProcessRawToArd)
 class ConvertFilesToTif(luigi.Task):
     """
     Converts all KEA files into GeoTIFF's, extracts a list of files to convert,

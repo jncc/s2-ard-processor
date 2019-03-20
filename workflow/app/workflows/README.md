@@ -64,13 +64,11 @@ Each section (seperated by ------------) is a functional step or (set of steps t
 |--------------------------------|---------------------------------|
 | ProcessRawToArd                | CheckFileExistsWithPattern*     |
 |--------------------------------|---------------------------------|
-| CheckOutputFilesExist          | CheckFileExists*                |
-|--------------------------------|---------------------------------|
 | ConvertToTif                   | GdalTranslateKeaToTif*          |
 |--------------------------------|---------------------------------|
 | OptimiseOutputs                | BuildPyramidsAndCalculateStats* |
-|--------------------------------|---------------------------------|
 | GenerateMetadata               | GenerateProductMetadata*        |
+|--------------------------------|---------------------------------|
 | GenerateThumbnails             | GenerateThumbnail*?             |
 |--------------------------------|---------------------------------|
 | FinaliseOutputs                |                                 |

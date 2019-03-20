@@ -8,6 +8,13 @@ from process_s2_swath.GenerateThumbnails import GenerateThumbnails
 
 @requires(OptimiseFiles, GenerateMetadata, GenerateThumbnails)
 class FinaliseOutputs(luigi.Task):
+    """
+    Cleanup and other work should go here, or this is just a pseudo task at the
+    end of the chain potentially?
+
+    TODO: Need to work the sensor back into the naming convention at some point
+    i.e. SEN2A... / SEN2B ....
+    """
     pathRoots = luigi.DictParameter()
 
     def run(self):

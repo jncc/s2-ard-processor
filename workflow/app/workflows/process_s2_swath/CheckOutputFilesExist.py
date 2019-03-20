@@ -9,8 +9,8 @@ from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 class CheckOutputFilesExist(luigi.Task):
     """
     Runs after the process raw to ard task? 
-    TODO: Is this actually needed, we check expected file patterns in that
-    step already
+    TODO: Is this actually needed, we check expected file patterns in the
+    previous step already
 
     outputs previous step input with outputsExist = True flag?
     """

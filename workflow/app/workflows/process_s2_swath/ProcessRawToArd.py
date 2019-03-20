@@ -75,7 +75,8 @@ class ProcessRawToArd(luigi.Task):
     
     def run(self):
         # Create / cleanout output directory
-        common.createDirectory(os.path.join(self.pathRoots["temp"], "output"))
+        tempOutdir = os.path.join(self.pathRoots["temp"], "output")
+        common.createDirectory(tempOutdir)
 
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:
@@ -90,7 +91,7 @@ class ProcessRawToArd(luigi.Task):
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
                 self.pathRoots["temp"],
-                os.path.join(self.pathRoots["temp"], "output"),
+                tempOutdir,
                 self.projabbv,
                 projectionWktPath,
                 demFilePath,
@@ -111,7 +112,7 @@ class ProcessRawToArd(luigi.Task):
             for product in expectedFilePatterns["products"]:
                 for filePattern in product["files"]:
                     testFilename = filePattern.replace("*", "TEST")
-                    testFilepath = os.path.join(self.pathRoots["output"], testFilename)
+                    testFilepath = os.path.join(tempOutdir, testFilename)
 
                     if not os.path.exists(testFilepath):
                         with open(testFilepath, "w") as testFile:
@@ -120,7 +121,7 @@ class ProcessRawToArd(luigi.Task):
         tasks = []
         for product in expectedFilePatterns["products"]:
             for filePattern in product["files"]:
-                tasks.append(CheckFileExistsWithPattern(dirPath=os.path.join(self.pathRoots["temp"], "output"), pattern=filePattern))
+                tasks.append(CheckFileExistsWithPattern(dirPath=os.path.join(tempOutdir, pattern=filePattern))
         yield tasks
 
         output = {

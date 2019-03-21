@@ -51,12 +51,12 @@ class ConvertFilesToTif(luigi.Task):
 
     def run(self):
 
-        with self.input().open('r') as checkOutputFilesExistFile:
-            checkOutputFilesExistJson = json.load(checkOutputFilesExistFile)
+        with self.input().open('r') as processRawToArdFile:
+            processRawToArdJson = json.load(processRawToArdFile)
             # TODO: This doesn't actually do what its supposed to do anymore pending with changes from previous ProcessToArd step, but we
             # will need to work with that structure i.e.;
             # for each product -> extract list of kea files (minus json metadata file) -> convert to tif -> store in final output directory
-            filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == 'kea', checkOutputFilesExistJson['files']))
+            filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == 'kea', processRawToArdJson['files']))
 
             convertTasks = []
             for filename in filesToConvert:

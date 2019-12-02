@@ -3,16 +3,16 @@ import os
 import subprocess
 import logging
 import json
-import process_s2_swath.common as common
+import .common as common
 from luigi import LocalTarget
 from luigi.util import inherits
-from process_s2_swath.GetInputFileInfos import GetInputFileInfos
-from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.CheckFileExists import CheckFileExists
+from .GetInputFileInfos import GetSwathInfo
+from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
+from .CheckFileExists import CheckFileExists
 
 log = logging.getLogger('luigi-interface')
 
-@requires(GetInputFileInfos, GetSatelliteAndOrbitNumber)
+@requires(GetSwathInfo, GetSatelliteAndOrbitNumber)
 class BuildFileList(luigi.Task):
     """
     Builds files lists for arcsi to process using the arcsibuildmultifilelists.py command, it
@@ -25,6 +25,18 @@ class BuildFileList(luigi.Task):
     }
     """
     pathRoots = luigi.DictParameter()
+
+    def getOutputFileName(self):
+        with self.input()[0].open('r') as swathInfoFile, \
+            self.input()[1].open('r') as satelliteAndOrbitNoFile:
+            swathInfo = json.loads(swathInfoFile.read())
+            getSatelliteAndOrbitNoOutput = json.loads(satelliteAndOrbitNoFile.read())
+
+        basename = "File_Sentinel"
+        satelliteLetter = getSatelliteAndOrbitNoOutput["satelliteNumber"]
+        date = swathInfo["products"][0]["date"] # date should be the same for all
+
+        return basename + satelliteLetter + "_" + date + ".txt"
 
     def run(self):
         # Create / cleanout temporary folder
@@ -54,20 +66,8 @@ class BuildFileList(luigi.Task):
         }
 
         with self.output().open('w') as o:
-            o.write(common.getFormattedJson(output))
-
-    def getOutputFileName(self):
-        with self.input()[0].open('r') as inputFileInfosFile, \
-            self.input()[1].open('r') as satelliteAndOrbitNoFile:
-            getInputFileInfosOutput = json.loads(inputFileInfosFile.read())
-            getSatelliteAndOrbitNoOutput = json.loads(satelliteAndOrbitNoFile.read())
-
-        basename = "File_Sentinel"
-        satelliteLetter = getSatelliteAndOrbitNoOutput["satelliteNumber"]
-        date = getInputFileInfosOutput["products"][0]["date"] # date should be the same for all
-
-        return basename + satelliteLetter + "_" + date + ".txt"
-
+            json.dump(output, o, indent=4)
+            
     def output(self):
         outFile = os.path.join(self.pathRoots['state'], "BuildFileList.json")
         return LocalTarget(outFile)

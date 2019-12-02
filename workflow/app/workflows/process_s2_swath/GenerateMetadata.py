@@ -3,9 +3,10 @@ import luigi
 import os
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.CheckFileExists import CheckFileExists
-from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
-from process_s2_swath.ProcessRawToArd import ProcessRawToArd
+from functional import seq
+from .CheckFileExistsWithPattern import CheckFileExists
+from .GenerateProductMetadata import GenerateProductMetadata
+from .ProcessRawToArd import ProcessRawToArd
 
 @requires(ProcessRawToArd)
 class GenerateMetadata(luigi.Task):
@@ -41,28 +42,52 @@ class GenerateMetadata(luigi.Task):
     }
     """
     pathRoots = luigi.DictParameter()
+    metadataTemplatePath = luigi.Parameter()
+    metadataConfigPath = luigi.Parameter()
 
     def run(self):
-        with self.input().open("r") as outputFile:
-            outputFileJson = json.read(outputFile)
+        processRawToArdInfo = {}
+        with self.input().open("r") as ProcessRawToArd:
+            processRawToArdInfo = json.load(ProcessRawToArd)
 
-            generateMetadataTasks = []
+        getConfigTask = CheckFileExists(filePath=self.metadataConfigPath)
 
-            # make metadata file/(s) per product?
-            for output in outputFileJson["convertedFiles"]:
-                # TODO: Generate metadata task?
-                generateMetadataTasks.append(GenerateProductMetadata(pathRoots=self.pathRoots, inputProduct=output))
+        yield getConfigTask
 
-            yield generateMetadataTasks
+        metadataConfig = {}
+        with getConfigTask.open('r') as m:
+            metadataConfig = json.load(m)
 
-            for task in generateMetadataTasks:
-                # TODO: do something?
+        getTemplateTask = CheckFileExists(filePath=self.metadataTemplatePath)
 
+        metadataTemplate = ""
+
+        with getTemplateTask.open('r') as t:
+            metadataTemplate = t.read()
+
+        generateMetadataTasks = []
+
+        # make metadata file/(s) per product?
+        for output in processRawToArdInfo["products"]:
+            generateMetadataTasks.append(GenerateProductMetadata(pathRoots=self.pathRoots, 
+            inputProduct=output, 
+            metadataConfig=metadataConfig,
+            metadataTemplate=metadataTemplate))
+
+        yield generateMetadataTasks
+
+        products = []
+        for task in generateMetadataTasks:
+            with task.open('r') as productInfo:
+                products.append(json.load(productInfo))
+        
+        output = {
+            "products" : products
+        }
+            
         with self.output().open('w') as o:
-            outputFileJson["generatedMetadata"] = True # TODO: per product more fine grained handling?
-            json.dump(outputFileJson, o)
+            json.dump(output, o)
 
     def output(self):
-        # some loigc to determin actual arcsi filelist file name
-        outFile = os.path.join(self.pathRoots['state'], 'generatedMetadata.json')
+        outFile = os.path.join(self.pathRoots['state'], 'GenerateMetadata.json')
         return LocalTarget(outFile)

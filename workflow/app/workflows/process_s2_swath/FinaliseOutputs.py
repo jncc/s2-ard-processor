@@ -1,19 +1,20 @@
 import luigi
 import os
+import shutil
+import json
 from luigi import LocalTarget
 from luigi.util import inherits
-from process_s2_swath.OptimiseFiles import OptimiseFiles
-from process_s2_swath.GenerateMetadata import GenerateMetadata
-from process_s2_swath.GenerateThumbnails import GenerateThumbnails
+from functional import seq
+from .OptimiseFiles import OptimiseFiles
+from .GenerateMetadata import GenerateMetadata
+from .CreateCOGs import CreateCOGs
 
-@requires(OptimiseFiles, GenerateMetadata, GenerateThumbnails)
+log = logging.getLogger('luigi-interface')
+
+@requires(GenerateMetadata, CreateCOGs)
 class FinaliseOutputs(luigi.Task):
     """
-    Cleanup and other work should go here, or this is just a pseudo task at the
-    end of the chain potentially?
-
-    TODO: Need to work the sensor back into the naming convention at some point
-    i.e. SEN2A... / SEN2B ....
+    Cleanup and other work should go here
     """
     pathRoots = luigi.DictParameter()
 
@@ -21,13 +22,54 @@ class FinaliseOutputs(luigi.Task):
         # take the files we want to keep and move them to the output folder
         # files to keep: .tif, .json, and any of our metadata files 
         # e.g. http://gws-access.ceda.ac.uk/public/defra_eo/sentinel/2/processed/ard/SEPA/
+        meta = {}
+        with self.input()[0].open('r') as gm:
+            meta = json.load(gm)
+
+        cogs = {}
+        with self.input()[0].open('r') as c:
+            cogs = json.load(c)
+
+        # Combine metadata and products 
+        productList = seq(cogs["products"]) \
+                    .map(lambda x: (x["productName"], x["files"])) \
+                    .join(
+                        seq(meta["products"]) \
+                        .map(lambda x: (x["productName"], x["files"]))) \
+                    .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten()}) \
+                    .to_list()
+
+        # Move products to output
+        log.info("Moving products to output folder {}".format(self.pathRoots["output"]))
+
+        outputList = []
+
+        for product in productList:
+            outputProduct = {
+                "productName" : product["productName"],
+                "files" : []
+            }
+
+            copyList = seq(product["files"]) \
+                .map(lambda f: (f, f.replace(self.pathRoots["temp"], self.pathRoots["output"])))
+
+            for c in copyList:
+                targetPath = os.path.dirname(c[1])
+                
+                if not os.path.exists(targetPath):
+                    os.makedirs(targetPath)
+
+                shutil.copy(c[0], c[1])
+
+                outputProduct["files"].append(c[1])
+
+            outputList.append[outputProduct]
+                
+        output = {"products": outputList}
 
         with self.output().open('w') as o:
-            # write out input file list
-            o.write('some files')
+            json.dump(output, o)
 
     def output(self):
-        # some loigc to determin actual arcsi filelist file name
-
-        outFile = os.path.join(self.pathRoots['state'], 'TransferArdToOutput.json')
+        outFile = os.path.join(self.pathRoots['state'], 'FinaliseOutputs.json')
         return LocalTarget(outFile)

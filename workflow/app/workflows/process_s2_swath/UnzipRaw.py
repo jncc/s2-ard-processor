@@ -1,9 +1,10 @@
 import luigi
 import os
+import shutil
 import subprocess
 import json
 import glob
-import process_s2_swath.common as common
+import .common as common
 from luigi import LocalTarget
 from luigi.util import requires
 
@@ -24,7 +25,7 @@ class UnzipRaw(luigi.Task):
 
     def run(self):
         # Create / cleanout extracted folder to store extracted zip files
-        common.createDirectory(self.pathRoots['extracted'])))
+        common.createDirectory(self.pathRoots['extracted'])
 
         # Extract data to extracted folder
         cmd = "arcsiextractdata.py -i {} -o {}" \
@@ -37,6 +38,12 @@ class UnzipRaw(luigi.Task):
             stderr=subprocess.STDOUT,
             shell=True)
 
+        # Move any folders to extracted
+        for f in [dI for dI in os.listdir(self.pathRoots["input"]) if os.path.isdir(os.path.join(self.pathRoots["input"],dI))]:
+            src = os.path.join(self.pathRoots["input"], f)
+            dst = os.path.join(self.pathRoots["extracted"], f)
+            shutil.copytree(src, dst)
+
         extractedProducts = glob.glob(os.path.join(self.pathRoots["extracted"], "*"))
 
         output = {
@@ -44,7 +51,7 @@ class UnzipRaw(luigi.Task):
         }
 
         with self.output().open('w') as o:
-            json.dump(output, o)
+            json.dump(output, o, indent=4)
     
     def output(self):
         outFile = os.path.join(self.pathRoots['state'], 'UnzipRaw.json')

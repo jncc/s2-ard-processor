@@ -3,7 +3,7 @@ import os
 import shutil
 import json
 from luigi import LocalTarget
-from luigi.util import inherits
+from luigi.util import requires
 from functional import seq
 from .OptimiseFiles import OptimiseFiles
 from .GenerateMetadata import GenerateMetadata
@@ -39,6 +39,8 @@ class FinaliseOutputs(luigi.Task):
                     .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten()}) \
                     .to_list()
 
+        # Rename Files
+        # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
         # Move products to output
         log.info("Moving products to output folder {}".format(self.pathRoots["output"]))
 

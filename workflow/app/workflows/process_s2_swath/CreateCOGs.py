@@ -7,11 +7,11 @@ from luigi.util import requires
 from functional import seq
 from .common import getFormattedJson
 from .CreateCOG import CreateCOG
-from .ProcessRawToArd import ProcessRawToArd
+from .CheckArdProducts import CheckArdProducts
 
 log = logging.getLogger('luigi-interface')
 
-@requires(ProcessRawToArd)
+@requires(CheckArdProducts)
 class CreateCOGs(luigi.Task):
     """
     Converts all KEA files into GeoTIFF's, extracts a list of files to convert,

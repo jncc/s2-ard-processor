@@ -6,7 +6,7 @@ import logging
 import glob
 import .common as common
 from luigi import LocalTarget
-from luigi.util import inherits
+from luigi.util import requires
 from .BuildFileList import BuildFileList
 from .GetInputFileInfos import GetSwathInfo
 from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
@@ -76,23 +76,7 @@ class ProcessRawToArd(luigi.Task):
     outWkt = luigi.Parameter()
     projAbbv = luigi.Parameter()
 
-    def checkFiles(self, dirPath, pattern):
-        #TODO: Should this raise log
-        filePattern = os.path.join(dirPath, pattern)
-        matchingFiles = glob.glob(filePattern)
-        result = True
 
-        if not len(matchingFiles) == 1:
-            log.error("ARD processing error, found more than one file for pattern " + pattern)
-            result = False
-        if not os.path.isfile(matchingFiles[0]):
-            log.error("ARD processing error, " + matchingFiles[0] + " is not a file")
-            result = False
-        if not os.path.getsize(matchingFiles[0]) > 0:
-            log.error("ARD processing error, file size is 0 for " + matchingFiles[0])
-            result = False
-
-        return result
 
     def getBaseNameFromFilename(self, filename):
         return "SEN2_%s_*_%s_ORB%s_*%s" % \
@@ -103,23 +87,24 @@ class ProcessRawToArd(luigi.Task):
                 self.projAbbv
             )
 
-    def getExpectedFilePatterns(self):
+    def getExpectedProductFilePatterns(self, outDir):
         swathInfo = {}
         satelliteAndOrbitNoOutput = {}
         with self.input()[1].open('r') as swathInfoFile, \
             self.input()[2].open('r') as satelliteAndOrbitNoFile:
-            swathInfo = json.loads(swathInfoFile.read())
-            satelliteAndOrbitNoOutput = json.loads(satelliteAndOrbitNoFile.read())
+            swathInfo = json.load(swathInfoFile)
+            satelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
 
-        expectedFiles = {
+        expectedProducts = {
             "products": []
         }
 
         for product in swathInfo["products"]:
-            productFiles = {
+            expected = {
                 "productName": product["productName"],
                 "files": []
             }
+
 
             basename = "SEN2_%s_*_%s_ORB%s_*%s" % \
                 (
@@ -128,17 +113,20 @@ class ProcessRawToArd(luigi.Task):
                     satelliteAndOrbitNoOutput["orbitNumber"],
                     self.projectionAbbreviation
                 )
-            productFiles["files"].append(basename + "clouds.kea")
-            productFiles["files"].append(basename + "meta.json")
-            productFiles["files"].append(basename + "sat.kea")
-            productFiles["files"].append(basename + "toposhad.kea")
-            productFiles["files"].append(basename + "valid.kea")
-            productFiles["files"].append(basename + "vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea")
-            productFiles["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.kea")
 
-            expectedFiles["products"].append(productFiles)
+            basename = os.path.join(outDir, basename)
+
+            expected["files"].append(basename + "clouds.kea")
+            expected["files"].append(basename + "meta.json")
+            expected["files"].append(basename + "sat.kea")
+            expected["files"].append(basename + "toposhad.kea")
+            expected["files"].append(basename + "valid.kea")
+            expected["files"].append(basename + "vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea")
+            expected["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.kea")
+
+            expectedProducts["products"].append(expected)
         
-        return expectedFiles
+        return expectedProducts
 
     def run(self):
         # Create / cleanout output directory
@@ -147,7 +135,7 @@ class ProcessRawToArd(luigi.Task):
 
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:
-            buildFileListOutput = json.loads(buildFileListFile.read())
+            buildFileListOutput = json.load(buildFileListFile)
 
         demFilePath = os.path.join(self.pathRoots["static"], self.dem)
         projectionWktPath = os.path.join(self.pathRoots["static"], self.projectionOptions["wkt"])
@@ -165,7 +153,7 @@ class ProcessRawToArd(luigi.Task):
                 fileListPath
             )
 
-        expectedFilePatterns = self.getExpectedFilePatterns()
+        expectedProducts = self.getExpectedProductFilePatterns(tempOutdir)
         if not self.testProcessing:
             try:
                 log.info("Running cmd: " + cmd)
@@ -175,9 +163,10 @@ class ProcessRawToArd(luigi.Task):
                 log.error(errStr)
                 raise RuntimeError(errStr)
         else:
+            #TODO: this needs refactoring to an external command that creats mock files
             log.info("Generating mock output files")
-            for product in expectedFilePatterns["products"]:
-                for filePattern in product["files"]:
+            for expectedProduct in expectedProducts["products"]:
+                for filePattern in expectedProduct["files"]:
                     testFilename = filePattern.replace("*", "TEST")
                     testFilepath = os.path.join(tempOutdir, testFilename)
 
@@ -185,18 +174,8 @@ class ProcessRawToArd(luigi.Task):
                         with open(testFilepath, "w") as testFile:
                             testFile.write("TEST")
 
-        tasks = []
-        fileCheck = True
-        for product in expectedFilePatterns["products"]:
-            for filePattern in product["files"]:
-                if not (self.CheckFileExistsWithPattern(dirPath=os.path.join(tempOutdir, pattern=filePattern))): fileCheck = False
-
-        if not fileCheck:
-            raise Exception("Product Validation failed")
-        
-        # TODO: make this output sensible again? probably more in line with the ExpectedFilePatterns JSON object            
         with self.output().open('w') as o:
-            json.dump(expectedFilePatterns,o, indent=4)
+            json.dump(expectedProducts, o, indent=4)
 
     def output(self):
         outFile = os.path.join(self.pathRoots['state'], 'ProcessRawToArd.json')

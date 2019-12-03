@@ -6,9 +6,10 @@ from luigi.util import requires
 from functional import seq
 from .CheckFileExistsWithPattern import CheckFileExists
 from .GenerateProductMetadata import GenerateProductMetadata
-from .ProcessRawToArd import ProcessRawToArd
+from .CheckArdProducts import CheckArdProducts
 
-@requires(ProcessRawToArd)
+#TODO: Requires CheckArdProducts instead
+@requires(CheckArdProducts)
 class GenerateMetadata(luigi.Task):
     """
     When we have created the final outputs we need to generate a set of 

@@ -5,7 +5,7 @@ import logging
 import json
 import .common as common
 from luigi import LocalTarget
-from luigi.util import inherits
+from luigi.util import requires
 from .GetInputFileInfos import GetSwathInfo
 from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from .CheckFileExists import CheckFileExists
@@ -29,8 +29,8 @@ class BuildFileList(luigi.Task):
     def getOutputFileName(self):
         with self.input()[0].open('r') as swathInfoFile, \
             self.input()[1].open('r') as satelliteAndOrbitNoFile:
-            swathInfo = json.loads(swathInfoFile.read())
-            getSatelliteAndOrbitNoOutput = json.loads(satelliteAndOrbitNoFile.read())
+            swathInfo = json.load(swathInfoFile)
+            getSatelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
 
         basename = "File_Sentinel"
         satelliteLetter = getSatelliteAndOrbitNoOutput["satelliteNumber"]

@@ -14,5 +14,5 @@
             "parentPlaceName" : "Europe"}
 
 ## Runtime parameters
---metadataTemplate - can be overridden wiht a template path relative to the container - ie /state/mytemplate.xml
+--metadataTemplate - can be overridden with a template path relative to the container - ie /state/mytemplate.xml
 

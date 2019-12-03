@@ -12,44 +12,36 @@ from .CheckArdProducts import CheckArdProducts
 @requires(CheckArdProducts)
 class GenerateMetadata(luigi.Task):
     """
-    When we have created the final outputs we need to generate a set of 
-    metadata files for forward consumption, TODO: define these files!
-
-    TODO: Currently only pushing out the metadata file created by ARCSI, but
-    need to create GEMINI and CEOS metdata files here;
-
     Output will look like the following;
 
     {
         "products": [
             {
                 "productName": "SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
-                "metadata": [
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta.json",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta_gemini.xml",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta_ceos.xml"
+                "files": [
+                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta.xml"
                 ]
             },
             {
                 "productName": "SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
-                "metadata": [
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta.json",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta_gemini.xml",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta_ceos.xml"
+                "files": [
+                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta.xml"
                 ]                
             },
             ...
         ]
     }
     """
-    pathRoots = luigi.DictParameter()
-    metadataTemplatePath = luigi.Parameter()
-    metadataConfigPath = luigi.Parameter()
+    paths = luigi.DictParameter()
+    metadataTemplate = luigi.Parameter()
+    metadataConfigFile = luigi.Parameter()
 
     def run(self):
         processRawToArdInfo = {}
         with self.input().open("r") as ProcessRawToArd:
             processRawToArdInfo = json.load(ProcessRawToArd)
+
+        metadataConfig = os.path.join(self.paths["static"], self.metadataConfigFile)
 
         getConfigTask = CheckFileExists(filePath=self.metadataConfigPath)
 

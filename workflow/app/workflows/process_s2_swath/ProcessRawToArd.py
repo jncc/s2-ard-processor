@@ -130,7 +130,7 @@ class ProcessRawToArd(luigi.Task):
 
     def run(self):
         # Create / cleanout output directory
-        tempOutdir = os.path.join(self.paths["temp"], "output")
+        tempOutdir = os.path.join(self.paths["working"], "output")
         common.createDirectory(tempOutdir)
 
         buildFileListOutput = {}
@@ -145,7 +145,7 @@ class ProcessRawToArd(luigi.Task):
             --interpresamp near --interp cubic -t {} -o {} --projabbv {} --outwkt {} --dem {} \
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
-                self.paths["temp"],
+                self.paths["working"],
                 tempOutdir,
                 self.projAbbv,
                 self.outWkt,

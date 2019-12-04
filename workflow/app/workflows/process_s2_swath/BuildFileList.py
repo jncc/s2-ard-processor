@@ -46,7 +46,7 @@ class BuildFileList(luigi.Task):
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \
             .format(
                 self.paths["extracted"],
-                os.path.join(self.paths["temp"], "File_")
+                os.path.join(self.paths["working"], "File_")
             )
 
         command_line_process = subprocess.Popen(
@@ -58,7 +58,7 @@ class BuildFileList(luigi.Task):
         process_output, _ =  command_line_process.communicate()
         log.info(process_output)
 
-        fileListPath = os.path.join(self.paths["temp"], self.getOutputFileName())
+        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName())
         yield CheckFileExists(filePath=fileListPath)
 
         output = {

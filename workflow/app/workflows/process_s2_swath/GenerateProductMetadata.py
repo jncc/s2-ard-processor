@@ -129,7 +129,7 @@ class GenerateProductMetadata(luigi.ExternalTask):
         
         metadataFileName = "%s_meta.xml" % fileIdentifier
 
-        target = os.path.join(self.paths["temp"], metadataFileName)
+        target = os.path.join(self.paths["working"], metadataFileName)
 
         with open(target, 'w') as out:
             out.write(ardMetadata)

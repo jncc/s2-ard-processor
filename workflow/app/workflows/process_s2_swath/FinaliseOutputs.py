@@ -53,7 +53,7 @@ class FinaliseOutputs(luigi.Task):
             }
 
             copyList = seq(product["files"]) \
-                .map(lambda f: (f, f.replace(self.paths["temp"], self.paths["output"])))
+                .map(lambda f: (f, f.replace(self.paths["working"], self.paths["output"])))
 
             for c in copyList:
                 targetPath = os.path.dirname(c[1])

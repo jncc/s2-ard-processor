@@ -25,13 +25,15 @@ class UnzipRaw(luigi.Task):
 
     def run(self):
         # Create / cleanout extracted folder to store extracted zip files
-        common.createDirectory(self.paths['extracted'])
+        extractPath = os.path.join(self.paths['working'], "extracted")
+
+        common.createDirectory(extractPath)
 
         # Extract data to extracted folder
         cmd = "arcsiextractdata.py -i {} -o {}" \
             .format(
                 self.paths["input"],
-                self.paths["extracted"])
+                extractPath)
 
         subprocess.check_output(
             cmd,
@@ -41,10 +43,10 @@ class UnzipRaw(luigi.Task):
         # Move any folders to extracted
         for f in [dI for dI in os.listdir(self.paths["input"]) if os.path.isdir(os.path.join(self.paths["input"],dI))]:
             src = os.path.join(self.paths["input"], f)
-            dst = os.path.join(self.paths["extracted"], f)
+            dst = os.path.join(extractPath, f)
             shutil.copytree(src, dst)
 
-        extractedProducts = glob.glob(os.path.join(self.paths["extracted"], "*"))
+        extractedProducts = glob.glob(os.path.join(extractPath, "*"))
 
         output = {
             "products": extractedProducts

@@ -69,7 +69,7 @@ class ProcessRawToArd(luigi.Task):
         ]
     }
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
     projectionOptions = luigi.DictParameter()
@@ -130,22 +130,22 @@ class ProcessRawToArd(luigi.Task):
 
     def run(self):
         # Create / cleanout output directory
-        tempOutdir = os.path.join(self.pathRoots["temp"], "output")
+        tempOutdir = os.path.join(self.paths["temp"], "output")
         common.createDirectory(tempOutdir)
 
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:
             buildFileListOutput = json.load(buildFileListFile)
 
-        demFilePath = os.path.join(self.pathRoots["static"], self.dem)
-        projectionWktPath = os.path.join(self.pathRoots["static"], self.projectionOptions["wkt"])
+        demFilePath = os.path.join(self.paths["static"], self.dem)
+        projectionWktPath = os.path.join(self.paths["static"], self.projectionOptions["wkt"])
         fileListPath = buildFileListOutput["fileListPath"]
 
         cmd = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA \
             --interpresamp near --interp cubic -t {} -o {} --projabbv {} --outwkt {} --dem {} \
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
-                self.pathRoots["temp"],
+                self.paths["temp"],
                 tempOutdir,
                 self.projAbbv,
                 self.outWkt,
@@ -178,5 +178,5 @@ class ProcessRawToArd(luigi.Task):
             json.dump(expectedProducts, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'ProcessRawToArd.json')
+        outFile = os.path.join(self.paths['state'], 'ProcessRawToArd.json')
         return LocalTarget(outFile)

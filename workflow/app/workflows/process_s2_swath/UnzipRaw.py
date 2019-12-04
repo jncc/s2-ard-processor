@@ -21,17 +21,17 @@ class UnzipRaw(luigi.Task):
         ]
     }
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
 
     def run(self):
         # Create / cleanout extracted folder to store extracted zip files
-        common.createDirectory(self.pathRoots['extracted'])
+        common.createDirectory(self.paths['extracted'])
 
         # Extract data to extracted folder
         cmd = "arcsiextractdata.py -i {} -o {}" \
             .format(
-                self.pathRoots["input"],
-                self.pathRoots["extracted"])
+                self.paths["input"],
+                self.paths["extracted"])
 
         subprocess.check_output(
             cmd,
@@ -39,12 +39,12 @@ class UnzipRaw(luigi.Task):
             shell=True)
 
         # Move any folders to extracted
-        for f in [dI for dI in os.listdir(self.pathRoots["input"]) if os.path.isdir(os.path.join(self.pathRoots["input"],dI))]:
-            src = os.path.join(self.pathRoots["input"], f)
-            dst = os.path.join(self.pathRoots["extracted"], f)
+        for f in [dI for dI in os.listdir(self.paths["input"]) if os.path.isdir(os.path.join(self.paths["input"],dI))]:
+            src = os.path.join(self.paths["input"], f)
+            dst = os.path.join(self.paths["extracted"], f)
             shutil.copytree(src, dst)
 
-        extractedProducts = glob.glob(os.path.join(self.pathRoots["extracted"], "*"))
+        extractedProducts = glob.glob(os.path.join(self.paths["extracted"], "*"))
 
         output = {
             "products": extractedProducts
@@ -54,6 +54,6 @@ class UnzipRaw(luigi.Task):
             json.dump(output, o, indent=4)
     
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'UnzipRaw.json')
+        outFile = os.path.join(self.paths['state'], 'UnzipRaw.json')
         return LocalTarget(outFile)
     

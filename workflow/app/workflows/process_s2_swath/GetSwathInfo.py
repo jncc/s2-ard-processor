@@ -31,7 +31,7 @@ class GetSwathInfo(luigi.Task):
         ]
     }
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
 
     def run(self):
         with self.input().open('r') as unzipRawFile:
@@ -39,7 +39,7 @@ class GetSwathInfo(luigi.Task):
 
         tasks = []
         for product in unzipRawOutput["products"]:
-            tasks.append(GetGranuleInfo(pathRoots=self.pathRoots, productPath=product))
+            tasks.append(GetGranuleInfo(pathRoots=self.paths, productPath=product))
 
         yield tasks
 
@@ -57,5 +57,5 @@ class GetSwathInfo(luigi.Task):
             json.dump(o, output, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'GetSwathInfo.json')
+        outFile = os.path.join(self.paths['state'], 'GetSwathInfo.json')
         return LocalTarget(outFile)

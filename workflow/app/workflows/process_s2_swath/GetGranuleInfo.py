@@ -17,7 +17,7 @@ class GetGranuleInfo(luigi.Task):
     }
     """
 
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
     productPath = luigi.Parameter()
 
     def run(self):
@@ -43,5 +43,5 @@ class GetGranuleInfo(luigi.Task):
 
     def output(self):
         filename = "GetGranuleInfo_{}.json".format(os.path.basename(self.productPath))
-        outFile = os.path.join(self.pathRoots['state'], filename)
+        outFile = os.path.join(self.paths['state'], filename)
         return LocalTarget(outFile)

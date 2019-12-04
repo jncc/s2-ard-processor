@@ -13,7 +13,7 @@ class CreateCOG(luigi.Task):
     """
     Takes in an input KEA file and converts it into a cloud optimised GeoTIFF using 
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
     product = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter()
 
@@ -79,5 +79,5 @@ class CreateCOG(luigi.Task):
             json.dump(output, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], "{}_CreateCOG.json".format(self.product["productName"]))
+        outFile = os.path.join(self.paths['state'], "{}_CreateCOG.json".format(self.product["productName"]))
         return LocalTarget(self.outputFile)

@@ -24,7 +24,7 @@ class BuildFileList(luigi.Task):
         "fileListPath": "/app/temp/File_Sentinel2B_137_20190226.txt"
     }
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
 
     def getOutputFileName(self):
         with self.input()[0].open('r') as swathInfoFile, \
@@ -40,13 +40,13 @@ class BuildFileList(luigi.Task):
 
     def run(self):
         # Create / cleanout temporary folder
-        common.createDirectory(self.pathRoots['temp'])
+        common.createDirectory(self.paths['temp'])
 
         # Build filelist for processing
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \
             .format(
-                self.pathRoots["extracted"],
-                os.path.join(self.pathRoots["temp"], "File_")
+                self.paths["extracted"],
+                os.path.join(self.paths["temp"], "File_")
             )
 
         command_line_process = subprocess.Popen(
@@ -58,7 +58,7 @@ class BuildFileList(luigi.Task):
         process_output, _ =  command_line_process.communicate()
         log.info(process_output)
 
-        fileListPath = os.path.join(self.pathRoots["temp"], self.getOutputFileName())
+        fileListPath = os.path.join(self.paths["temp"], self.getOutputFileName())
         yield CheckFileExists(filePath=fileListPath)
 
         output = {
@@ -69,6 +69,6 @@ class BuildFileList(luigi.Task):
             json.dump(output, o, indent=4)
             
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], "BuildFileList.json")
+        outFile = os.path.join(self.paths['state'], "BuildFileList.json")
         return LocalTarget(outFile)
 

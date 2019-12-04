@@ -66,13 +66,7 @@ class CheckArdProducts(luigi.Task):
             json.dump(output, o, indent=4)
     
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'CheckArdProducts.json')
+        outFile = os.path.join(self.paths['state'], 'CheckArdProducts.json')
         return LocalTarget(outFile)
 
 
-# TODO:
-
-# 
-# Takes in expected product id and patterns from ProcessRawToArd
-# Matches a file against each pattern
-# Creates a list like 

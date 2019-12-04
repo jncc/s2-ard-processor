@@ -23,7 +23,7 @@ class GetSatelliteAndOrbitNumber(luigi.Task):
         "orbitNumber": "137"
     }
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
 
     def getManifestFilepath(self, productPath):
         productSafeName = os.listdir(productPath)[0]
@@ -70,5 +70,5 @@ class GetSatelliteAndOrbitNumber(luigi.Task):
             json.dump(output, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'GetSatelliteAndOrbitNumber.json')
+        outFile = os.path.join(self.paths['state'], 'GetSatelliteAndOrbitNumber.json')
         return LocalTarget(outFile)

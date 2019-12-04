@@ -48,7 +48,7 @@ class CreateCOGs(luigi.Task):
         ]
     }
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter(default=4)
 
     def run(self):
@@ -62,7 +62,7 @@ class CreateCOGs(luigi.Task):
 
         cogTasks = []
         for p in processRawToArdInfo["products"]:
-            cogTasks.append(CreateCOG(pathRoots=self.pathRoots, product=p, maxCogProcesses=self.maxCogProcesses))
+            cogTasks.append(CreateCOG(pathRoots=self.paths, product=p, maxCogProcesses=self.maxCogProcesses))
         
         yield cogTasks
         
@@ -101,5 +101,5 @@ class CreateCOGs(luigi.Task):
             json.dump(output, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'CreateCOGs.json')
+        outFile = os.path.join(self.paths['state'], 'CreateCOGs.json')
         return LocalTarget(outFile)

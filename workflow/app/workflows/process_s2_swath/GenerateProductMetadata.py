@@ -8,7 +8,7 @@ from functional import seq
 from luigi import LocalTarget
 
 class GenerateProductMetadata(luigi.ExternalTask):
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
     inputProduct = luigi.DictParameter()
     metadataConfig = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
@@ -129,7 +129,7 @@ class GenerateProductMetadata(luigi.ExternalTask):
         
         metadataFileName = "%s_meta.xml" % fileIdentifier
 
-        target = os.path.join(self.pathRoots["temp"], metadataFileName)
+        target = os.path.join(self.paths["temp"], metadataFileName)
 
         with open(target, 'w') as out:
             out.write(ardMetadata)
@@ -157,5 +157,5 @@ class GenerateProductMetadata(luigi.ExternalTask):
             json.dump(output, o)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'GenerateProductMetadata_%s.json' % self.inputProduct["productName"])
+        outFile = os.path.join(self.paths['state'], 'GenerateProductMetadata_%s.json' % self.inputProduct["productName"])
         return LocalTarget(outFile)

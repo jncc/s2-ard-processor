@@ -16,7 +16,7 @@ class FinaliseOutputs(luigi.Task):
     """
     Cleanup and other work should go here
     """
-    pathRoots = luigi.DictParameter()
+    paths = luigi.DictParameter()
 
     def run(self):
         # take the files we want to keep and move them to the output folder
@@ -42,7 +42,7 @@ class FinaliseOutputs(luigi.Task):
         # Rename Files
         # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
         # Move products to output
-        log.info("Moving products to output folder {}".format(self.pathRoots["output"]))
+        log.info("Moving products to output folder {}".format(self.paths["output"]))
 
         outputList = []
 
@@ -53,7 +53,7 @@ class FinaliseOutputs(luigi.Task):
             }
 
             copyList = seq(product["files"]) \
-                .map(lambda f: (f, f.replace(self.pathRoots["temp"], self.pathRoots["output"])))
+                .map(lambda f: (f, f.replace(self.paths["temp"], self.paths["output"])))
 
             for c in copyList:
                 targetPath = os.path.dirname(c[1])
@@ -73,5 +73,5 @@ class FinaliseOutputs(luigi.Task):
             json.dump(output, o)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'FinaliseOutputs.json')
+        outFile = os.path.join(self.paths['state'], 'FinaliseOutputs.json')
         return LocalTarget(outFile)

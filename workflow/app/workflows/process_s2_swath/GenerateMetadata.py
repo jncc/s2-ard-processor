@@ -62,7 +62,7 @@ class GenerateMetadata(luigi.Task):
 
         # make metadata file/(s) per product?
         for output in processRawToArdInfo["products"]:
-            generateMetadataTasks.append(GenerateProductMetadata(pathRoots=self.pathRoots, 
+            generateMetadataTasks.append(GenerateProductMetadata(pathRoots=self.paths, 
             inputProduct=output, 
             metadataConfig=metadataConfig,
             metadataTemplate=metadataTemplate))
@@ -82,5 +82,5 @@ class GenerateMetadata(luigi.Task):
             json.dump(output, o)
 
     def output(self):
-        outFile = os.path.join(self.pathRoots['state'], 'GenerateMetadata.json')
+        outFile = os.path.join(self.paths['state'], 'GenerateMetadata.json')
         return LocalTarget(outFile)

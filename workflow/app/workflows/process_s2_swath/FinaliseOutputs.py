@@ -2,6 +2,7 @@ import luigi
 import os
 import shutil
 import json
+import logging
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq

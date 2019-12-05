@@ -4,9 +4,9 @@ import json
 import subprocess
 import logging
 import glob
-import .common as common
 from luigi import LocalTarget
 from luigi.util import requires
+from .common import createDirectory
 from .BuildFileList import BuildFileList
 from .GetInputFileInfos import GetSwathInfo
 from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
@@ -131,7 +131,7 @@ class ProcessRawToArd(luigi.Task):
     def run(self):
         # Create / cleanout output directory
         tempOutdir = os.path.join(self.paths["working"], "output")
-        common.createDirectory(tempOutdir)
+        createDirectory(tempOutdir)
 
         buildFileListOutput = {}
         with self.input()[0].open('r') as buildFileListFile:

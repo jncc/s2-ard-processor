@@ -4,7 +4,6 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
-from .CheckFileExistsWithPattern import CheckFileExists
 from .GenerateProductMetadata import GenerateProductMetadata
 from .CheckArdProducts import CheckArdProducts
 

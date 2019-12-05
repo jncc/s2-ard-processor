@@ -4,7 +4,6 @@ import json
 import subprocess
 import logging
 import glob
-import .common as common
 from luigi import LocalTarget
 from luigi.util import requires
 from .ProcessRawToArd import ProcessRawToArd

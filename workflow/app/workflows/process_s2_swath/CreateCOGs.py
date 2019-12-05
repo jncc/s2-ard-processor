@@ -5,7 +5,6 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
-from .common import getFormattedJson
 from .CreateCOG import CreateCOG
 from .CheckArdProducts import CheckArdProducts
 

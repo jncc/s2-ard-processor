@@ -3,10 +3,10 @@ import os
 import subprocess
 import logging
 import json
-import .common as common
 from luigi import LocalTarget
 from luigi.util import requires
-from .GetInputFileInfos import GetSwathInfo
+from .common import createDirectory
+from .GetSwathInfo import GetSwathInfo
 from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from .CheckFileExists import CheckFileExists
 
@@ -40,7 +40,7 @@ class BuildFileList(luigi.Task):
 
     def run(self):
         # Create / cleanout temporary folder
-        common.createDirectory(self.paths['temp'])
+        createDirectory(self.paths['temp'])
 
         # Build filelist for processing
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \

@@ -5,7 +5,6 @@ import json
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
-from .OptimiseFiles import OptimiseFiles
 from .GenerateMetadata import GenerateMetadata
 from .CreateCOGs import CreateCOGs
 

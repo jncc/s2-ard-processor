@@ -1,7 +1,6 @@
 import luigi
 import os
 import json
-import process_s2_swath.common as common
 from luigi import LocalTarget
 from luigi.util import requires
 from .UnzipRaw import UnzipRaw

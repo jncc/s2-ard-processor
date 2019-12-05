@@ -4,9 +4,9 @@ import shutil
 import subprocess
 import json
 import glob
-import .common as common
 from luigi import LocalTarget
 from luigi.util import requires
+from .common import createDirectory
 
 class UnzipRaw(luigi.Task):
     """
@@ -27,7 +27,7 @@ class UnzipRaw(luigi.Task):
         # Create / cleanout extracted folder to store extracted zip files
         extractPath = os.path.join(self.paths['working'], "extracted")
 
-        common.createDirectory(extractPath)
+        createDirectory(extractPath)
 
         # Extract data to extracted folder
         cmd = "arcsiextractdata.py -i {} -o {}" \

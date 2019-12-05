@@ -10,7 +10,7 @@ from .ProcessRawToArd import ProcessRawToArd
 
 @requires(ProcessRawToArd)
 class CheckArdProducts(luigi.Task):
-    paths = luig.DictParameter()
+    paths = luigi.DictParameter()
 
     def checkFileExists(self, filePattern):
         matchingFiles = glob.glob(filePattern)

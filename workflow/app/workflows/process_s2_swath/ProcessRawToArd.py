@@ -8,7 +8,7 @@ from luigi import LocalTarget
 from luigi.util import requires
 from .common import createDirectory
 from .BuildFileList import BuildFileList
-from .GetInputFileInfos import GetSwathInfo
+from .GetSwathInfo import GetSwathInfo
 from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from .CheckFileExistsWithPattern import CheckFileExistsWithPattern
 

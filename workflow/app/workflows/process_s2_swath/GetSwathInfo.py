@@ -38,7 +38,7 @@ class GetSwathInfo(luigi.Task):
 
         tasks = []
         for product in unzipRawOutput["products"]:
-            tasks.append(GetGranuleInfo(pathRoots=self.paths, productPath=product))
+            tasks.append(GetGranuleInfo(paths=self.paths, productPath=product))
 
         yield tasks
 

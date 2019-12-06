@@ -47,7 +47,7 @@ class BuildFileList(luigi.Task):
         mtdPaths = []
         for path in unzipRawInfo["products"]:
             mtdSearch = os.path.join(path, "*MTD*.xml")
-            mtdPath = glob.glob(mtdSearch)
+            mtdPath = glob.glob(mtdSearch)[0]
             checkFileExists(mtdPath)
             mtdPaths.append(mtdPath)
 

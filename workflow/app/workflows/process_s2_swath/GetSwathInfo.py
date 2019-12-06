@@ -53,7 +53,7 @@ class GetSwathInfo(luigi.Task):
         }
 
         with self.output().open("w") as o:
-            json.dump(o, output, indent=4)
+            json.dump(output, o, indent=4)
 
     def output(self):
         outFile = os.path.join(self.paths['state'], 'GetSwathInfo.json')

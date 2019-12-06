@@ -9,10 +9,11 @@ from process_s2_swath.common import createDirectory
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from process_s2_swath.CheckFileExists import CheckFileExists
+from process_s2_swath.UnzipRaw import UnzipRaw
 
 log = logging.getLogger('luigi-interface')
 
-@requires(GetSwathInfo, GetSatelliteAndOrbitNumber)
+@requires(GetSwathInfo, GetSatelliteAndOrbitNumber, UnzipRAw)
 class BuildFileList(luigi.Task):
     """
     Builds files lists for arcsi to process using the arcsibuildmultifilelists.py command, it
@@ -26,26 +27,28 @@ class BuildFileList(luigi.Task):
     """
     paths = luigi.DictParameter()
 
-    def getOutputFileName(self):
-        with self.input()[0].open('r') as swathInfoFile, \
-            self.input()[1].open('r') as satelliteAndOrbitNoFile:
-            swathInfo = json.load(swathInfoFile)
-            getSatelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
-
+    def getOutputFileName(self, satelliteAndOrbitNoInfo, swathInfo):
         basename = "File_Sentinel"
-        satelliteLetter = getSatelliteAndOrbitNoOutput["satelliteNumber"]
+        satelliteLetter = satelliteAndOrbitNoInfo["satelliteNumber"]
         date = swathInfo["products"][0]["date"] # date should be the same for all
 
         return basename + satelliteLetter + "_" + date + ".txt"
 
     def run(self):
+        with self.input()[0].open('r') as swathInfoFile, \
+            self.input()[1].open('r') as satelliteAndOrbitNoFile, \
+            self.input()[2].open('r') as unzipRawFile:
+            swathInfo = json.load(swathInfoFile)
+            satelliteAndOrbitNoInfo = json.load(satelliteAndOrbitNoFile)
+            unzipRawInfo = json.load(unzipRawFile)
+
         # Create / cleanout temporary folder
-        createDirectory(self.paths['temp'])
+        createDirectory(self.paths['working'])
 
         # Build filelist for processing
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \
             .format(
-                self.paths["extracted"],
+                unzipRawInfo["extractedProductRoot"],
                 os.path.join(self.paths["working"], "File_")
             )
 
@@ -58,7 +61,7 @@ class BuildFileList(luigi.Task):
         process_output, _ =  command_line_process.communicate()
         log.info(process_output)
 
-        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName())
+        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
         yield CheckFileExists(filePath=fileListPath)
 
         output = {

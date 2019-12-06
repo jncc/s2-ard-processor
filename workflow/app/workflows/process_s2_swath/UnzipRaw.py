@@ -48,6 +48,7 @@ class UnzipRaw(luigi.Task):
         extractedProducts = glob.glob(os.path.join(extractPath, "*"))
 
         output = {
+            "extractedProductRoot": extractPath,
             "products": extractedProducts
         }
 

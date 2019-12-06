@@ -1,5 +1,6 @@
 import json
 import luigi
+import shutil
 import os
 
 def getFormattedJson(jsonString):

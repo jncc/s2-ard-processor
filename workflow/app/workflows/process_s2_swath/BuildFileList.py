@@ -5,10 +5,9 @@ import logging
 import json
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.common import createDirectory
+from process_s2_swath.common import createDirectory, checkFileExists
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.CheckFileExists import CheckFileExists
 from process_s2_swath.UnzipRaw import UnzipRaw
 
 log = logging.getLogger('luigi-interface')
@@ -42,14 +41,13 @@ class BuildFileList(luigi.Task):
             satelliteAndOrbitNoInfo = json.load(satelliteAndOrbitNoFile)
             unzipRawInfo = json.load(unzipRawFile)
 
-        # Create / cleanout temporary folder
-        createDirectory(self.paths['working'])
+        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
 
         # Build filelist for processing
         cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \
             .format(
                 unzipRawInfo["extractedProductRoot"],
-                os.path.join(self.paths["working"], "File_")
+                fileListPath
             )
 
         command_line_process = subprocess.Popen(
@@ -57,12 +55,10 @@ class BuildFileList(luigi.Task):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=True)
-        # todo: logging probably doesn't work
         process_output, _ =  command_line_process.communicate()
         log.info(process_output)
 
-        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
-        yield CheckFileExists(filePath=fileListPath)
+        checkFileExists(filePath=fileListPath)
 
         output = {
             "fileListPath": fileListPath

@@ -26,3 +26,8 @@ def createDirectory(path):
 
     if not (os.path.isdir(path)):
         raise RuntimeError("Could not create the directory: {}".format(path))
+
+def checkFileExisits(filePath):
+    if not os.path.getsize(filePath) > 0:
+        raise Exception("Something went wrong, file size is 0 for " + filePath)
+    return filePath

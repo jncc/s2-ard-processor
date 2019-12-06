@@ -20,8 +20,8 @@ def clearFolder(folder):
 
 def createDirectory(path):
     if (os.path.exists(path)):
-        self.clearFolder(path)
-    self.makePath(path)
+        clearFolder(path)
+    makePath(path)
 
     if not (os.path.isdir(path)):
         raise RuntimeError("Could not create the directory: {}".format(path))

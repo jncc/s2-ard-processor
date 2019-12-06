@@ -4,7 +4,7 @@ import json
 import re
 from luigi import LocalTarget
 from luigi.util import requires
-from .UnzipRaw import UnzipRaw
+from process_s2_swath.UnzipRaw import UnzipRaw
 
 @requires(UnzipRaw)
 class GetSatelliteAndOrbitNumber(luigi.Task):

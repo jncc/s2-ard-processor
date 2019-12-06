@@ -7,7 +7,7 @@ from string import Template
 from functional import seq
 from luigi import LocalTarget
 
-class GenerateProductMetadata(luigi.ExternalTask):
+class GenerateProductMetadata(luigi.Task):
     paths = luigi.DictParameter()
     inputProduct = luigi.DictParameter()
     metadataConfig = luigi.DictParameter()

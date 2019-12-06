@@ -6,11 +6,11 @@ import logging
 import glob
 from luigi import LocalTarget
 from luigi.util import requires
-from .common import createDirectory
-from .BuildFileList import BuildFileList
-from .GetSwathInfo import GetSwathInfo
-from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from .CheckFileExistsWithPattern import CheckFileExistsWithPattern
+from process_s2_swath.common import createDirectory
+from process_s2_swath.BuildFileList import BuildFileList
+from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
+from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
 
 log = logging.getLogger("luigi-interface")
 
@@ -72,7 +72,6 @@ class ProcessRawToArd(luigi.Task):
     paths = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
-    projectionOptions = luigi.DictParameter()
     outWkt = luigi.Parameter()
     projAbbv = luigi.Parameter()
 
@@ -138,7 +137,7 @@ class ProcessRawToArd(luigi.Task):
             buildFileListOutput = json.load(buildFileListFile)
 
         demFilePath = os.path.join(self.paths["static"], self.dem)
-        projectionWktPath = os.path.join(self.paths["static"], self.projectionOptions["wkt"])
+        projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
         fileListPath = buildFileListOutput["fileListPath"]
 
         cmd = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA \

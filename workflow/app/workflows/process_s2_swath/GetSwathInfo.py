@@ -3,8 +3,8 @@ import os
 import json
 from luigi import LocalTarget
 from luigi.util import requires
-from .UnzipRaw import UnzipRaw
-from .GetGranuleInfo import GetGranuleInfo
+from process_s2_swath.UnzipRaw import UnzipRaw
+from process_s2_swath.GetGranuleInfo import GetGranuleInfo
 
 @requires(UnzipRaw)
 class GetSwathInfo(luigi.Task):

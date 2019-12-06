@@ -6,8 +6,8 @@ import logging
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
-from .GenerateMetadata import GenerateMetadata
-from .CreateCOGs import CreateCOGs
+from process_s2_swath.GenerateMetadata import GenerateMetadata
+from process_s2_swath.CreateCOGs import CreateCOGs
 
 log = logging.getLogger('luigi-interface')
 

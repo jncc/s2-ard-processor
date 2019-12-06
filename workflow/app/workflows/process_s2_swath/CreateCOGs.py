@@ -5,8 +5,8 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
-from .CreateCOG import CreateCOG
-from .CheckArdProducts import CheckArdProducts
+from process_s2_swath.CreateCOG import CreateCOG
+from process_s2_swath.CheckArdProducts import CheckArdProducts
 
 log = logging.getLogger('luigi-interface')
 

@@ -6,8 +6,7 @@ import json
 import glob
 from luigi import LocalTarget
 from luigi.util import requires
-from .common import createDirectory
-
+from process_s2_swath.common import createDirectory
 class UnzipRaw(luigi.Task):
     """
     Unzips all zip files inside a given folder using the arcsiextractdata.py command,

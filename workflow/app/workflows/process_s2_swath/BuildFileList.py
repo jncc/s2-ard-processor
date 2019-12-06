@@ -5,10 +5,10 @@ import logging
 import json
 from luigi import LocalTarget
 from luigi.util import requires
-from .common import createDirectory
-from .GetSwathInfo import GetSwathInfo
-from .GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from .CheckFileExists import CheckFileExists
+from process_s2_swath.common import createDirectory
+from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
+from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger('luigi-interface')
 

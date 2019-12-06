@@ -6,7 +6,7 @@ import logging
 import glob
 from luigi import LocalTarget
 from luigi.util import requires
-from .ProcessRawToArd import ProcessRawToArd
+from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
 @requires(ProcessRawToArd)
 class CheckArdProducts(luigi.Task):

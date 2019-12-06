@@ -4,8 +4,8 @@ import os
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
-from .GenerateProductMetadata import GenerateProductMetadata
-from .CheckArdProducts import CheckArdProducts
+from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
+from process_s2_swath.CheckArdProducts import CheckArdProducts
 
 #TODO: Requires CheckArdProducts instead
 @requires(CheckArdProducts)

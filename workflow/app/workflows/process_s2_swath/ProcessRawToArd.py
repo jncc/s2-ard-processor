@@ -75,8 +75,6 @@ class ProcessRawToArd(luigi.Task):
     outWkt = luigi.Parameter()
     projAbbv = luigi.Parameter()
 
-
-
     def getBaseNameFromFilename(self, filename):
         return "SEN2_%s_*_%s_ORB%s_*%s" % \
             (
@@ -110,7 +108,7 @@ class ProcessRawToArd(luigi.Task):
                     product["date"],
                     product["tileId"],
                     satelliteAndOrbitNoOutput["orbitNumber"],
-                    self.projectionAbbreviation
+                    self.projAbbv
                 )
 
             basename = os.path.join(outDir, basename)

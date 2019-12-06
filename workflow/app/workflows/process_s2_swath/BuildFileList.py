@@ -42,7 +42,7 @@ class BuildFileList(luigi.Task):
             satelliteAndOrbitNoInfo = json.load(satelliteAndOrbitNoFile)
             unzipRawInfo = json.load(unzipRawFile)
 
-        listFilePath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
+        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
 
         mtdPaths = []
         for path in unzipRawInfo["products"]:
@@ -51,12 +51,12 @@ class BuildFileList(luigi.Task):
             checkFileExists(mtdPath)
             mtdPaths.append(mtdPath)
 
-        with open(listFilePath, 'w') as f:
+        with open(fileListPath, 'w') as f:
             for mtd in mtdPaths:
                 f.write("%s\n" % mtd) 
 
         output = {
-            "fileListPath": listFilePath
+            "fileListPath": fileListPath
         }
 
         with self.output().open('w') as o:

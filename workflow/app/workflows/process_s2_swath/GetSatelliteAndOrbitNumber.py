@@ -23,15 +23,7 @@ class GetSatelliteAndOrbitNumber(luigi.Task):
     }
     """
     paths = luigi.DictParameter()
-
-    def getManifestFilepath(self, productPath):
-        productSafeName = os.listdir(productPath)[0]
-
-        productSafePath = os.path.join(productPath, productSafeName)
-        manifestPath = os.path.join(productSafePath, "manifest.safe")
-
-        return manifestPath
-
+    
     def getOrbitNumber(self, manifestString):
         pattern = "<safe:relativeOrbitNumber type=\"start\">(.+)<\/safe:relativeOrbitNumber>"
         orbitNo = re.search(pattern, manifestString).group(1)
@@ -52,7 +44,7 @@ class GetSatelliteAndOrbitNumber(luigi.Task):
         }
 
         # details should be the same for all granules so take the first one
-        manifestPath = self.getManifestFilepath(unzipRawInfo["products"][0])
+        manifestPath = os.path.join(unzipRawInfo["products"][0], "manifest.safe")
 
         with open(manifestPath, 'r') as m:
             manifestString = m.read()

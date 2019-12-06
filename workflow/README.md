@@ -5,7 +5,7 @@
 - dem
 - metadata.config file
 
-{"metadataTemplate" : "templates/s2_metadata_template.xml",
+{
             "arcsiVersion": "v3.1.6",
             "projection" : "OSGB",
             "targetSrs" : "EPSG:27700",
@@ -14,5 +14,5 @@
             "parentPlaceName" : "Europe"}
 
 ## Runtime parameters
---metadataTemplate - can be overridden with a template path relative to the container - ie /state/mytemplate.xml
+--metadataTemplate - can be overridden with a template path relative to the container - ie /working/templates/mytemplate.xml
 

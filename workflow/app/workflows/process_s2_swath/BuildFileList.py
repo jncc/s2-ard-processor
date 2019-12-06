@@ -13,7 +13,7 @@ from process_s2_swath.UnzipRaw import UnzipRaw
 
 log = logging.getLogger('luigi-interface')
 
-@requires(GetSwathInfo, GetSatelliteAndOrbitNumber, UnzipRAw)
+@requires(GetSwathInfo, GetSatelliteAndOrbitNumber, UnzipRaw)
 class BuildFileList(luigi.Task):
     """
     Builds files lists for arcsi to process using the arcsibuildmultifilelists.py command, it

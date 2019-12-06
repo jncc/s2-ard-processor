@@ -46,6 +46,7 @@ class CheckArdProducts(luigi.Task):
 
             for filePattern in expectedProduct["files"]:
                 fileName = self.checkFileExists(pattern=filePattern)
+                # todo :size check
                 if len(fileName) == 0:
                     fileCheck = False
                 else: 

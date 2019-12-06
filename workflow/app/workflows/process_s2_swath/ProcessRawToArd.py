@@ -120,7 +120,6 @@ class ProcessRawToArd(luigi.Task):
             expected["files"].append(basename + "sat.kea")
             expected["files"].append(basename + "toposhad.kea")
             expected["files"].append(basename + "valid.kea")
-            expected["files"].append(basename + "vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea")
             expected["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.kea")
 
             expectedProducts["products"].append(expected)

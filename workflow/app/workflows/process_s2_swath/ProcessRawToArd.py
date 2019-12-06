@@ -11,6 +11,7 @@ from process_s2_swath.BuildFileList import BuildFileList
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
+from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger("luigi-interface")
 
@@ -72,7 +73,7 @@ class ProcessRawToArd(luigi.Task):
     paths = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
-    outWkt = luigi.Parameter()
+    outWkt = luigi.Parameter(default = "")
     projAbbv = luigi.Parameter()
 
     def getBaseNameFromFilename(self, filename):
@@ -125,6 +126,18 @@ class ProcessRawToArd(luigi.Task):
         return expectedProducts
 
     def run(self):
+        # Check dem, wkt exist
+        demFilePath = os.path.join(self.paths["static"], self.dem)
+        projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
+
+        checkTasks = []
+        checkTasks.append(CheckFileExists(filePath=demFilePath))
+
+        if self.outWkt != "":
+            checkTasks.append(CheckFileExists(filePath=projectionWktPath))
+
+        yield checkTasks
+
         # Create / cleanout output directory
         tempOutdir = os.path.join(self.paths["working"], "output")
         createDirectory(tempOutdir)
@@ -133,21 +146,21 @@ class ProcessRawToArd(luigi.Task):
         with self.input()[0].open('r') as buildFileListFile:
             buildFileListOutput = json.load(buildFileListFile)
 
-        demFilePath = os.path.join(self.paths["static"], self.dem)
-        projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
         fileListPath = buildFileListOutput["fileListPath"]
 
         cmd = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA \
-            --interpresamp near --interp cubic -t {} -o {} --projabbv {} --outwkt {} --dem {} \
+            --interpresamp near --interp cubic -t {} -o {} --projabbv {} --dem {} \
             -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
             .format(
                 self.paths["working"],
                 tempOutdir,
                 self.projAbbv,
-                self.outWkt,
                 demFilePath,
                 fileListPath
             )
+
+        if self.outWkt != "":
+            cmd = cmd + " --outwkt {}".format(projectionWktPath)
 
         expectedProducts = self.getExpectedProductFilePatterns(tempOutdir)
         if not self.testProcessing:

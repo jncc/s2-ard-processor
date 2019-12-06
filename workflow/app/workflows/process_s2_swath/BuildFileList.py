@@ -1,8 +1,8 @@
 import luigi
 import os
-import subprocess
 import logging
 import json
+import glob
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.common import createDirectory, checkFileExists
@@ -34,6 +34,7 @@ class BuildFileList(luigi.Task):
         return basename + satelliteLetter + "_" + date + ".txt"
 
     def run(self):
+        
         with self.input()[0].open('r') as swathInfoFile, \
             self.input()[1].open('r') as satelliteAndOrbitNoFile, \
             self.input()[2].open('r') as unzipRawFile:
@@ -41,27 +42,21 @@ class BuildFileList(luigi.Task):
             satelliteAndOrbitNoInfo = json.load(satelliteAndOrbitNoFile)
             unzipRawInfo = json.load(unzipRawFile)
 
-        fileListPath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
+        listFilePath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
 
-        # Build filelist for processing
-        cmd = "arcsibuildmultifilelists.py --input {} --header \"*MTD*.xml\" -d 3 -s sen2 --output {}" \
-            .format(
-                unzipRawInfo["extractedProductRoot"],
-                fileListPath
-            )
+        mtdPaths = []
+        for path in unzipRawInfo["products"]:
+            mtdSearch = os.path.join(path, "*MTD*.xml")
+            mtdPath = glob.glob(mtdSearch)
+            checkFileExists(mtdPath)
+            mtdPaths.append(mtdPath)
 
-        command_line_process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True)
-        process_output, _ =  command_line_process.communicate()
-        log.info(process_output)
-
-        checkFileExists(filePath=fileListPath)
+        with open(listFilePath, 'w') as f:
+            for mtd in mtdPaths:
+                f.write("%s\n" % mtd) 
 
         output = {
-            "fileListPath": fileListPath
+            "fileListPath": listFilePath
         }
 
         with self.output().open('w') as o:

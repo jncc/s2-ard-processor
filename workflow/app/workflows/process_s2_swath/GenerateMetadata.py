@@ -6,6 +6,7 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
 from process_s2_swath.CheckArdProducts import CheckArdProducts
+from process_s2_swath.CheckFileExists import CheckFileExists
 
 #TODO: Requires CheckArdProducts instead
 @requires(CheckArdProducts)

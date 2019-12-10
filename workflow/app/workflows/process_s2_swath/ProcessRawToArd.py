@@ -85,14 +85,7 @@ class ProcessRawToArd(luigi.Task):
                 self.projAbbv
             )
 
-    def getExpectedProductFilePatterns(self, outDir):
-        swathInfo = {}
-        satelliteAndOrbitNoOutput = {}
-        with self.input()[1].open('r') as swathInfoFile, \
-            self.input()[2].open('r') as satelliteAndOrbitNoFile:
-            swathInfo = json.load(swathInfoFile)
-            satelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
-
+    def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
             "products": []
         }
@@ -143,7 +136,15 @@ class ProcessRawToArd(luigi.Task):
         createDirectory(tempOutdir)
 
         buildFileListOutput = {}
-        with self.input()[0].open('r') as buildFileListFile:
+        swathInfo = {}
+        satelliteAndOrbitNoOutput = {}
+
+        with self.input()[0].open('r') as buildFileListFile, \
+            self.input()[1].open('r') as swathInfoFile, \
+            self.input()[2].open('r') as satelliteAndOrbitNoFile:
+            
+            swathInfo = json.load(swathInfoFile)
+            satelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
             buildFileListOutput = json.load(buildFileListFile)
 
         fileListPath = buildFileListOutput["fileListPath"]
@@ -162,11 +163,13 @@ class ProcessRawToArd(luigi.Task):
         if self.outWkt != "":
             cmd = cmd + " --outwkt {}".format(projectionWktPath)
 
-        expectedProducts = self.getExpectedProductFilePatterns(tempOutdir)
+        expectedProducts = self.getExpectedProductFilePatterns(tempOutdir, satelliteAndOrbitNoOutput, swathInfo)
         if not self.testProcessing:
             try:
                 log.info("Running cmd: " + cmd)
-                subprocess.check_output(cmd, shell=True) 
+
+                subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
+                
             except subprocess.CalledProcessError as e:
                 errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
                 log.error(errStr)

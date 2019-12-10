@@ -18,29 +18,19 @@ class CreateCOG(luigi.Task):
     maxCogProcesses = luigi.IntParameter()
 
     def generateCogFile(self, keaFile):
-        tempFile = "%s_part1.tif" % os.path.splitext(keaFile)[0]
         outputFile = "%s.tif" % os.path.splitext(keaFile)[0]
 
-        cmd = "gdal_translate -of GTiff -co \"COMPRESS=DEFLATE\" -co \"TILED=YES\" -co \"BLOCKXSIZE=512\" -co \"BLOCKYSIZE=512\" -co \"BIGTIFF=YES\" {} {}".format(
-            keaFile, 
-            tempFile
-        )
-
-        self.executeSubProcess(cmd)
-
-        cmd = "gdaladdo -r nearest {} 2 4 8 16 32 64 128 256 512".format(tempFile)
+        cmd = "gdaladdo -r nearest {} 2 4 8 16 32 64 128 256 512".format(keaFile)
         
         self.executeSubProcess(cmd)
 
         
-        cmd = "gdal_translate -co \"COMPRESS=DEFLATE\" -co \"BIGTIFF=YES\" -co \"TILED=YES\" -co \"BLOCKXSIZE=512\" -co \"BLOCKYSIZE=512\" --config GDAL_TIFF_OVR_BLOCKSIZE 512  -co \"COPY_SRC_OVERVIEWS=YES\" {} {}".format(
-            tempFile,
+        cmd = "gdal_translate -co \"GTiff\" -co \"COMPRESS=DEFLATE\" -co \"BIGTIFF=YES\" -co \"TILED=YES\" -co \"BLOCKXSIZE=512\" -co \"BLOCKYSIZE=512\" --config GDAL_TIFF_OVR_BLOCKSIZE 512  -co \"COPY_SRC_OVERVIEWS=YES\" {} {}".format(
+            keaFile,
             outputFile
         )
 
         self.executeSubProcess(cmd)
-
-        os.remove(tempFile)
 
         return outputFile
 

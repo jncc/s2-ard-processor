@@ -8,6 +8,7 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateMetadata import GenerateMetadata
 from process_s2_swath.CreateCOGs import CreateCOGs
+from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
 
@@ -68,6 +69,9 @@ class FinaliseOutputs(luigi.Task):
             outputList.append[outputProduct]
                 
         output = {"products": outputList}
+
+        #empty out the working folder
+        clearFolder(self.paths["working"])
 
         with self.output().open('w') as o:
             json.dump(output, o)

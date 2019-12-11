@@ -19,13 +19,16 @@ class CheckArdProducts(luigi.Task):
         matchingFiles = glob.glob(filePattern)
         result = True
 
-        if not len(matchingFiles) == 1:
+        if len(matchingFiles) < 1:
+            log.error("ARD processing error, did not find any matching files for pattern {}".format(filePattern))
+            result = False 
+        elif len(matchingFiles) > 1:
             log.error("ARD processing error, found more than one file for pattern {}".format(filePattern))
             result = False
-        if not os.path.isfile(matchingFiles[0]):
+        elif not os.path.isfile(matchingFiles[0]):
             log.error("ARD processing error, {} is not a file".format(matchingFiles[0]))
             result = False
-        if not os.path.getsize(matchingFiles[0]) > 0:
+        elif not os.path.getsize(matchingFiles[0]) > 0:
             log.error("ARD processing error, file size is 0 for {} ".format(matchingFiles[0]))
             result = False
 

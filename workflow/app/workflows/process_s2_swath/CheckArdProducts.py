@@ -8,6 +8,9 @@ from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
+
+log = logging.getLogger('luigi-interface')
+
 @requires(ProcessRawToArd)
 class CheckArdProducts(luigi.Task):
     paths = luigi.DictParameter()
@@ -17,13 +20,13 @@ class CheckArdProducts(luigi.Task):
         result = True
 
         if not len(matchingFiles) == 1:
-            log.error("ARD processing error, found more than one file for pattern " + pattern)
+            log.error("ARD processing error, found more than one file for pattern {}".format(filePattern))
             result = False
         if not os.path.isfile(matchingFiles[0]):
-            log.error("ARD processing error, " + matchingFiles[0] + " is not a file")
+            log.error("ARD processing error, {} is not a file".format(matchingFiles[0]))
             result = False
         if not os.path.getsize(matchingFiles[0]) > 0:
-            log.error("ARD processing error, file size is 0 for " + matchingFiles[0])
+            log.error("ARD processing error, file size is 0 for {} ".format(matchingFiles[0]))
             result = False
 
         if result:
@@ -45,12 +48,12 @@ class CheckArdProducts(luigi.Task):
             }
 
             for filePattern in expectedProduct["files"]:
-                fileName = self.checkFileExists(filePattern)
+                filePath = self.checkFileExists(filePattern)
                 # todo :size check
-                if len(fileName) == 0:
+                if len(filePath) == 0:
                     fileCheck = False
                 else: 
-                    product["files"].append(fileName)
+                    product["files"].append(filePath)
                 
             products.append(product)
                     

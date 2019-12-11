@@ -97,7 +97,7 @@ class ProcessRawToArd(luigi.Task):
             }
 
 
-            basename = "SEN2_%s_*_%s_ORB%s_*%s" % \
+            basename = "SEN2_%s_*_%s_ORB%s_*_%s_" % \
                 (
                     product["date"],
                     product["tileId"],

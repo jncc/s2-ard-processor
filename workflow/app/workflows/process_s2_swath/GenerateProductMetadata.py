@@ -122,8 +122,10 @@ class GenerateProductMetadata(luigi.Task):
             "parentPlaceName": parentPlaceName
         }
 
+        template = ""
 
-        template = Template(self.metadataTemplate)
+        with open(self.metadataTemplate, 'r') as tf:
+            template = tf.read()
 
         ardMetadata = template.substitute(metadataParams)
         
@@ -138,7 +140,7 @@ class GenerateProductMetadata(luigi.Task):
 
     def run(self):
        
-        arcsiMetadataFile = seq(inputProduct["files"]) \
+        arcsiMetadataFile = seq(self.inputProduct["files"]) \
                     .where(lambda x: x.endswith("meta.json")) \
                     .first()
 

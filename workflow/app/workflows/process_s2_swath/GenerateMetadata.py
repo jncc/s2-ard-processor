@@ -37,10 +37,6 @@ class GenerateMetadata(luigi.Task):
     metadataConfigFile = luigi.Parameter()
 
     def run(self):
-        processRawToArdInfo = {}
-        with self.input().open("r") as ProcessRawToArd:
-            processRawToArdInfo = json.load(ProcessRawToArd)
-
         metadataConfigPath = os.path.join(self.paths["static"], self.metadataConfigFile)
 
         getConfigTask = CheckFileExists(filePath=metadataConfigPath)
@@ -53,19 +49,20 @@ class GenerateMetadata(luigi.Task):
 
         getTemplateTask = CheckFileExists(filePath=self.metadataTemplate)
 
-        template = ""
+        yield getTemplateTask
 
-        with getTemplateTask.output().open('r') as t:
-            template = t.read()
+        ardProducts = {}
+        with self.input().open("r") as CheckArdProductsFile:
+            ardProducts = json.load(CheckArdProductsFile)
 
         generateMetadataTasks = []
 
         # make metadata file/(s) per product?
-        for output in processRawToArdInfo["products"]:
+        for product in ardProducts["products"]:
             generateMetadataTasks.append(GenerateProductMetadata(paths=self.paths, 
-            inputProduct=output, 
+            inputProduct=product, 
             metadataConfig=metadataConfig,
-            metadataTemplate=template))
+            metadataTemplate=self.metadataTemplate))
 
         yield generateMetadataTasks
 

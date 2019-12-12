@@ -70,4 +70,4 @@ class CreateCOG(luigi.Task):
 
     def output(self):
         outFile = os.path.join(self.paths['state'], "{}_CreateCOG.json".format(self.product["productName"]))
-        return LocalTarget(self.outputFile)
+        return LocalTarget(outFile)

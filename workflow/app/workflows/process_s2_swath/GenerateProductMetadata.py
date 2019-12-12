@@ -88,13 +88,13 @@ class GenerateProductMetadata(luigi.Task):
         arcsiAotValue = arcsiMetadata['ProductsInfo']['ARCSI_AOT_VALUE']
         arcsiLutElevationMax = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MAX']
         arcsiLutElevationMin = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MIN']
-        arcsiVersion = self.metadata["arcsiVersion"]
-        projection = self.metadata ["projection"]
-        referenceSystemCodeSpace = self.metadata ["targetSrs"].split(":")[0]
-        referenceSystemCode = self.metadata ["targetSrs"].split(":")[1]
-        demTitle = self.metadata ["demTitle"]
-        placeName = self.metadata ["placeName"]
-        parentPlaceName = self.metadata ["parentPlaceName"]
+        arcsiVersion = self.metadataConfig["arcsiVersion"]
+        projection = self.metadataConfig["projection"]
+        referenceSystemCodeSpace = self.metadataConfig["targetSrs"].split(":")[0]
+        referenceSystemCode = self.metadataConfig["targetSrs"].split(":")[1]
+        demTitle = self.metadataConfig["demTitle"]
+        placeName = self.metadataConfig["placeName"]
+        parentPlaceName = self.metadataConfig["parentPlaceName"]
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,

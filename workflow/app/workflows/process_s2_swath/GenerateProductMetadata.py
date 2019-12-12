@@ -122,10 +122,9 @@ class GenerateProductMetadata(luigi.Task):
             "parentPlaceName": parentPlaceName
         }
 
-        template = ""
 
         with open(self.metadataTemplate, 'r') as tf:
-            template = tf.read()
+            template = Template(tf.read())
 
         ardMetadata = template.substitute(metadataParams)
         

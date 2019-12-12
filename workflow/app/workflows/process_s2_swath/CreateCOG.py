@@ -36,7 +36,9 @@ class CreateCOG(luigi.Task):
 
     def executeSubProcess(self, cmd):
         try:
-            subprocess.check_output(cmd, shell=True)
+            log.info("Running cmd: " + cmd)
+
+            subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
 
         except subprocess.CalledProcessError as e:
             errStr = "command '{}' returned with error (code {}): {}".format(e.cmd, e.returncode, e.output)

@@ -51,10 +51,7 @@ class CreateCOG(luigi.Task):
                     .filter(lambda x: os.path.splitext(x)[1] == '.kea') \
                     .to_list()
 
-        output = {
-            "productName" : self.product["productName"],
-            "files" : []
-        }
+        tifFiles = []
 
         #Process multiple Kea files simultaneously
         with ProcessPool(max_workers=self.maxCogProcesses) as pool:
@@ -63,9 +60,14 @@ class CreateCOG(luigi.Task):
 
             try:
                 for cogFile in generateCogJobs.result():
-                    output["files"].append(cogFile)
+                    tifFiles.append(cogFile)
             except ProcessExpired as error:
                 log.error("%s. Exit code: %d" % (error, error.exitcode))
+
+        output = {
+            "productName" : self.product["productName"],
+            "files" : tifFiles
+        }
 
         with self.output().open('w') as o:
             json.dump(output, o, indent=4)

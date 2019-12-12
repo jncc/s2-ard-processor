@@ -52,15 +52,15 @@ class CreateCOGs(luigi.Task):
 
     def run(self):
 
-        processRawToArdInfo = {}
+        ardProducts = {}
 
-        with self.input().open('r') as processRawToArdFile:
-            processRawToArdInfo = json.load(processRawToArdFile)
+        with self.input().open('r') as CheckArdProductsFile:
+            ardProducts = json.load(CheckArdProductsFile)
     
         # filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == '.kea', processRawToArdInfo['files']))
 
         cogTasks = []
-        for p in processRawToArdInfo["products"]:
+        for p in ardProducts["products"]:
             cogTasks.append(CreateCOG(paths=self.paths, product=p, maxCogProcesses=self.maxCogProcesses))
         
         yield cogTasks
@@ -70,15 +70,15 @@ class CreateCOGs(luigi.Task):
             with task.output().open('r') as cogInfo:
                 cogProducts.append(json.load(cogInfo))
 
-        numFilesToConvert = seq(processRawToArdInfo["products"]) \
+        numFilesToConvert = seq(ardProducts["products"]) \
                         .map(lambda x: x["files"]) \
                         .flatten() \
                         .count(lambda x: os.path.splitext(x)[1] == '.kea')
 
-        numCogProducts = seq(processRawToArdInfo["products"]) \
+        numCogProducts = seq(cogProducts) \
                         .map(lambda x: x["files"]) \
                         .flatten() \
-                        .count()
+                        .count(lambda x: os.path.splitext(x)[1] == '.tif')
 
         if not numFilesToConvert == numCogProducts:
             log.error("""The length of known files to convert to tif is not the same as the number of converted files, expected conversions for the files;

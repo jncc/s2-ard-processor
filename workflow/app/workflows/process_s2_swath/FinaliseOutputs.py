@@ -66,7 +66,7 @@ class FinaliseOutputs(luigi.Task):
 
                 outputProduct["files"].append(c[1])
 
-            outputList.append[outputProduct]
+            outputList.append(outputProduct)
                 
         output = {"products": outputList}
 

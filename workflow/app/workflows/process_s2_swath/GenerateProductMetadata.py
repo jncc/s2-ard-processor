@@ -12,6 +12,7 @@ class GenerateProductMetadata(luigi.Task):
     inputProduct = luigi.DictParameter()
     metadataConfig = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
+    projAbbv = luigi.Parameter()
 
     def enforce_dd(self, in_data):
         in_data = str(in_data)
@@ -95,6 +96,8 @@ class GenerateProductMetadata(luigi.Task):
         demTitle = self.metadataConfig["demTitle"]
         placeName = self.metadataConfig["placeName"]
         parentPlaceName = self.metadataConfig["parentPlaceName"]
+        targetSrs = self.metadataConfig["targetSrs"]
+        projection = self.projAbbv
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,
@@ -119,7 +122,9 @@ class GenerateProductMetadata(luigi.Task):
             "referenceSystemCode": referenceSystemCode,
             "demTitle": demTitle,
             "placeName": placeName,
-            "parentPlaceName": parentPlaceName
+            "parentPlaceName": parentPlaceName,
+            "targetSrs": targetSrs,
+            "projection": projection
         }
 
 

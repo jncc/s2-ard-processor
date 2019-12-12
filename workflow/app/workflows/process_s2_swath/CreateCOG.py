@@ -55,7 +55,7 @@ class CreateCOG(luigi.Task):
         }
 
         #Process multiple Kea files simultaneously
-        with ProcessPool(max_workers=self.maxCogThreads) as pool:
+        with ProcessPool(max_workers=self.maxCogProcesses) as pool:
 
             generateCogJobs = pool.map(self.generateCogFile, keaFiles)
 

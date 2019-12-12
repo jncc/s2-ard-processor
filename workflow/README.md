@@ -9,7 +9,7 @@
             "arcsiVersion": "v3.1.6",
             "projection" : "OSGB",
             "targetSrs" : "EPSG:27700",
-            "demTitle" : "dem title"
+            "demTitle" : "dem title",
             "placeName" : "United Kingdom",
             "parentPlaceName" : "Europe"}
 

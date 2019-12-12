@@ -149,16 +149,18 @@ class ProcessRawToArd(luigi.Task):
 
         fileListPath = buildFileListOutput["fileListPath"]
 
-        cmd = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA \
-            --interpresamp near --interp cubic -t {} -o {} --projabbv {} --dem {} \
-            -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi -i {}" \
-            .format(
-                self.paths["working"],
-                tempOutdir,
-                self.projAbbv,
-                demFilePath,
-                fileListPath
-            )
+        a = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
+        b = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
+        c = "-t {} -o {} --projabbv {} --dem {} -i {}" \
+        .format(
+            self.paths["working"],
+            tempOutdir,
+            self.projAbbv,
+            demFilePath,
+            fileListPath
+        )
+
+        cmd = "{} {} {}".format(a, b, c)
 
         if self.outWkt != "":
             cmd = cmd + " --outwkt {}".format(projectionWktPath)

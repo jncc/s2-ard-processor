@@ -41,9 +41,9 @@ class GenerateMetadata(luigi.Task):
         with self.input().open("r") as ProcessRawToArd:
             processRawToArdInfo = json.load(ProcessRawToArd)
 
-        metadataConfig = os.path.join(self.paths["static"], self.metadataConfigFile)
+        metadataConfigPath = os.path.join(self.paths["static"], self.metadataConfigFile)
 
-        getConfigTask = CheckFileExists(filePath=self.metadataConfigPath)
+        getConfigTask = CheckFileExists(filePath=metadataConfigPath)
 
         yield getConfigTask
 

@@ -61,7 +61,7 @@ class CreateCOGs(luigi.Task):
 
         cogTasks = []
         for p in processRawToArdInfo["products"]:
-            cogTasks.append(CreateCOG(pathRoots=self.paths, product=p, maxCogProcesses=self.maxCogProcesses))
+            cogTasks.append(CreateCOG(paths=self.paths, product=p, maxCogProcesses=self.maxCogProcesses))
         
         yield cogTasks
         

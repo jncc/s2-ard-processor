@@ -48,14 +48,14 @@ class GenerateMetadata(luigi.Task):
         yield getConfigTask
 
         metadataConfig = {}
-        with getConfigTask.open('r') as m:
+        with getConfigTask.output().open('r') as m:
             metadataConfig = json.load(m)
 
         getTemplateTask = CheckFileExists(filePath=self.metadataTemplatePath)
 
         metadataTemplate = ""
 
-        with getTemplateTask.open('r') as t:
+        with getTemplateTask.output().open('r') as t:
             metadataTemplate = t.read()
 
         generateMetadataTasks = []
@@ -71,7 +71,7 @@ class GenerateMetadata(luigi.Task):
 
         products = []
         for task in generateMetadataTasks:
-            with task.open('r') as productInfo:
+            with task.output().open('r') as productInfo:
                 products.append(json.load(productInfo))
         
         output = {

@@ -67,7 +67,7 @@ class CreateCOGs(luigi.Task):
         
         cogProducts = []
         for task in cogTasks:
-            with task.open('r') as cogInfo:
+            with task.output().open('r') as cogInfo:
                 cogProducts.append(json.load(cogInfo))
 
         numFilesToConvert = seq(processRawToArdInfo["products"]) \

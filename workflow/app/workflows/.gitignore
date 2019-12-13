@@ -1,0 +1,5 @@
+/eo-s2-workflow-venv/
+__pycache__
+*.pyc
+*.pem
+.vscode/

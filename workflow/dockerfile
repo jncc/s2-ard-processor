@@ -1,0 +1,45 @@
+FROM jncc/arcsi-base:latest
+
+# Setup app folder
+WORKDIR /app
+
+# Configure apt
+RUN apt-get update && apt-get -y install \ 
+    apt-utils \
+    unzip
+
+
+# --------- Place machine build layers before this line ---------
+
+# Create processing paths
+RUN mkdir /input/ \
+    && mkdir /static/ \
+    && mkdir /state/ \
+    && mkdir /working/ \
+    && mkdir /output/
+
+# Copy workflow requirements
+COPY /app/workflows/requirements.txt ./workflows/
+
+# Install workflow dependencies
+RUN pip install -r /app/workflows/requirements.txt
+
+# Copy workflows
+COPY /app/workflows ./workflows
+
+# Copy workflow config
+COPY config/app/workflows/luigi.cfg ./workflows
+RUN chmod +r ./workflows/luigi.cfg
+
+# Copy wkt file
+COPY /app/BritishNationalGrid.wkt ./
+
+# Copy the singularity test script
+COPY app/test-luigi.sh ./
+RUN chmod +rx /app/test-luigi.sh
+
+#Initialise startup script
+COPY app/exec.sh ./
+RUN chmod +rx /app/exec.sh
+
+ENTRYPOINT ["/app/exec.sh"]

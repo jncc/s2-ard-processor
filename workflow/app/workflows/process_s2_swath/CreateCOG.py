@@ -73,5 +73,5 @@ class CreateCOG(luigi.Task):
             json.dump(output, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.paths['state'], "{}_CreateCOG.json".format(self.product["productName"]))
+        outFile = os.path.join(self.paths['state'], "CreateCOG_{}.json".format(self.product["productName"]))
         return LocalTarget(outFile)

@@ -54,8 +54,10 @@ class FinaliseOutputs(luigi.Task):
                 "files" : []
             }
 
+            outputPath = os.path.join(self.paths["output"], product["productName"])
+
             copyList = seq(product["files"]) \
-                .map(lambda f: (f, f.replace(cogs["outputDir"], self.paths["output"]))) \
+                .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath))) \
                 .to_list()
 
             for c in copyList:

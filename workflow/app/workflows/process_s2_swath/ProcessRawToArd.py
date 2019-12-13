@@ -151,8 +151,13 @@ class ProcessRawToArd(luigi.Task):
 
         if jasmin:
             cmd = self.GetBsubCommand()
+            # mpi arcsi (runs in lotus job in mpi container)
+            # need the same mount points for static, working, input, and platform_mpi (real paths)
+            # modify base container to have separate mount points for above folders
+            # change orchestration workflow to create "static" bsub for this workflow when submitting mpi jobs
         else
             cmd = self.GetArcisCommand()
+            # serial arcsi (runs within workflow container)
 
         a = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
         b = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"

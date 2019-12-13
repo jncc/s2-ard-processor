@@ -65,6 +65,7 @@ class CheckArdProducts(luigi.Task):
             raise Exception("Product Validation failed")
     
         output = {
+            "outputDir" : expectedProducts["outputDir"],
             "products" : products
         }
         

@@ -3,6 +3,7 @@ import os
 import shutil
 import json
 import logging
+import pprint
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
@@ -11,6 +12,7 @@ from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
+pprinter = pprint.PrettyPrinter()
 
 @requires(GenerateMetadata, CreateCOGs)
 class FinaliseOutputs(luigi.Task):
@@ -54,7 +56,8 @@ class FinaliseOutputs(luigi.Task):
             }
 
             copyList = seq(product["files"]) \
-                .map(lambda f: (f, f.replace(self.paths["working"], self.paths["output"])))
+                .map(lambda f: (f, f.replace(cogs["outputDir"], self.paths["output"]))) \
+                .to_list()
 
             for c in copyList:
                 targetPath = os.path.dirname(c[1])
@@ -71,10 +74,10 @@ class FinaliseOutputs(luigi.Task):
         output = {"products": outputList}
 
         #empty out the working folder
-        clearFolder(self.paths["working"])
+        #clearFolder(self.paths["working"])
 
         with self.output().open('w') as o:
-            json.dump(output, o)
+            json.dump(output, o, indent=4)
 
     def output(self):
         outFile = os.path.join(self.paths['state'], 'FinaliseOutputs.json')

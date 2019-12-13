@@ -94,7 +94,10 @@ class CreateCOGs(luigi.Task):
             )
             raise RuntimeError("Not all files were converted from kea to tif files")
 
-        output = {"products": cogProducts}
+        output = {
+            "outputDir": ardProducts["outputDir"],
+            "products": cogProducts
+            }
 
         with self.output().open('w') as o:
             json.dump(output, o, indent=4)

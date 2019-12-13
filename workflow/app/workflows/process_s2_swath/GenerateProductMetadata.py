@@ -13,6 +13,7 @@ class GenerateProductMetadata(luigi.Task):
     metadataConfig = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
     projAbbv = luigi.Parameter()
+    outputDir = luigi.Parameter()
 
     def enforce_dd(self, in_data):
         in_data = str(in_data)
@@ -135,7 +136,7 @@ class GenerateProductMetadata(luigi.Task):
         
         metadataFileName = "%s_meta.xml" % fileIdentifier
 
-        target = os.path.join(self.paths["working"], metadataFileName)
+        target = os.path.join(self.outputDir, metadataFileName)
 
         with open(target, 'w') as out:
             out.write(ardMetadata)
@@ -160,7 +161,7 @@ class GenerateProductMetadata(luigi.Task):
         }
 
         with self.output().open('w') as o:
-            json.dump(output, o)
+            json.dump(output, o, indent=4)
 
     def output(self):
         outFile = os.path.join(self.paths['state'], 'GenerateProductMetadata_%s.json' % self.inputProduct["productName"])

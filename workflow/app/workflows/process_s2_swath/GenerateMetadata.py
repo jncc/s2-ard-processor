@@ -64,7 +64,8 @@ class GenerateMetadata(luigi.Task):
             inputProduct=product, 
             metadataConfig=metadataConfig,
             metadataTemplate=self.metadataTemplate,
-            projAbbv = self.projAbbv))
+            projAbbv = self.projAbbv,
+            outputDir = ardProducts["outputDir"]))
 
         yield generateMetadataTasks
 
@@ -74,11 +75,12 @@ class GenerateMetadata(luigi.Task):
                 products.append(json.load(productInfo))
         
         output = {
+            "outputDir" : ardProducts["outputDir"],
             "products" : products
         }
             
         with self.output().open('w') as o:
-            json.dump(output, o)
+            json.dump(output, o, indent=4)
 
     def output(self):
         outFile = os.path.join(self.paths['state'], 'GenerateMetadata.json')

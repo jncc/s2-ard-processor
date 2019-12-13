@@ -187,6 +187,8 @@ class ProcessRawToArd(luigi.Task):
                     if not os.path.exists(testFilepath):
                         with open(testFilepath, "w") as testFile:
                             testFile.write("TEST")
+                            
+        expectedProducts["outputDir"] = tempOutdir
 
         with self.output().open('w') as o:
             json.dump(expectedProducts, o, indent=4)

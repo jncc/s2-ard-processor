@@ -12,7 +12,6 @@ from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
-pp = pprint.PrettyPrinter(indent=4)
 
 @requires(GenerateMetadata, CreateCOGs)
 class FinaliseOutputs(luigi.Task):
@@ -30,7 +29,7 @@ class FinaliseOutputs(luigi.Task):
             meta = json.load(gm)
 
         cogs = {}
-        with self.input()[0].open('r') as c:
+        with self.input()[1].open('r') as c:
             cogs = json.load(c)
 
         # Combine metadata and products 
@@ -41,10 +40,6 @@ class FinaliseOutputs(luigi.Task):
                         .map(lambda x: (x["productName"], x["files"]))) \
                     .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten()}) \
                     .to_list()
-
-
-        log.debug("PRODUCT LIST")
-        log.debug(pp.pprint(productList))
 
         # Rename Files
         # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
@@ -62,9 +57,6 @@ class FinaliseOutputs(luigi.Task):
             copyList = seq(product["files"]) \
                 .map(lambda f: (f, f.replace(cogs["outputDir"], self.paths["output"]))) \
                 .to_list()
-
-            log.debug("COPY LIST {}".format(product["productName"]))
-            log.debug(pp.pprint(copyList))
 
             for c in copyList:
                 targetPath = os.path.dirname(c[1])

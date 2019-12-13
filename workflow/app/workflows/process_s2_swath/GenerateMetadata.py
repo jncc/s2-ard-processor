@@ -35,7 +35,6 @@ class GenerateMetadata(luigi.Task):
     paths = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
     metadataConfigFile = luigi.Parameter()
-    projAbbv = luigi.Parameter()
 
     def run(self):
         metadataConfigPath = os.path.join(self.paths["static"], self.metadataConfigFile)
@@ -64,7 +63,6 @@ class GenerateMetadata(luigi.Task):
             inputProduct=product, 
             metadataConfig=metadataConfig,
             metadataTemplate=self.metadataTemplate,
-            projAbbv = self.projAbbv,
             outputDir = ardProducts["outputDir"]))
 
         yield generateMetadataTasks

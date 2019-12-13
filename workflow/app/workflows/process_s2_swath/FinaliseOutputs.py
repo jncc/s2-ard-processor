@@ -75,7 +75,7 @@ class FinaliseOutputs(luigi.Task):
         output = {"products": outputList}
 
         #empty out the working folder
-        #clearFolder(self.paths["working"])
+        clearFolder(self.paths["working"])
 
         with self.output().open('w') as o:
             json.dump(output, o, indent=4)

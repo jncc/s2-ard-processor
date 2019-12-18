@@ -73,17 +73,8 @@ class ProcessRawToArd(luigi.Task):
     paths = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
-    outWkt = luigi.Parameter(default = "")
-    projAbbv = luigi.Parameter()
-
-    def getBaseNameFromFilename(self, filename):
-        return "SEN2_%s_*_%s_ORB%s_*%s" % \
-            (
-                product["date"],
-                product["tileId"],
-                satelliteAndOrbitNoOutput["orbitNumber"],
-                self.projAbbv
-            )
+    outWkt = luigi.OptionalParameter()
+    projAbbv = luigi.OptionalParameter()
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -96,13 +87,17 @@ class ProcessRawToArd(luigi.Task):
                 "files": []
             }
 
+            abv = "*"
 
+            if self.projAbbv: 
+                abv = self.projAbbv
+            
             basename = "SEN2_%s_*_%s_ORB%s_*_%s_" % \
                 (
                     product["date"],
                     product["tileId"],
                     satelliteAndOrbitNoOutput["orbitNumber"],
-                    self.projAbbv
+                    abv
                 )
 
             basename = os.path.join(outDir, basename)
@@ -161,19 +156,21 @@ class ProcessRawToArd(luigi.Task):
 
         a = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
         b = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
-        c = "-t {} -o {} --projabbv {} --dem {} -i {}" \
+        c = "-t {} -o {} --dem {} -i {}" \
         .format(
             self.paths["working"],
             tempOutdir,
-            self.projAbbv,
             demFilePath,
             fileListPath
         )
 
         cmd = "{} {} {}".format(a, b, c)
 
-        if self.outWkt != "":
+        if self.outWkt:
             cmd = cmd + " --outwkt {}".format(projectionWktPath)
+
+        if self.projAbbv:
+            cmd = cmd + " --projabbv {}".format(self.projAbbv)
 
         expectedProducts = self.getExpectedProductFilePatterns(tempOutdir, satelliteAndOrbitNoOutput, swathInfo)
         if not self.testProcessing:

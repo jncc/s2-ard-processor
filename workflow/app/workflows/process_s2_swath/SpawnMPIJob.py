@@ -22,9 +22,11 @@ class SpawnMPIJob(luigi.Task):
     tempOutDir = luigi.Parameter()
     fileListPath = luigi.Parameter()
 
+
     def run(self):
         # load configuration
-        getConfigTask = CheckFileExists(filePath=self.jasminMpiConfig)
+        mpiConfigPath = os.path.join(self.paths["working"], self.jasminMpiConfig)
+        getConfigTask = CheckFileExists(filePath=mpiConfigPath)
 
         yield getConfigTask
 

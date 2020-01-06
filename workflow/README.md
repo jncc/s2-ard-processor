@@ -16,9 +16,8 @@
 
 # If running MPI jobs
 - jasmin-mpi-config.json file (in root of static folder)
-** NOTE Paths relative to host.
+
 {
-    "hostWorkingPath" : "/the/path/mounted/to/working",
     "container" : {
         "location" : "/img/path/imag.simg",
         "mounts" : [

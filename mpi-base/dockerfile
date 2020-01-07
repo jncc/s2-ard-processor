@@ -17,7 +17,7 @@ ENV MPI_WORKDIR /data
 # Make mount points
 RUN mkdir /input && \
     mkdir /output && \
-    mkdur /working && \
+    mkdir /working && \
     mkdir /state && \
     mkdir /static
 

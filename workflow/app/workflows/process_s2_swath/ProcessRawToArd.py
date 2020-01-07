@@ -12,7 +12,7 @@ from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
 from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
 from process_s2_swath.CheckFileExists import CheckFileExists
-from process_s2_swath.spawnMpiJob import SpawnMPIJob
+from process_s2_swath.SpawnMPIJob import SpawnMPIJob
 
 log = logging.getLogger("luigi-interface")
 

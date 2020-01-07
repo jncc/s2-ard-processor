@@ -13,3 +13,4 @@ import process_s2_swath.GetSatelliteAndOrbitNumber
 import process_s2_swath.GetSwathInfo
 import process_s2_swath.ProcessRawToArd
 import process_s2_swath.UnzipRaw
+import process_s2_swath.SpawnMPIJob

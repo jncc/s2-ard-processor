@@ -12,6 +12,6 @@ Push to local registry
 
 Build singularity image
 
-    sudo SINGULARITY_NOHTTPS=1 singularity build ./img/arcsi-base-mpi.simg docker://localhost:5000/arcsi-base-mpi
+    sudo SINGULARITY_NOHTTPS=1 singularity build arcsi-base-mpi.simg docker://localhost:5000/arcsi-base-mpi
 
 

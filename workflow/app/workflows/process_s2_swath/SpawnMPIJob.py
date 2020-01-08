@@ -71,7 +71,8 @@ class SpawnMPIJob(luigi.Task):
             out.write(bsub)
 
         #todo swap working path (hostWorkingPath)
-        cmd = "bsub -x < {}".format(target)
+        #todo parameterise the bsub path?
+        cmd = "/apps/lsf/10.1/linux2.6-glibc2.3-x86_64/bin/bsub -x < {}".format(target)
         
         if not self.testProcessing:
             try:

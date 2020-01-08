@@ -87,6 +87,8 @@ class ProcessRawToArd(luigi.Task):
         for product in swathInfo["products"]:
             expected = {
                 "productName": product["productName"],
+                "date" : product["date"],
+                "tileId" : product["tileId"],
                 "files": []
             }
 

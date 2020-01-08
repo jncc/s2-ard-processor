@@ -71,7 +71,7 @@ class SpawnMPIJob(luigi.Task):
             out.write(bsub)
 
         #todo swap working path (hostWorkingPath)
-        cmd = "busb -x < {}".format(target)
+        cmd = "bsub -x < {}".format(target)
         
         if not self.testProcessing:
             try:

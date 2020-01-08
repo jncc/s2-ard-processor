@@ -18,6 +18,9 @@ RUN mkdir /input/ \
     && mkdir /working/ \
     && mkdir /output/
 
+# Create mount point for LOTUS LSF commands
+RUN mkdir -p /apps/lsf/
+
 # Copy workflow requirements
 COPY /app/workflows/requirements.txt ./workflows/
 

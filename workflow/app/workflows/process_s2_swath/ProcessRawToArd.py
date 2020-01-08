@@ -87,6 +87,8 @@ class ProcessRawToArd(luigi.Task):
         for product in swathInfo["products"]:
             expected = {
                 "productName": product["productName"],
+                "date" : product["date"],
+                "tileId" : product["tileId"],
                 "files": []
             }
 
@@ -130,8 +132,8 @@ class ProcessRawToArd(luigi.Task):
         yield checkTasks
 
         # Create / cleanout output directory
-        tempOutdir = os.path.join(self.paths["working"], "output")
-        createDirectory(tempOutdir)
+        tempOutDir = os.path.join(self.paths["working"], "output")
+        createDirectory(tempOutDir)
 
         buildFileListOutput = {}
         swathInfo = {}
@@ -156,7 +158,7 @@ class ProcessRawToArd(luigi.Task):
         # else
         #     cmd = self.GetArcisCommand()
             # serial arcsi (runs within workflow container)
-        expectedProducts = self.getExpectedProductFilePatterns(tempOutdir, satelliteAndOrbitNoOutput, swathInfo)
+        expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
 
         if self.jasminMpi:
             spawnMpiTask = SpawnMPIJob(
@@ -167,7 +169,7 @@ class ProcessRawToArd(luigi.Task):
                 projAbbv = self.projAbbv,
                 jasminMpiConfig = self.jasminMpiConfig,
                 productCount = len(swathInfo["products"]),
-                tempOutdir = tempOutdir,
+                tempOutDir = tempOutDir,
                 fileListPath = fileListPath
             )
 
@@ -178,7 +180,7 @@ class ProcessRawToArd(luigi.Task):
             c = "-t {} -o {} --dem {} -i {}" \
             .format(
                 self.paths["working"],
-                tempOutdir,
+                tempOutDir,
                 demFilePath,
                 fileListPath
             )
@@ -207,13 +209,13 @@ class ProcessRawToArd(luigi.Task):
                 for expectedProduct in expectedProducts["products"]:
                     for filePattern in expectedProduct["files"]:
                         testFilename = filePattern.replace("*", "TEST")
-                        testFilepath = os.path.join(tempOutdir, testFilename)
+                        testFilepath = os.path.join(tempOutDir, testFilename)
 
                         if not os.path.exists(testFilepath):
                             with open(testFilepath, "w") as testFile:
                                 testFile.write("TEST")
                             
-        expectedProducts["outputDir"] = tempOutdir
+        expectedProducts["outputDir"] = tempOutDir
 
         with self.output().open('w') as o:
             json.dump(expectedProducts, o, indent=4)

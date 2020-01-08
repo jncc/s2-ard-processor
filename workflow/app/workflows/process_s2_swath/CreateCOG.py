@@ -66,6 +66,8 @@ class CreateCOG(luigi.Task):
 
         output = {
             "productName" : self.product["productName"],
+            "date" : self.product["date"],
+            "tileId" : self.product["tileId"],
             "files" : tifFiles
         }
 

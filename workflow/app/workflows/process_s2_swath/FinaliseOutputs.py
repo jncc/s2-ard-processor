@@ -51,11 +51,15 @@ class FinaliseOutputs(luigi.Task):
         for product in productList:
             outputProduct = {
                 "productName" : product["productName"],
+                "date" : product["date"],
+                "tileId" : product["tileId"],
                 "files" : []
             }
 
-            outputPath = os.path.join(self.paths["output"], product["productName"])
-
+            #Todo: move file to folder with structure based on start date as YYYY/MM/DD
+            pDate =  datetime.strptime(product["date"],"%Y%m%d").date()
+            outputPath = os.path.join(self.paths["output"], pDate.year, pDate.month, pDate.day, product["productName"])
+            
             copyList = seq(product["files"]) \
                 .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath))) \
                 .to_list()

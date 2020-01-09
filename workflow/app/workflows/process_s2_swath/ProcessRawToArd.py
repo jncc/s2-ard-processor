@@ -164,9 +164,9 @@ class ProcessRawToArd(luigi.Task):
         if self.jasminMpi:
             spawnMpiTask = SpawnMPIJob(
                 paths = self.paths,
-                dem = self.dem,
+                dem = demFilePath,
                 testProcessing = self.testProcessing,
-                outWkt = self.outWkt,
+                outWkt = projectionWktPath,
                 projAbbv = self.projAbbv,
                 jasminMpiConfig = self.jasminMpiConfig,
                 productCount = len(swathInfo["products"]),

@@ -58,7 +58,7 @@ class FinaliseOutputs(luigi.Task):
 
             #Todo: move file to folder with structure based on start date as YYYY/MM/DD
             pDate =  datetime.strptime(product["date"],"%Y%m%d").date()
-            outputPath = os.path.join(self.paths["output"], pDate.year, pDate.month, pDate.day, product["productName"])
+            outputPath = os.path.join(self.paths["output"], pDate.year, "{:02d}".format(pDate.month), "{:02d}".format(pDate.day), product["productName"])
             
             copyList = seq(product["files"]) \
                 .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath))) \

@@ -21,7 +21,7 @@ class SpawnMPIJob(luigi.Task):
     productCount = luigi.IntParameter()
     tempOutDir = luigi.Parameter()
     fileListPath = luigi.Parameter()
-
+    bsubCmdPath = luigi.Parameter()
 
     def run(self):
         # load configuration
@@ -71,8 +71,7 @@ class SpawnMPIJob(luigi.Task):
             out.write(bsub)
 
         #todo swap working path (hostWorkingPath)
-        #todo parameterise the bsub path?
-        cmd = "/apps/lsf/10.1/linux2.6-glibc2.3-x86_64/bin/bsub -x < {}".format(target)
+        cmd = "{} < {}".format(self.bsubCmdPath, target)
         
         if not self.testProcessing:
             try:

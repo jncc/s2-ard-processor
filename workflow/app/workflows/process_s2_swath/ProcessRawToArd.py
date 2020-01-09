@@ -78,7 +78,7 @@ class ProcessRawToArd(luigi.Task):
     projAbbv = luigi.OptionalParameter()
     jasminMpi = luigi.BoolParameter(default = False)
     jasminMpiConfig = luigi.OptionalParameter()
-    bsubCmdPath = luigi.Parameter()
+    jasminPathEnv = luigi.OptionalParameter()
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -172,7 +172,7 @@ class ProcessRawToArd(luigi.Task):
                 productCount = len(swathInfo["products"]),
                 tempOutDir = tempOutDir,
                 fileListPath = fileListPath,
-                bsubCmdPath = self.bsubCmdPath
+                jasminPathEnv = self.jasminPathEnv
             )
 
             yield spawnMpiTask

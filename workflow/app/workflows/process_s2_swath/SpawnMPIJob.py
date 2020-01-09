@@ -21,7 +21,7 @@ class SpawnMPIJob(luigi.Task):
     productCount = luigi.IntParameter()
     tempOutDir = luigi.Parameter()
     fileListPath = luigi.Parameter()
-    bsubCmdPath = luigi.Parameter()
+    jasminPathEnv = luigi.Parameter()
 
     def run(self):
         # load configuration
@@ -72,13 +72,16 @@ class SpawnMPIJob(luigi.Task):
             out.write(bsub)
 
         #todo swap working path (hostWorkingPath)
-        cmd = "{} < {}".format(self.bsubCmdPath, target)
+        cmd = "bsub < {}".format(target)
         
         if not self.testProcessing:
             try:
+                jasmin_env = os.environ.copy()
+                jasmin_env["PATH"] = self.jasminPathEnv
+
                 log.info("Running cmd: " + cmd)
 
-                subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
+                subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True, env=jasmin_env)
                 
             except subprocess.CalledProcessError as e:
                 errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)

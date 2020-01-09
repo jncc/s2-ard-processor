@@ -41,7 +41,7 @@ class SpawnMPIJob(luigi.Task):
 
         yield getTemplateTask
 
-        with getConfigTask.output().open('r') as t:
+        with getTemplateTask.output().open('r') as t:
             template = Template(t.read())
 
         # compute nodes

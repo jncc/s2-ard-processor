@@ -79,6 +79,8 @@ class SpawnMPIJob(luigi.Task):
                 jasmin_env = os.environ.copy()
                 jasmin_env["PATH"] = self.jasminPathEnv
 
+                log.info("subprocess PATH=" + self.jasminPathEnv)
+
                 log.info("Running cmd: " + cmd)
 
                 subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True, env=jasmin_env)

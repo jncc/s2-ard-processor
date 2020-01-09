@@ -55,7 +55,7 @@ class SpawnMPIJob(luigi.Task):
             "mounts" : mounts,
             "arcsiContainer": mpiConfig["container"]["location"],
             "working": self.paths["working"],
-            "tempOutdir": self.tempOutDir,
+            "tempOutDir": self.tempOutDir,
             "projabbv": self.projAbbv,
             "outWkt" : self.outWkt,
             "dem" : self.dem,

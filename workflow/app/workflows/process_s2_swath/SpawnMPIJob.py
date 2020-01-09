@@ -88,7 +88,7 @@ class SpawnMPIJob(luigi.Task):
                 log.error(errStr)
                 raise RuntimeError(errStr)
 
-        #todo: should be job number reall
+        #todo: should be job number really
         output = {
             "job" : "started"
         }
@@ -97,5 +97,5 @@ class SpawnMPIJob(luigi.Task):
             json.dump(output, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.paths['state'], 'ProcessRawToArd.json')
+        outFile = os.path.join(self.paths['state'], 'SpawnMPIJob.json')
         return LocalTarget(outFile)

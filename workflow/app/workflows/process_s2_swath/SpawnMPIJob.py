@@ -59,7 +59,8 @@ class SpawnMPIJob(luigi.Task):
             "projabbv": self.projAbbv,
             "outWkt" : self.outWkt,
             "dem" : self.dem,
-            "fileList" : self.fileListPath
+            "fileList" : self.fileListPath,
+            "jobWorkingDir": mpiConfig["jobWorkingDir"]
         }
 
         bsub = template.substitute(bsubParams)

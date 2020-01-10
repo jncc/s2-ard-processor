@@ -47,6 +47,8 @@ class CheckArdProducts(luigi.Task):
         for expectedProduct in expectedProducts["products"]:
             product = {
                 "productName" : expectedProduct["productName"],
+                "date" : expectedProduct["date"],
+                "tileId" : expectedProduct["tileId"],
                 "files" : []
             }
 

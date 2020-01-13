@@ -34,11 +34,11 @@ class FinaliseOutputs(luigi.Task):
 
         # Combine metadata and products 
         productList = seq(cogs["products"]) \
-                    .map(lambda x: (x["productName"], x["files"])) \
+                    .map(lambda x: (x["productName"], x["files"], x["date"], x["tileId"])) \
                     .join(
                         seq(meta["products"]) \
                         .map(lambda x: (x["productName"], x["files"]))) \
-                    .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten()}) \
+                    .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten(), "date": x[2], "tileId": x[3]}) \
                     .to_list()
 
         # Rename Files

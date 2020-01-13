@@ -4,6 +4,7 @@ import shutil
 import json
 import logging
 import pprint
+from datetime import datetime
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
@@ -38,7 +39,11 @@ class FinaliseOutputs(luigi.Task):
                     .join(
                         seq(meta["products"]) \
                         .map(lambda x: (x["productName"], x["files"]))) \
-                    .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten(), "date": x[2], "tileId": x[3]}) \
+                    .map(lambda x: {
+                        "productName": x[0],
+                        "files": seq(x[1]).flatten(),
+                        "date": next(filter(lambda y: y["productName"] == x[0], cogs["products"]))["date"],
+                        "tileId": next(filter(lambda y: y["productName"] == x[0], cogs["products"]))["tileId"]}) \
                     .to_list()
 
         # Rename Files
@@ -58,7 +63,7 @@ class FinaliseOutputs(luigi.Task):
 
             #Todo: move file to folder with structure based on start date as YYYY/MM/DD
             pDate =  datetime.strptime(product["date"],"%Y%m%d").date()
-            outputPath = os.path.join(self.paths["output"], pDate.year, "{:02d}".format(pDate.month), "{:02d}".format(pDate.day), product["productName"])
+            outputPath = os.path.join(self.paths["output"], str(pDate.year), "{:02d}".format(pDate.month), "{:02d}".format(pDate.day), product["productName"])
             
             copyList = seq(product["files"]) \
                 .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath))) \

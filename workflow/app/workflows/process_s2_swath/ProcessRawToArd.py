@@ -10,13 +10,11 @@ from process_s2_swath.common import createDirectory
 from process_s2_swath.BuildFileList import BuildFileList
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
-from process_s2_swath.CheckFileExists import CheckFileExists
-from process_s2_swath.SpawnMPIJob import SpawnMPIJob
+from process_s2_swath.PrepareArdProcessing import PrepareArdProcessing
 
 log = logging.getLogger("luigi-interface")
 
-@requires(BuildFileList, GetSwathInfo, GetSatelliteAndOrbitNumber)
+@requires(BuildFileList, GetSwathInfo, GetSatelliteAndOrbitNumber, PrepareArdProcessing)
 class ProcessRawToArd(luigi.Task):
 
     """
@@ -76,9 +74,8 @@ class ProcessRawToArd(luigi.Task):
     testProcessing = luigi.BoolParameter(default = False)
     outWkt = luigi.OptionalParameter()
     projAbbv = luigi.OptionalParameter()
-    jasminMpi = luigi.BoolParameter(default = False)
-    jasminMpiConfig = luigi.OptionalParameter()
-    jasminPathEnv = luigi.OptionalParameter()
+    mpi = luigi.BoolParameter(default = False)
+    mpirunCmd = luigi.OptionalParameter()
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -120,22 +117,6 @@ class ProcessRawToArd(luigi.Task):
         return expectedProducts
 
     def run(self):
-        # Check dem, wkt exist
-        demFilePath = os.path.join(self.paths["static"], self.dem)
-        projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
-
-        checkTasks = []
-        checkTasks.append(CheckFileExists(filePath=demFilePath))
-
-        if self.outWkt != "":
-            checkTasks.append(CheckFileExists(filePath=projectionWktPath))
-
-        yield checkTasks
-
-        # Create / cleanout output directory
-        tempOutDir = os.path.join(self.paths["working"], "output")
-        createDirectory(tempOutDir)
-
         buildFileListOutput = {}
         swathInfo = {}
         satelliteAndOrbitNoOutput = {}
@@ -150,72 +131,48 @@ class ProcessRawToArd(luigi.Task):
 
         fileListPath = buildFileListOutput["fileListPath"]
 
-        # if jasmin:
-        #     cmd = self.GetBsubCommand()
-        #     # mpi arcsi (runs in lotus job in mpi container)
-        #     # need the same mount points for static, working, input, and platform_mpi (real paths)
-        #     # modify base container to have separate mount points for above folders
-        #     # change orchestration workflow to create "static" bsub for this workflow when submitting mpi jobs
-        # else
-        #     cmd = self.GetArcisCommand()
-            # serial arcsi (runs within workflow container)
         expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
+        
+        a = "arcsi.py" if not self.mpi else "{} arcsimpi.py".format(self.mpirunCmd)
+        b = " -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
+        c = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
+        d = "-t {} -o {} --dem {} -i {}" \
+        .format(
+            self.paths["working"],
+            tempOutDir,
+            demFilePath,
+            fileListPath
+        )
 
-        if self.jasminMpi:
-            spawnMpiTask = SpawnMPIJob(
-                paths = self.paths,
-                dem = demFilePath,
-                testProcessing = self.testProcessing,
-                outWkt = projectionWktPath,
-                projAbbv = self.projAbbv,
-                jasminMpiConfig = self.jasminMpiConfig,
-                productCount = len(swathInfo["products"]),
-                tempOutDir = tempOutDir,
-                fileListPath = fileListPath,
-                jasminPathEnv = self.jasminPathEnv
-            )
+        cmd = "{} {} {} {}".format(a, b, c, d)
 
-            yield spawnMpiTask
+        if self.outWkt:
+            cmd = cmd + " --outwkt {}".format(projectionWktPath)
+
+        if self.projAbbv:
+            cmd = cmd + " --projabbv {}".format(self.projAbbv)
+
+        if not self.testProcessing:
+            try:
+                log.info("Running cmd: " + cmd)
+
+                subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
+                
+            except subprocess.CalledProcessError as e:
+                errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
+                log.error(errStr)
+                raise RuntimeError(errStr)
         else:
-            a = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
-            b = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
-            c = "-t {} -o {} --dem {} -i {}" \
-            .format(
-                self.paths["working"],
-                tempOutDir,
-                demFilePath,
-                fileListPath
-            )
+            #TODO: this needs refactoring to an external command that creats mock files
+            log.info("Generating mock output files")
+            for expectedProduct in expectedProducts["products"]:
+                for filePattern in expectedProduct["files"]:
+                    testFilename = filePattern.replace("*", "TEST")
+                    testFilepath = os.path.join(tempOutDir, testFilename)
 
-            cmd = "{} {} {}".format(a, b, c)
-
-            if self.outWkt:
-                cmd = cmd + " --outwkt {}".format(projectionWktPath)
-
-            if self.projAbbv:
-                cmd = cmd + " --projabbv {}".format(self.projAbbv)
-
-            if not self.testProcessing:
-                try:
-                    log.info("Running cmd: " + cmd)
-
-                    subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
-                    
-                except subprocess.CalledProcessError as e:
-                    errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
-                    log.error(errStr)
-                    raise RuntimeError(errStr)
-            else:
-                #TODO: this needs refactoring to an external command that creats mock files
-                log.info("Generating mock output files")
-                for expectedProduct in expectedProducts["products"]:
-                    for filePattern in expectedProduct["files"]:
-                        testFilename = filePattern.replace("*", "TEST")
-                        testFilepath = os.path.join(tempOutDir, testFilename)
-
-                        if not os.path.exists(testFilepath):
-                            with open(testFilepath, "w") as testFile:
-                                testFile.write("TEST")
+                    if not os.path.exists(testFilepath):
+                        with open(testFilepath, "w") as testFile:
+                            testFile.write("TEST")
                             
         expectedProducts["outputDir"] = tempOutDir
 

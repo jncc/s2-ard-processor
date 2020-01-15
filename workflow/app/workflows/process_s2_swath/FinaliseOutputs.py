@@ -10,11 +10,13 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateMetadata import GenerateMetadata
 from process_s2_swath.CreateCOGs import CreateCOGs
+from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.CreateThumbnails import CreateThumbnails
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
 
-@requires(GenerateMetadata, CreateCOGs)
+@requires(GenerateMetadata, CreateCOGs, CreateThumbnails, GetSwathInfo)
 class FinaliseOutputs(luigi.Task):
     """
     Cleanup and other work should go here
@@ -26,24 +28,35 @@ class FinaliseOutputs(luigi.Task):
         # files to keep: .tif, .json, and any of our metadata files 
         # e.g. http://gws-access.ceda.ac.uk/public/defra_eo/sentinel/2/processed/ard/SEPA/
         meta = {}
-        with self.input()[0].open('r') as gm:
-            meta = json.load(gm)
-
         cogs = {}
-        with self.input()[1].open('r') as c:
+        thumbs = {}
+        info = {}
+
+        with self.input()[0].open('r') as gm,
+            self.input()[1].open('r') as c,
+            self.input()[2].open('r') as t,
+            self.input()[3].open('r') as i:
+
+            meta = json.load(gm)
             cogs = json.load(c)
+            thumbs = json.load(t)
+            info = json.load(i)
+
 
         # Combine metadata and products 
         productList = seq(cogs["products"]) \
-                    .map(lambda x: (x["productName"], x["files"], x["date"], x["tileId"])) \
+                    .map(lambda x: (x["productName"], x["files"])) \
                     .join(
                         seq(meta["products"]) \
+                        .map(lambda x: (x["productName"], x["files"]))) \
+                    .join(
+                        seq(thumbs["products"]) \
                         .map(lambda x: (x["productName"], x["files"]))) \
                     .map(lambda x: {
                         "productName": x[0],
                         "files": seq(x[1]).flatten(),
-                        "date": next(filter(lambda y: y["productName"] == x[0], cogs["products"]))["date"],
-                        "tileId": next(filter(lambda y: y["productName"] == x[0], cogs["products"]))["tileId"]}) \
+                        "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
+                        "tileId": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["tileId"]}) \
                     .to_list()
 
         # Rename Files

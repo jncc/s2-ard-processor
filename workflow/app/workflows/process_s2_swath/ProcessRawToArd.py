@@ -88,8 +88,6 @@ class ProcessRawToArd(luigi.Task):
         for product in swathInfo["products"]:
             expected = {
                 "productName": product["productName"],
-                "date" : product["date"],
-                "tileId" : product["tileId"],
                 "files": []
             }
 
@@ -150,15 +148,6 @@ class ProcessRawToArd(luigi.Task):
 
         fileListPath = buildFileListOutput["fileListPath"]
 
-        # if jasmin:
-        #     cmd = self.GetBsubCommand()
-        #     # mpi arcsi (runs in lotus job in mpi container)
-        #     # need the same mount points for static, working, input, and platform_mpi (real paths)
-        #     # modify base container to have separate mount points for above folders
-        #     # change orchestration workflow to create "static" bsub for this workflow when submitting mpi jobs
-        # else
-        #     cmd = self.GetArcisCommand()
-            # serial arcsi (runs within workflow container)
         expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
 
         if self.jasminMpi:

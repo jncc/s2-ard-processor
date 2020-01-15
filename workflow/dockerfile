@@ -12,11 +12,11 @@ RUN apt-get update && apt-get -y install \
 # --------- Place machine build layers before this line ---------
 
 # Create processing paths
-RUN mkdir /input/ \
-    && mkdir /static/ \
-    && mkdir /state/ \
-    && mkdir /working/ \
-    && mkdir /output/
+RUN mkdir -p /input/ \
+    && mkdir -p /static/ \
+    && mkdir -p /state/ \
+    && mkdir -p /working/ \
+    && mkdir -p /output/
 
 # Create mount point for LOTUS LSF commands
 RUN mkdir -p /apps/lsf/

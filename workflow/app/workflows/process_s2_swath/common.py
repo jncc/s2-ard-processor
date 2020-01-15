@@ -31,3 +31,7 @@ def checkFileExists(filePath):
     if not os.path.getsize(filePath) > 0:
         raise Exception("Something went wrong, file size is 0 for " + filePath)
     return filePath
+
+def writeBinaryFile(filePath):
+    with open(filePath, 'wb') as f:
+        f.write(bytes([10]))

@@ -21,7 +21,63 @@ class PrepareArdProcessing(luigi.Task):
     dem = luigi.Parameter()
     outWkt = luigi.OptionalParameter()
 
+    def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
+        expectedProducts = {
+            "products": []
+        }
+
+        for product in swathInfo["products"]:
+            expected = {
+                "productName": product["productName"],
+                "date" : product["date"],
+                "tileId" : product["tileId"],
+                "files": []
+            }
+
+            abv = "*"
+
+            if self.projAbbv: 
+                abv = self.projAbbv
+            
+            basename = "SEN2_%s_*_%s_ORB%s_*_%s_" % \
+                (
+                    product["date"],
+                    product["tileId"],
+                    satelliteAndOrbitNoOutput["orbitNumber"],
+                    abv
+                )
+
+            basename = os.path.join(outDir, basename)
+
+            expected["files"].append(basename + "clouds.kea")
+            expected["files"].append(basename + "meta.json")
+            expected["files"].append(basename + "sat.kea")
+            expected["files"].append(basename + "toposhad.kea")
+            expected["files"].append(basename + "valid.kea")
+            expected["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.kea")
+
+            expectedProducts["products"].append(expected)
+        
+        return expectedProducts
+
     def run(self):
+        # Generate expected products list
+        buildFileListOutput = {}
+        swathInfo = {}
+        satelliteAndOrbitNoOutput = {}
+
+        with self.input()[0].open('r') as buildFileListFile, \
+            self.input()[1].open('r') as swathInfoFile, \
+            self.input()[2].open('r') as satelliteAndOrbitNoFile:
+            
+            swathInfo = json.load(swathInfoFile)
+            satelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
+            buildFileListOutput = json.load(buildFileListFile)
+
+        fileListPath = buildFileListOutput["fileListPath"]
+
+        expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
+
         # Check dem, wkt exist
         demFilePath = os.path.join(self.paths["static"], self.dem)
         projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
@@ -38,8 +94,15 @@ class PrepareArdProcessing(luigi.Task):
         tempOutDir = os.path.join(self.paths["working"], "output")
         createDirectory(tempOutDir)
 
+        output = {
+            "fileListPath": fileListPath,
+            "expectedProducts": expectedProducts,
+            "tempOutDir": tempOutDir,
+            "demFilePath": demFilePath,
+            "projectionWktPath": projectionWktPath
+        }
         with self.output().open('w') as o:
-            json.dump("Ready for ARD processing", o, indent=4)
+            json.dump(output, o, indent=4)
 
     def output(self):
         outFile = os.path.join(self.paths['state'], 'PrepareArdProcessing.json')

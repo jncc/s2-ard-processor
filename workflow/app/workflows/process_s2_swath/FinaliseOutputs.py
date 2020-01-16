@@ -52,6 +52,7 @@ class FinaliseOutputs(luigi.Task):
                     .join(
                         seq(meta["products"]) \
                         .map(lambda x: (x["productName"], x["files"]))) \
+                    .map(lambda x: (x[0], seq(x[1]).flatten())) \
                     .join(
                         seq(thumbs["products"]) \
                         .map(lambda x: (x["productName"], x["files"]))) \
@@ -66,7 +67,6 @@ class FinaliseOutputs(luigi.Task):
         # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
         # Move products to output
         log.info("Moving products to output folder {}".format(self.paths["output"]))
-        pp.pprint(productList)
         outputList = []
 
         for product in productList:

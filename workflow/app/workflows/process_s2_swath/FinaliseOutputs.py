@@ -32,9 +32,9 @@ class FinaliseOutputs(luigi.Task):
         thumbs = {}
         info = {}
 
-        with self.input()[0].open('r') as gm,
-            self.input()[1].open('r') as c,
-            self.input()[2].open('r') as t,
+        with self.input()[0].open('r') as gm, \
+            self.input()[1].open('r') as c, \
+            self.input()[2].open('r') as t, \
             self.input()[3].open('r') as i:
 
             meta = json.load(gm)

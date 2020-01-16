@@ -5,13 +5,15 @@ import logging
 import json
 from functional import seq
 from luigi import LocalTarget
+from luigi.util import requires
 from pebble import ProcessPool, ProcessExpired
 from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.common import writeBinaryFile 
 
-
+@requires(CreateCOGs)
 class CreateThumbnails(luigi.Task):
 
+    paths = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter()
     testProcessing = luigi.BoolParameter(default = False)
 
@@ -73,5 +75,5 @@ class CreateThumbnails(luigi.Task):
             json.dump(output, o, indent=4)
 
     def output(self):
-        outFile = os.path.join(self.paths['state'], "CreateThumbnails.json"))
+        outFile = os.path.join(self.paths['state'], "CreateThumbnails.json")
         return LocalTarget(outFile)

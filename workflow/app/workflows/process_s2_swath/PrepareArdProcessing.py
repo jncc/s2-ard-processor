@@ -20,6 +20,7 @@ class PrepareArdProcessing(luigi.Task):
     paths = luigi.DictParameter()
     dem = luigi.Parameter()
     outWkt = luigi.OptionalParameter()
+    projAbbv = luigi.OptionalParameter(default = None)
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -34,10 +35,10 @@ class PrepareArdProcessing(luigi.Task):
                 "files": []
             }
 
-            abv = "*"
-
             if self.projAbbv: 
                 abv = self.projAbbv
+            else:
+                abv = "*"
             
             basename = "SEN2_%s_*_%s_ORB%s_*_%s_" % \
                 (
@@ -76,8 +77,6 @@ class PrepareArdProcessing(luigi.Task):
 
         fileListPath = buildFileListOutput["fileListPath"]
 
-        expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
-
         # Check dem, wkt exist
         demFilePath = os.path.join(self.paths["static"], self.dem)
         projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
@@ -93,6 +92,8 @@ class PrepareArdProcessing(luigi.Task):
         # Create / cleanout output directory
         tempOutDir = os.path.join(self.paths["working"], "output")
         createDirectory(tempOutDir)
+
+        expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
 
         output = {
             "fileListPath": fileListPath,

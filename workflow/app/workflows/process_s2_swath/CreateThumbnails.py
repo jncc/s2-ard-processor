@@ -47,7 +47,7 @@ class CreateThumbnails(luigi.Task):
         with self.input().open('r') as CreateCOGsFile:
             cogs = json.load(CreateCOGsFile)
 
-        sources = seq(x["products"]) \
+        sources = seq(cogs["products"]) \
                     .map(lambda x: (x["productName"], 
                         seq(x["files"]).filter(lambda x: x.endswith("_vmsk_sharp_rad_srefdem_stdsref.tif"))[0])) \
                     .to_list()

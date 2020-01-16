@@ -4,6 +4,7 @@ import shutil
 import json
 import logging
 import pprint
+
 from datetime import datetime
 from luigi import LocalTarget
 from luigi.util import requires
@@ -15,6 +16,8 @@ from process_s2_swath.CreateThumbnails import CreateThumbnails
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
+
+pp = pprint.PrettyPrinter(indent=4)
 
 @requires(GenerateMetadata, CreateCOGs, CreateThumbnails, GetSwathInfo)
 class FinaliseOutputs(luigi.Task):
@@ -63,7 +66,7 @@ class FinaliseOutputs(luigi.Task):
         # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
         # Move products to output
         log.info("Moving products to output folder {}".format(self.paths["output"]))
-
+        pp.pprint(productList)
         outputList = []
 
         for product in productList:

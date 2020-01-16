@@ -76,7 +76,7 @@ class ProcessRawToArd(luigi.Task):
 
     def run(self):
         prepareArdProcessing = {}
-        with self.input()[].open('r') as prepareArdProcessingInfo:
+        with self.input().open('r') as prepareArdProcessingInfo:
             prepareArdProcessing = json.load(prepareArdProcessingInfo)
 
         expectedProducts = prepareArdProcessing["expectedProducts"]

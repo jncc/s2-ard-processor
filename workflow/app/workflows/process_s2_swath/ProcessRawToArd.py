@@ -69,10 +69,10 @@ class ProcessRawToArd(luigi.Task):
     paths = luigi.DictParameter()
     dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
-    outWkt = luigi.OptionalParameter()
-    projAbbv = luigi.OptionalParameter()
+    outWkt = luigi.OptionalParameter(default = None)
+    projAbbv = luigi.OptionalParameter(default = None)
     mpi = luigi.BoolParameter(default = False)
-    mpirunCmd = luigi.OptionalParameter()
+    mpirunCmd = luigi.OptionalParameter(default = None)
 
     def run(self):
         prepareArdProcessing = {}

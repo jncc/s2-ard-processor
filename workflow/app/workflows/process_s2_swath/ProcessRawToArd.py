@@ -7,16 +7,11 @@ import glob
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.common import createDirectory
-from process_s2_swath.BuildFileList import BuildFileList
-from process_s2_swath.GetSwathInfo import GetSwathInfo
-from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
-from process_s2_swath.CheckFileExists import CheckFileExists
-from process_s2_swath.SpawnMPIJob import SpawnMPIJob
+from process_s2_swath.PrepareArdProcessing import PrepareArdProcessing
 
 log = logging.getLogger("luigi-interface")
 
-@requires(BuildFileList, GetSwathInfo, GetSatelliteAndOrbitNumber)
+@requires(PrepareArdProcessing)
 class ProcessRawToArd(luigi.Task):
 
     """
@@ -76,137 +71,58 @@ class ProcessRawToArd(luigi.Task):
     testProcessing = luigi.BoolParameter(default = False)
     outWkt = luigi.OptionalParameter()
     projAbbv = luigi.OptionalParameter()
-    jasminMpi = luigi.BoolParameter(default = False)
-    jasminMpiConfig = luigi.OptionalParameter()
-    jasminPathEnv = luigi.OptionalParameter()
-
-    def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
-        expectedProducts = {
-            "products": []
-        }
-
-        for product in swathInfo["products"]:
-            expected = {
-                "productName": product["productName"],
-                "files": []
-            }
-
-            abv = "*"
-
-            if self.projAbbv: 
-                abv = self.projAbbv
-            
-            basename = "SEN2_%s_*_%s_ORB%s_*_%s_" % \
-                (
-                    product["date"],
-                    product["tileId"],
-                    satelliteAndOrbitNoOutput["orbitNumber"],
-                    abv
-                )
-
-            basename = os.path.join(outDir, basename)
-
-            expected["files"].append(basename + "clouds.kea")
-            expected["files"].append(basename + "meta.json")
-            expected["files"].append(basename + "sat.kea")
-            expected["files"].append(basename + "toposhad.kea")
-            expected["files"].append(basename + "valid.kea")
-            expected["files"].append(basename + "vmsk_sharp_rad_srefdem_stdsref.kea")
-
-            expectedProducts["products"].append(expected)
-        
-        return expectedProducts
+    mpi = luigi.BoolParameter(default = False)
+    mpirunCmd = luigi.OptionalParameter()
 
     def run(self):
-        # Check dem, wkt exist
-        demFilePath = os.path.join(self.paths["static"], self.dem)
-        projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
+        prepareArdProcessing = {}
+        with self.input()[].open('r') as prepareArdProcessingInfo:
+            prepareArdProcessing = json.load(prepareArdProcessingInfo)
 
-        checkTasks = []
-        checkTasks.append(CheckFileExists(filePath=demFilePath))
+        expectedProducts = prepareArdProcessing["expectedProducts"]
+        
+        a = "arcsi.py" if not self.mpi else "{} arcsimpi.py".format(self.mpirunCmd)
+        b = " -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
+        c = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
+        d = "-t {} -o {} --dem {} -i {}" \
+        .format(
+            self.paths["working"],
+            prepareArdProcessing["tempOutDir"],
+            prepareArdProcessing["demFilePath"],
+            prepareArdProcessing["fileListPath"]
+        )
 
-        if self.outWkt != "":
-            checkTasks.append(CheckFileExists(filePath=projectionWktPath))
+        cmd = "{} {} {} {}".format(a, b, c, d)
 
-        yield checkTasks
+        if self.outWkt:
+            cmd = cmd + " --outwkt {}".format(prepareArdProcessing["projectionWktPath"])
 
-        # Create / cleanout output directory
-        tempOutDir = os.path.join(self.paths["working"], "output")
-        createDirectory(tempOutDir)
+        if self.projAbbv:
+            cmd = cmd + " --projabbv {}".format(self.projAbbv)
 
-        buildFileListOutput = {}
-        swathInfo = {}
-        satelliteAndOrbitNoOutput = {}
+        if not self.testProcessing:
+            try:
+                log.info("Running cmd: " + cmd)
 
-        with self.input()[0].open('r') as buildFileListFile, \
-            self.input()[1].open('r') as swathInfoFile, \
-            self.input()[2].open('r') as satelliteAndOrbitNoFile:
-            
-            swathInfo = json.load(swathInfoFile)
-            satelliteAndOrbitNoOutput = json.load(satelliteAndOrbitNoFile)
-            buildFileListOutput = json.load(buildFileListFile)
-
-        fileListPath = buildFileListOutput["fileListPath"]
-
-        expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
-
-        if self.jasminMpi:
-            spawnMpiTask = SpawnMPIJob(
-                paths = self.paths,
-                dem = demFilePath,
-                testProcessing = self.testProcessing,
-                outWkt = projectionWktPath,
-                projAbbv = self.projAbbv,
-                jasminMpiConfig = self.jasminMpiConfig,
-                productCount = len(swathInfo["products"]),
-                tempOutDir = tempOutDir,
-                fileListPath = fileListPath,
-                jasminPathEnv = self.jasminPathEnv
-            )
-
-            yield spawnMpiTask
+                subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
+                
+            except subprocess.CalledProcessError as e:
+                errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
+                log.error(errStr)
+                raise RuntimeError(errStr)
         else:
-            a = "arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
-            b = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
-            c = "-t {} -o {} --dem {} -i {}" \
-            .format(
-                self.paths["working"],
-                tempOutDir,
-                demFilePath,
-                fileListPath
-            )
 
-            cmd = "{} {} {}".format(a, b, c)
+            log.info("Generating mock output files")
+            for expectedProduct in expectedProducts["products"]:
+                for filePattern in expectedProduct["files"]:
+                    testFilename = filePattern.replace("*", "TEST")
+                    testFilepath = os.path.join(prepareArdProcessing["tempOutDir"], testFilename)
 
-            if self.outWkt:
-                cmd = cmd + " --outwkt {}".format(projectionWktPath)
-
-            if self.projAbbv:
-                cmd = cmd + " --projabbv {}".format(self.projAbbv)
-
-            if not self.testProcessing:
-                try:
-                    log.info("Running cmd: " + cmd)
-
-                    subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
-                    
-                except subprocess.CalledProcessError as e:
-                    errStr = "command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)
-                    log.error(errStr)
-                    raise RuntimeError(errStr)
-            else:
-                #TODO: this needs refactoring to an external command that creats mock files
-                log.info("Generating mock output files")
-                for expectedProduct in expectedProducts["products"]:
-                    for filePattern in expectedProduct["files"]:
-                        testFilename = filePattern.replace("*", "TEST")
-                        testFilepath = os.path.join(tempOutDir, testFilename)
-
-                        if not os.path.exists(testFilepath):
-                            with open(testFilepath, "w") as testFile:
-                                testFile.write("TEST")
+                    if not os.path.exists(testFilepath):
+                        with open(testFilepath, "w") as testFile:
+                            testFile.write("TEST")
                             
-        expectedProducts["outputDir"] = tempOutDir
+        expectedProducts["outputDir"] = prepareArdProcessing["tempOutDir"]
 
         with self.output().open('w') as o:
             json.dump(expectedProducts, o, indent=4)

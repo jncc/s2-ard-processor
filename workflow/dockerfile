@@ -21,6 +21,8 @@ RUN mkdir -p /input/ \
 # Create mount point for LOTUS LSF commands
 RUN mkdir -p /apps/lsf/
 
+#todo create mount point for mpirun.lotus script location
+
 # Copy workflow requirements
 COPY /app/workflows/requirements.txt ./workflows/
 

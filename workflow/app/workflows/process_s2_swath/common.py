@@ -31,3 +31,17 @@ def checkFileExists(filePath):
     if not os.path.getsize(filePath) > 0:
         raise Exception("Something went wrong, file size is 0 for " + filePath)
     return filePath
+
+def writeBinaryFile(filePath):
+    with open(filePath, 'wb') as f:
+        f.write(bytes([10]))
+
+def generateTestProducts(expectedProducts, tempOutDir):
+    for expectedProduct in expectedProducts["products"]:
+        for filePattern in expectedProduct["files"]:
+            testFilename = filePattern.replace("*", "TEST")
+            testFilepath = os.path.join(tempOutDir, testFilename)
+
+            if not os.path.exists(testFilepath):
+                with open(testFilepath, "w") as testFile:
+                    testFile.write("TEST")

@@ -4,16 +4,22 @@ import shutil
 import json
 import logging
 import pprint
+
+from datetime import datetime
 from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateMetadata import GenerateMetadata
 from process_s2_swath.CreateCOGs import CreateCOGs
+from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.CreateThumbnails import CreateThumbnails
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
 
-@requires(GenerateMetadata, CreateCOGs)
+pp = pprint.PrettyPrinter(indent=4)
+
+@requires(GenerateMetadata, CreateCOGs, CreateThumbnails, GetSwathInfo)
 class FinaliseOutputs(luigi.Task):
     """
     Cleanup and other work should go here
@@ -25,12 +31,20 @@ class FinaliseOutputs(luigi.Task):
         # files to keep: .tif, .json, and any of our metadata files 
         # e.g. http://gws-access.ceda.ac.uk/public/defra_eo/sentinel/2/processed/ard/SEPA/
         meta = {}
-        with self.input()[0].open('r') as gm:
-            meta = json.load(gm)
-
         cogs = {}
-        with self.input()[1].open('r') as c:
+        thumbs = {}
+        info = {}
+
+        with self.input()[0].open('r') as gm, \
+            self.input()[1].open('r') as c, \
+            self.input()[2].open('r') as t, \
+            self.input()[3].open('r') as i:
+
+            meta = json.load(gm)
             cogs = json.load(c)
+            thumbs = json.load(t)
+            info = json.load(i)
+
 
         # Combine metadata and products 
         productList = seq(cogs["products"]) \
@@ -38,24 +52,35 @@ class FinaliseOutputs(luigi.Task):
                     .join(
                         seq(meta["products"]) \
                         .map(lambda x: (x["productName"], x["files"]))) \
-                    .map(lambda x: {"productName": x[0], "files": seq(x[1]).flatten()}) \
+                    .map(lambda x: (x[0], seq(x[1]).flatten())) \
+                    .join(
+                        seq(thumbs["products"]) \
+                        .map(lambda x: (x["productName"], x["files"]))) \
+                    .map(lambda x: {
+                        "productName": x[0],
+                        "files": seq(x[1]).flatten(),
+                        "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
+                        "tileId": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["tileId"]}) \
                     .to_list()
 
         # Rename Files
         # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
         # Move products to output
         log.info("Moving products to output folder {}".format(self.paths["output"]))
-
         outputList = []
 
         for product in productList:
             outputProduct = {
                 "productName" : product["productName"],
+                "date" : product["date"],
+                "tileId" : product["tileId"],
                 "files" : []
             }
 
-            outputPath = os.path.join(self.paths["output"], product["productName"])
-
+            #Todo: move file to folder with structure based on start date as YYYY/MM/DD
+            pDate =  datetime.strptime(product["date"],"%Y%m%d").date()
+            outputPath = os.path.join(self.paths["output"], str(pDate.year), "{:02d}".format(pDate.month), "{:02d}".format(pDate.day), product["productName"])
+            
             copyList = seq(product["files"]) \
                 .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath))) \
                 .to_list()

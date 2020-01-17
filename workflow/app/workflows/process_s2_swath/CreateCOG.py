@@ -6,6 +6,7 @@ import json
 from functional import seq
 from luigi import LocalTarget
 from pebble import ProcessPool, ProcessExpired
+from process_s2_swath.common import writeBinaryFile
 
 log = logging.getLogger("luigi-interface")
 
@@ -16,21 +17,25 @@ class CreateCOG(luigi.Task):
     paths = luigi.DictParameter()
     product = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter()
+    testProcessing = luigi.BoolParameter(default = False)
 
     def generateCogFile(self, keaFile):
         outputFile = "%s.tif" % os.path.splitext(keaFile)[0]
 
         cmd = "gdaladdo -r nearest {} 2 4 8 16 32 64 128 256 512".format(keaFile)
         
-        self.executeSubProcess(cmd)
+        if self.testProcessing:
+            writeBinaryFile(outputFile)
+        else:
+            self.executeSubProcess(cmd)
 
-        
         cmd = "gdal_translate -co \"GTiff\" -co \"COMPRESS=DEFLATE\" -co \"BIGTIFF=YES\" -co \"TILED=YES\" -co \"BLOCKXSIZE=512\" -co \"BLOCKYSIZE=512\" --config GDAL_TIFF_OVR_BLOCKSIZE 512  -co \"COPY_SRC_OVERVIEWS=YES\" {} {}".format(
             keaFile,
             outputFile
         )
 
-        self.executeSubProcess(cmd)
+        if not self.testProcessing:
+            self.executeSubProcess(cmd)
 
         return outputFile
 

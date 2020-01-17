@@ -1,0 +1,12 @@
+# MPI run_arcsimpi
+#BSUB -q par-multi
+#BSUB -n $nodes
+#BSUB -W 20:00
+#BSUB -R "rusage[mem=16000]"
+#BSUB -M 16000
+#BSUB -cwd $jobWorkingDir
+#BSUB -o $jobWorkingDir/%J.out
+#BSUB -e $jobWorkingDir/%J.err
+#BSUB -R "select[hname!=host283]"
+
+mpirun.lotus /apps/singularity/bin/singularity exec $mounts $arcsiContainer arcsimpi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA --interpresamp near --interp cubic -t $working -o $tempOutDir --projabbv $projabbv --outwkt $outWkt --dem $dem -k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea -i $fileList

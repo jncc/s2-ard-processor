@@ -7,12 +7,15 @@ from string import Template
 from functional import seq
 from luigi import LocalTarget
 
+log = logging.getLogger("luigi-interface")
+
 class GenerateProductMetadata(luigi.Task):
     paths = luigi.DictParameter()
     inputProduct = luigi.DictParameter()
     metadataConfig = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
     outputDir = luigi.Parameter()
+    testProcessing = luigi.BoolParameter(default = False)
 
     def enforce_dd(self, in_data):
         in_data = str(in_data)
@@ -148,8 +151,14 @@ class GenerateProductMetadata(luigi.Task):
                     .first()
 
         arcsiMetadata = {}
-        with open(arcsiMetadataFile, "r") as mf:
-            arcsiMetadata = json.load(mf)
+
+        if self.testProcessing:
+            log.debug("Test Mode, Would load: {}".format(arcsiMetadataFile))
+            with open("/app/workflows/process_s2_swath/test/dummy-arcsi-metadata.json", "r") as mf:
+                arcsiMetadata = json.load(mf)
+        else:
+            with open(arcsiMetadataFile, "r") as mf:
+                arcsiMetadata = json.load(mf)
 
         metadataFile = self.GenerateMetadata(arcsiMetadata)
 

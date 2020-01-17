@@ -49,6 +49,7 @@ class CreateCOGs(luigi.Task):
     """
     paths = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter(default=4)
+    testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
 
@@ -61,7 +62,10 @@ class CreateCOGs(luigi.Task):
 
         cogTasks = []
         for p in ardProducts["products"]:
-            cogTasks.append(CreateCOG(paths=self.paths, product=p, maxCogProcesses=self.maxCogProcesses))
+            cogTasks.append(CreateCOG(paths=self.paths, 
+                product=p, 
+                maxCogProcesses=self.maxCogProcesses,
+                testProcessing=self.testProcessing))
         
         yield cogTasks
         

@@ -10,6 +10,8 @@ from pebble import ProcessPool, ProcessExpired
 from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.common import writeBinaryFile 
 
+log = logging.getLogger("luigi-interface")
+
 @requires(CreateCOGs)
 class CreateThumbnails(luigi.Task):
 

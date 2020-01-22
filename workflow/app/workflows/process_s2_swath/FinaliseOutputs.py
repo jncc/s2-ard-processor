@@ -25,7 +25,7 @@ class FinaliseOutputs(luigi.Task):
     Cleanup and other work should go here
     """
     paths = luigi.DictParameter()
-    removeInputDir = luigi.BoolParameter(default = False)
+    removeInputFiles = luigi.BoolParameter(default = False)
 
     def run(self):
         # take the files we want to keep and move them to the output folder
@@ -104,9 +104,8 @@ class FinaliseOutputs(luigi.Task):
         clearFolder(self.paths["working"])
 
         # cleanup input files if flag is set
-        if self.removeInputDir:
+        if self.removeInputFiles:
             clearFolder(self.paths["input"])
-            os.rmdir(self.paths["input"])
 
 
         with self.output().open('w') as o:

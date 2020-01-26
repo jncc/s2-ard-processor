@@ -61,7 +61,8 @@ class FinaliseOutputs(luigi.Task):
                         "productName": x[0],
                         "files": seq(x[1]).flatten(),
                         "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
-                        "tileId": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["tileId"]}) \
+                        "tileId": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["tileId"],
+                        "satellite": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["satellite"]}) \
                     .to_list()
 
         # Rename Files
@@ -78,12 +79,16 @@ class FinaliseOutputs(luigi.Task):
                 "files" : []
             }
 
-            #Todo: move file to folder with structure based on start date as YYYY/MM/DD
             pDate =  datetime.strptime(product["date"],"%Y%m%d").date()
-            outputPath = os.path.join(self.paths["output"], str(pDate.year), "{:02d}".format(pDate.month), "{:02d}".format(pDate.day), product["productName"])
+            outputPath = os.path.join(self.paths["output"], 
+                str(pDate.year), 
+                "{:02d}".format(pDate.month), 
+                "{:02d}".format(pDate.day), 
+                product["productName"])
             
             copyList = seq(product["files"]) \
-                .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath))) \
+                .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath)
+                    .replace("SEN", product["satellite"]))) \
                 .to_list()
 
             for c in copyList:

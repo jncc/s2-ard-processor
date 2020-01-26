@@ -18,13 +18,15 @@ class GetSwathInfo(luigi.Task):
                 "productPath": "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
                 "productName": "S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
                 "date": "20190226",
-                "tileId": "T30UXD"
+                "tileId": "T30UXD",
+                "satellite": "S2B"
             },
             {
                 "productPath": "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
                 "productName": "S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
                 "date": "20190226",
-                "tileId": "T31UCT"
+                "tileId": "T31UCT",
+                "satellite": "S2B"
             },
             ...
         ]

@@ -88,7 +88,7 @@ class FinaliseOutputs(luigi.Task):
             
             copyList = seq(product["files"]) \
                 .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath)
-                    .replace("SEN", product["satellite"]))) \
+                    .replace("SEN2", product["satellite"]))) \
                 .to_list()
 
             for c in copyList:

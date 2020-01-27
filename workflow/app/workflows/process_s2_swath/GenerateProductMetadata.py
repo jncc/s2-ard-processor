@@ -80,7 +80,7 @@ class GenerateProductMetadata(luigi.Task):
         
     def GenerateMetadata(self, arcsiMetadata):
 
-        fileIdentifier = arcsiMetadata["FileInfo"]["SREF_DOS_IMG_WHOLE"][:-4]
+        fileIdentifier = arcsiMetadata["FileInfo"]["STD_SREF_WHOLE_IMG"][:-4]
         dateToday = str(datetime.date.today())
         boundingBox = self.getBoundingBox(arcsiMetadata)
         processingDate = self.getProcessingDate(arcsiMetadata)

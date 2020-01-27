@@ -91,12 +91,16 @@ class FinaliseOutputs(luigi.Task):
                     .replace("SEN2", product["satellite"]))) \
                 .to_list()
 
+
+
             for c in copyList:
                 targetPath = os.path.dirname(c[1])
                 
                 if not os.path.exists(targetPath):
                     os.makedirs(targetPath)
 
+                log.debug("Copy file {} to {}".format(c[0], c[1]))
+                
                 shutil.copy(c[0], c[1])
 
                 outputProduct["files"].append(c[1])

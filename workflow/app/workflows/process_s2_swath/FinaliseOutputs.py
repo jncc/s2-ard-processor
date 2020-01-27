@@ -99,8 +99,6 @@ class FinaliseOutputs(luigi.Task):
                 if not os.path.exists(targetPath):
                     os.makedirs(targetPath)
 
-                log.debug("Copy file {} to {}".format(c[0], c[1]))
-                
                 shutil.copy(c[0], c[1])
 
                 outputProduct["files"].append(c[1])

@@ -19,7 +19,7 @@ log = logging.getLogger("luigi-interface")
 class PrepareArdProcessing(luigi.Task):
     paths = luigi.DictParameter()
     dem = luigi.Parameter()
-    outWkt = luigi.OptionalParameter()
+    outWkt = luigi.OptionalParameter(default = None)
     projAbbv = luigi.OptionalParameter(default = None)
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
@@ -79,12 +79,12 @@ class PrepareArdProcessing(luigi.Task):
 
         # Check dem, wkt exist
         demFilePath = os.path.join(self.paths["static"], self.dem)
-        projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
 
         checkTasks = []
         checkTasks.append(CheckFileExists(filePath=demFilePath))
 
-        if self.outWkt != "":
+        if self.outWkt:
+            projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
             checkTasks.append(CheckFileExists(filePath=projectionWktPath))
 
         yield checkTasks

@@ -83,6 +83,7 @@ class PrepareArdProcessing(luigi.Task):
         checkTasks = []
         checkTasks.append(CheckFileExists(filePath=demFilePath))
 
+        projectionWktPath = ""
         if self.outWkt:
             projectionWktPath = os.path.join(self.paths["static"], self.outWkt)
             checkTasks.append(CheckFileExists(filePath=projectionWktPath))

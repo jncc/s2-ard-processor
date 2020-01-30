@@ -36,11 +36,11 @@ class PrepareArdProcessing(luigi.Task):
             }
 
             if self.projAbbv: 
-                abv = self.projAbbv
+                abv = self.projAbbv + "_"
             else:
-                abv = "*"
+                abv = ""
             
-            basename = "SEN2_%s_*_%s_ORB%s_*_%s_" % \
+            basename = "SEN2_%s_*_%s_ORB%s_*_%s" % \
                 (
                     product["date"],
                     product["tileId"],

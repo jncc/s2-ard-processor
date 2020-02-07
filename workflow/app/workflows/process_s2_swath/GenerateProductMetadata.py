@@ -154,7 +154,7 @@ class GenerateProductMetadata(luigi.Task):
 
         if self.testProcessing:
             log.debug("Test Mode, Would load: {}".format(arcsiMetadataFile))
-            with open("/app/workflows/process_s2_swath/test/dummy-arcsi-metadata.json", "r") as mf:
+            with open("process_s2_swath/test/dummy-arcsi-metadata.json", "r") as mf:
                 arcsiMetadata = json.load(mf)
         else:
             with open(arcsiMetadataFile, "r") as mf:

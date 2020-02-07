@@ -7,7 +7,22 @@ To run the workflow, you need to have and be running in an existing Arcsi base
 container (or other environment with Arcsi installed), this process will be 
 wrapped up in a docker container, and will require the following inputs;
 
-PYTHONPATH='.' luigi --module process_s2_swath -outwkt osgb.wkt -projabbv osgb -dem dem.kea
+PYTHONPATH='.' luigi --module process_s2_swath FinaliseOutputs --outwkt osgb.wkt --projabbv osgb --dem dem.kea --local-scheduler
+
+To test the workflow on your local dev machine without needing a container, you can also use the --testProcessing flag. This will skip most of the ARCSI/heavy processing commands, but you'll need to set up the venv yourself:
+
+Create virtual env
+```
+virtualenv -p python3 /<project path>/eo-s2-workflow-venv
+```
+Activate the virtual env
+```
+source ./eo-s2-workflow-venv/bin/activate
+```
+Install Requirements
+```
+pip install -r requirements.txt
+```
 
 ## PathRoots and input folders
 

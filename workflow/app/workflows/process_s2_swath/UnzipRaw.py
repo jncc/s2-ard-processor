@@ -46,7 +46,7 @@ class UnzipRaw(luigi.Task):
             extractedZips = glob.glob(os.path.join(extractPath, "*"))
             for extractedZip in extractedZips:
                 safeDir = os.listdir(extractedZip)[0]
-                files = os.listdir(safeDir)
+                files = os.listdir(os.path.join(extractedZip, safeDir))
 
                 for f in files:
                     shutil.move(os.path.join(safeDir, f), extractedZip)

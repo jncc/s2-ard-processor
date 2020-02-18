@@ -39,6 +39,9 @@ RUN chmod +r ./workflows/luigi.cfg
 # Copy wkt file
 COPY /app/BritishNationalGrid.wkt ./
 
+# Copy cog validation script
+COPY /app/validate_cloud_optimized_geotiff.py ./
+
 # Copy the singularity test script
 COPY app/test-luigi.sh ./
 RUN chmod +rx /app/test-luigi.sh

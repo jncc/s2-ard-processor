@@ -67,12 +67,7 @@ class ProcessRawToArd(luigi.Task):
     }
     """
     paths = luigi.DictParameter()
-    dem = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
-    outWkt = luigi.OptionalParameter(default = None)
-    projAbbv = luigi.OptionalParameter(default = None)
-    mpi = luigi.BoolParameter(default = False)
-    mpirunCmd = luigi.OptionalParameter(default = None)
 
     def run(self):
         prepareArdProcessing = {}
@@ -80,28 +75,10 @@ class ProcessRawToArd(luigi.Task):
             prepareArdProcessing = json.load(prepareArdProcessingInfo)
 
         expectedProducts = prepareArdProcessing["expectedProducts"]
-        
-        a = "arcsi.py" if not self.mpi else "{} arcsimpi.py".format(self.mpirunCmd)
-        b = " -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA"
-        c = "-k clouds.kea meta.json sat.kea toposhad.kea valid.kea stdsref.kea --multi --interpresamp near --interp cubic"
-        d = "-t {} -o {} --dem {} -i {}" \
-        .format(
-            self.paths["working"],
-            prepareArdProcessing["tempOutDir"],
-            prepareArdProcessing["demFilePath"],
-            prepareArdProcessing["fileListPath"]
-        )
-
-        cmd = "{} {} {} {}".format(a, b, c, d)
-
-        if self.outWkt:
-            cmd = cmd + " --outwkt {}".format(prepareArdProcessing["projectionWktPath"])
-
-        if self.projAbbv:
-            cmd = cmd + " --projabbv {}".format(self.projAbbv)
 
         if not self.testProcessing:
             try:
+                cmd = prepareArdProcessing["arcsiCmd"]
                 log.info("Running cmd: " + cmd)
 
                 subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)

@@ -105,7 +105,6 @@ class PrepareArdProcessing(luigi.Task):
             projAbbvParam = "--projabbv {}".format(self.projAbbv)
 
         arcsiRunParams = {
-            "tmpDir": self.paths["working"],
             "outDir": tempOutDir,
             "dem": demFilePath,
             "fileList": fileListPath,

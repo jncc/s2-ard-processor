@@ -6,6 +6,7 @@ from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
 from process_s2_swath.CreateCOG import CreateCOG
+from process_s2_swath.ValidateCOG import ValidateCOG
 from process_s2_swath.CheckArdProducts import CheckArdProducts
 
 log = logging.getLogger('luigi-interface')
@@ -49,6 +50,7 @@ class CreateCOGs(luigi.Task):
     """
     paths = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter(default=4)
+    validateCogs = luigi.BoolParameter(default = False)
     testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
@@ -97,6 +99,16 @@ class CreateCOGs(luigi.Task):
                 )
             )
             raise RuntimeError("Not all files were converted from kea to tif files")
+
+        if self.validateCogs:
+            validateCogTasks = []
+            for p in cogProducts:
+                validateCogTasks.append(ValidateCOG(paths=self.paths, 
+                    product=p, 
+                    maxCogProcesses=self.maxCogProcesses,
+                    testProcessing=self.testProcessing))
+            
+            yield validateCogTasks
 
         output = {
             "outputDir": ardProducts["outputDir"],

@@ -115,7 +115,7 @@ class PrepareArdProcessing(luigi.Task):
         with open(self.arcsiCmdTemplate, 'r') as tf:
             template = Template(tf.read())
 
-        arcsiCmd = template.substitute(arcsiRunParams)
+        arcsiCmd = template.substitute(arcsiRunParams).strip()
 
         expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
 

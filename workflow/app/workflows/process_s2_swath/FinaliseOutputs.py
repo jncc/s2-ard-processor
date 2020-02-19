@@ -13,14 +13,13 @@ from process_s2_swath.GenerateMetadata import GenerateMetadata
 from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.CreateThumbnails import CreateThumbnails
-from process_s2_swath.ValidateCOGs import ValidateCOGs
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
 
 pp = pprint.PrettyPrinter(indent=4)
 
-@requires(GenerateMetadata, CreateCOGs, CreateThumbnails, GetSwathInfo, ValidateCOGs)
+@requires(GenerateMetadata, CreateCOGs, CreateThumbnails, GetSwathInfo)
 class FinaliseOutputs(luigi.Task):
     """
     Cleanup and other work should go here

@@ -1,4 +1,4 @@
 {
-    "arcsiVersion": "v3.1.6",
+    "arcsiVersion": "$arcsiVersion",
     "dockerImage" : "$dockerImage"
 }

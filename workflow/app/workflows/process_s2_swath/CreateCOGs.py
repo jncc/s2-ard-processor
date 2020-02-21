@@ -51,6 +51,7 @@ class CreateCOGs(luigi.Task):
     paths = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter(default=4)
     validateCogs = luigi.BoolParameter(default = False)
+    validateCogScriptDir = luigi.Parameter(default = "/app")
     testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
@@ -106,6 +107,7 @@ class CreateCOGs(luigi.Task):
                 validateCogTasks.append(ValidateCOG(paths=self.paths, 
                     product=p, 
                     maxCogProcesses=self.maxCogProcesses,
+                    validateCogScriptDir=self.validateCogScriptDir,
                     testProcessing=self.testProcessing))
             
             yield validateCogTasks

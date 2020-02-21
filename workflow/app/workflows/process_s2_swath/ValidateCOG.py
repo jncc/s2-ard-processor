@@ -18,14 +18,16 @@ class ValidateCOG(luigi.Task):
     paths = luigi.DictParameter()
     product = luigi.DictParameter()
     maxCogProcesses = luigi.IntParameter()
+    validateCogScriptDir = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
 
     def validateCogFile(self, tifFile):
         result = {
             "file": tifFile,
             "validCog": False
-        }        
-        cmd = "python validate_cloud_optimized_geotiff.py {}".format(tifFile)
+        }
+        validateCogScriptPath = os.path.join(self.validateCogScriptDir, "validate_cloud_optimized_geotiff.py")
+        cmd = "python {} {}".format(validateCogScriptPath, tifFile)
 
         if not self.testProcessing:
             self.executeSubProcess(cmd)

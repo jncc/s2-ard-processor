@@ -1,31 +1,13 @@
-# Incoming
-# --------
-# /raw
-
-# Internal
-# --------
-# /tmp
-# /state
-
-# Output
-# ------
-# /ard
-
-
-# [UnzipRaw]
-# pathRoots = {"raw":"/incoming/raw",
-#             "state":"/internal/state",
-#             "output":"/output/ard", 
-#             "temp":"/internal/tmp"}
-
 [FinaliseOutputs]
 paths = {"input":"/workflow/input",
             "static":"/workflow/static",
             "state":"/workflow/state",
             "output":"/workflow/output", 
             "working":"/workflow/working"}
+buildConfigFile = build-config.json
 metadataConfigFile = metadata-config.json
 metadataTemplate = templates/s2_metadata_template.xml
+arcsiCmdTemplate = templates/arcsi_cmd_template.txt
 maxCogProcesses = 4
-mpi = False
-mpirunCmd = mpirun
+validateCogs = False
+removeInputFiles = False

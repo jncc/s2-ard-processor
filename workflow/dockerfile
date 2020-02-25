@@ -36,8 +36,14 @@ COPY /app/workflows ./workflows
 COPY config/app/workflows/luigi.cfg ./workflows
 RUN chmod +r ./workflows/luigi.cfg
 
+# Copy build config
+COPY config/app/workflows/build-config.json ./
+
 # Copy wkt file
 COPY /app/BritishNationalGrid.wkt ./
+
+# Copy cog validation script
+COPY /app/validate_cloud_optimized_geotiff.py ./
 
 # Copy the singularity test script
 COPY app/test-luigi.sh ./

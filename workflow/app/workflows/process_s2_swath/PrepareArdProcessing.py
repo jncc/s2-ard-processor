@@ -4,6 +4,7 @@ import json
 import subprocess
 import logging
 import glob
+from string import Template
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.common import createDirectory
@@ -21,6 +22,7 @@ class PrepareArdProcessing(luigi.Task):
     dem = luigi.Parameter()
     outWkt = luigi.OptionalParameter(default = None)
     projAbbv = luigi.OptionalParameter(default = None)
+    arcsiCmdTemplate = luigi.Parameter()
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -94,14 +96,33 @@ class PrepareArdProcessing(luigi.Task):
         tempOutDir = os.path.join(self.paths["working"], "output")
         createDirectory(tempOutDir)
 
+        outWktParam = ""
+        if self.outWkt:
+            outWktParam = "--outwkt {}".format(projectionWktPath)
+
+        projAbbvParam = ""
+        if self.projAbbv:
+            projAbbvParam = "--projabbv {}".format(self.projAbbv)
+
+        arcsiRunParams = {
+            "outDir": tempOutDir,
+            "dem": demFilePath,
+            "fileList": fileListPath,
+            "outWkt": outWktParam,
+            "projAbbv": projAbbvParam
+        }
+
+        with open(self.arcsiCmdTemplate, 'r') as tf:
+            template = Template(tf.read())
+
+        arcsiCmd = template.substitute(arcsiRunParams).strip()
+
         expectedProducts = self.getExpectedProductFilePatterns(tempOutDir, satelliteAndOrbitNoOutput, swathInfo)
 
         output = {
-            "fileListPath": fileListPath,
+            "arcsiCmd": arcsiCmd,
             "expectedProducts": expectedProducts,
-            "tempOutDir": tempOutDir,
-            "demFilePath": demFilePath,
-            "projectionWktPath": projectionWktPath
+            "tempOutDir": tempOutDir
         }
         with self.output().open('w') as o:
             json.dump(output, o, indent=4)

@@ -16,6 +16,7 @@ class GenerateProductMetadata(luigi.Task):
     buildConfig = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
     outputDir = luigi.Parameter()
+    ardProductName = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
 
     def enforce_dd(self, in_data):
@@ -24,35 +25,19 @@ class GenerateProductMetadata(luigi.Task):
             return "0" + in_data
         return in_data
 
-    def getAquisitionDate(self, arcsiMetadata, appendTime=True):
+    def getAquisitionDate(self, arcsiMetadata):
         data = arcsiMetadata["AcquasitionInfo"]
 
         aquisition_date = ""
 
         aquisition_date += self.enforce_dd(data["Date"]["Year"]) + "-"
         aquisition_date += self.enforce_dd(data["Date"]["Month"]) + "-"
-        aquisition_date += self.enforce_dd(data["Date"]["Day"])
-        
-        if appendTime:
-            aquisition_date += "T" + self.enforce_dd(data["Time"]["Hour"]) + ":"
-            aquisition_date += self.enforce_dd(data["Time"]["Minute"]) + ":"
-            aquisition_date += self.enforce_dd(data["Time"]["Second"]) + "Z"
+        aquisition_date += self.enforce_dd(data["Date"]["Day"]) + "T"
+        aquisition_date += self.enforce_dd(data["Time"]["Hour"]) + ":"
+        aquisition_date += self.enforce_dd(data["Time"]["Minute"]) + ":"
+        aquisition_date += self.enforce_dd(data["Time"]["Second"]) + "Z"
 
         return aquisition_date
-
-    def getProcessingDate(self, arcsiMetadata):
-        processing_date = ""
-
-        data = arcsiMetadata["ProductsInfo"]
-
-        processing_date += self.enforce_dd(data["ProcessDate"]["Year"]) + "-"
-        processing_date += self.enforce_dd(data["ProcessDate"]["Month"]) + "-"
-        processing_date += self.enforce_dd(data["ProcessDate"]["Day"]) + "T"
-        processing_date += self.enforce_dd(data["ProcessTime"]["Hour"]) + ":"
-        processing_date += self.enforce_dd(data["ProcessTime"]["Minute"]) + ":"
-        processing_date += self.enforce_dd(data["ProcessTime"]["Second"]) + "Z"
-
-        return processing_date
 
     def getBoundingBox(self, arcsiMetadata):
 
@@ -80,13 +65,13 @@ class GenerateProductMetadata(luigi.Task):
         return boundingBox
         
     def GenerateMetadata(self, arcsiMetadata):
-
-        fileIdentifier = arcsiMetadata["FileInfo"]["STD_SREF_WHOLE_IMG"][:-4]
+        fileIdentifier = self.ardProductName
         dateToday = str(datetime.date.today())
         boundingBox = self.getBoundingBox(arcsiMetadata)
-        processingDate = self.getProcessingDate(arcsiMetadata)
+        processingDate = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
         aquisitionDate = self.getAquisitionDate(arcsiMetadata)
-        publishedDate = self.getAquisitionDate(arcsiMetadata, appendTime=False)
+        publishedDate = self.getAquisitionDate(arcsiMetadata)
+        collectionTime = aquisitionDate.split("T")[1].split("Z")[0]
         arcsiCloudCover = arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER']
         arcsiAotRangeMax = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MAX']
         arcsiAotRangeMin = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MIN']
@@ -105,12 +90,14 @@ class GenerateProductMetadata(luigi.Task):
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,
+            "title": fileIdentifier,
             "metadataDate": processingDate,
             "publishedDate": publishedDate,
             "extentWestBound": boundingBox["west"],
             "extentEastBound": boundingBox["east"],
             "extentSouthBound": boundingBox["south"],
             "extentNorthBound": boundingBox["north"],
+            "collectionTime": collectionTime,
             "extentStartDate": aquisitionDate,
             "extentEndDate": aquisitionDate,
             "arcsiCloudCover": arcsiCloudCover,
@@ -148,10 +135,9 @@ class GenerateProductMetadata(luigi.Task):
         return target
 
     def run(self):
-       
         arcsiMetadataFile = seq(self.inputProduct["files"]) \
-                    .where(lambda x: x.endswith("meta.json")) \
-                    .first()
+            .where(lambda x: x.endswith("meta.json")) \
+            .first()
 
         arcsiMetadata = {}
 

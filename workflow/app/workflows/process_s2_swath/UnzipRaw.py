@@ -21,6 +21,7 @@ class UnzipRaw(luigi.Task):
     }
     """
     paths = luigi.DictParameter()
+    testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
         # Create / cleanout extracted folder to store extracted zip files
@@ -28,16 +29,29 @@ class UnzipRaw(luigi.Task):
 
         createDirectory(extractPath)
 
-        # Extract data to extracted folder
-        cmd = "arcsiextractdata.py -i {} -o {}" \
-            .format(
-                self.paths["input"],
-                extractPath)
+        # for the sake of being able to test outside of docker, ignore zip files
+        if not self.testProcessing:
+            # Extract data to extracted folder
+            cmd = "arcsiextractdata.py -i {} -o {}" \
+                .format(
+                    self.paths["input"],
+                    extractPath)
 
-        subprocess.check_output(
-            cmd,
-            stderr=subprocess.STDOUT,
-            shell=True)
+            subprocess.check_output(
+                cmd,
+                stderr=subprocess.STDOUT,
+                shell=True)
+
+            # Move files out of .SAFE folder for consistency
+            extractedZips = glob.glob(os.path.join(extractPath, "*"))
+            for extractedZip in extractedZips:
+                safeDir = os.path.join(extractedZip, os.listdir(extractedZip)[0])
+                files = os.listdir(safeDir)
+
+                for f in files:
+                    shutil.move(os.path.join(safeDir, f), extractedZip)
+                
+                os.rmdir(safeDir)
 
         # Move any folders to extracted
         for f in [dI for dI in os.listdir(self.paths["input"]) if os.path.isdir(os.path.join(self.paths["input"],dI))]:

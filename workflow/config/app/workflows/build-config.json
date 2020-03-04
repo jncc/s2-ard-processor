@@ -1,0 +1,4 @@
+{
+    "arcsiVersion": "$arcsiVersion",
+    "dockerImage" : "$dockerImage"
+}

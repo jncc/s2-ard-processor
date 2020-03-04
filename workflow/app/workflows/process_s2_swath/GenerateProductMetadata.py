@@ -13,6 +13,7 @@ class GenerateProductMetadata(luigi.Task):
     paths = luigi.DictParameter()
     inputProduct = luigi.DictParameter()
     metadataConfig = luigi.DictParameter()
+    buildConfig = luigi.DictParameter()
     metadataTemplate = luigi.Parameter()
     outputDir = luigi.Parameter()
     testProcessing = luigi.BoolParameter(default = False)
@@ -92,7 +93,7 @@ class GenerateProductMetadata(luigi.Task):
         arcsiAotValue = arcsiMetadata['ProductsInfo']['ARCSI_AOT_VALUE']
         arcsiLutElevationMax = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MAX']
         arcsiLutElevationMin = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MIN']
-        arcsiVersion = self.metadataConfig["arcsiVersion"]
+        arcsiVersion = self.buildConfig["arcsiVersion"]
         projection = self.metadataConfig["projection"]
         referenceSystemCodeSpace = self.metadataConfig["targetSrs"].split(":")[0]
         referenceSystemCode = self.metadataConfig["targetSrs"].split(":")[1]
@@ -100,6 +101,7 @@ class GenerateProductMetadata(luigi.Task):
         placeName = self.metadataConfig["placeName"]
         parentPlaceName = self.metadataConfig["parentPlaceName"]
         targetSrs = self.metadataConfig["targetSrs"]
+        dockerImage = self.buildConfig["dockerImage"]
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,
@@ -126,7 +128,8 @@ class GenerateProductMetadata(luigi.Task):
             "placeName": placeName,
             "parentPlaceName": parentPlaceName,
             "targetSrs": targetSrs,
-            "projection": projection
+            "projection": projection,
+            "dockerImage": dockerImage
         }
 
 
@@ -154,7 +157,7 @@ class GenerateProductMetadata(luigi.Task):
 
         if self.testProcessing:
             log.debug("Test Mode, Would load: {}".format(arcsiMetadataFile))
-            with open("/app/workflows/process_s2_swath/test/dummy-arcsi-metadata.json", "r") as mf:
+            with open("process_s2_swath/test/dummy-arcsi-metadata.json", "r") as mf:
                 arcsiMetadata = json.load(mf)
         else:
             with open(arcsiMetadataFile, "r") as mf:

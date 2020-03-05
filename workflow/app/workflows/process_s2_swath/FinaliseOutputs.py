@@ -10,16 +10,14 @@ from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateMetadata import GenerateMetadata
-from process_s2_swath.CreateCOGs import CreateCOGs
-from process_s2_swath.GetSwathInfo import GetSwathInfo
-from process_s2_swath.CreateThumbnails import CreateThumbnails
+from process_s2_swath.RenameOutputs import RenameOutputs
 from process_s2_swath.common import clearFolder
 
 log = logging.getLogger('luigi-interface')
 
 pp = pprint.PrettyPrinter(indent=4)
 
-@requires(GenerateMetadata, CreateCOGs, CreateThumbnails, GetSwathInfo)
+@requires(GenerateMetadata, RenameOutputs)
 class FinaliseOutputs(luigi.Task):
     """
     Cleanup and other work should go here
@@ -32,40 +30,28 @@ class FinaliseOutputs(luigi.Task):
         # files to keep: .tif, .json, and any of our metadata files 
         # e.g. http://gws-access.ceda.ac.uk/public/defra_eo/sentinel/2/processed/ard/SEPA/
         meta = {}
-        cogs = {}
-        thumbs = {}
-        info = {}
+        outputs = {}
 
         with self.input()[0].open('r') as gm, \
-            self.input()[1].open('r') as c, \
-            self.input()[2].open('r') as t, \
-            self.input()[3].open('r') as i:
+            self.input()[1].open('r') as ro:
 
             meta = json.load(gm)
-            cogs = json.load(c)
-            thumbs = json.load(t)
-            info = json.load(i)
+            outputs = json.load(ro)
 
 
         # Combine metadata and products 
-        productList = seq(cogs["products"]) \
-                    .map(lambda x: (x["productName"], x["files"])) \
-                    .join(
-                        seq(meta["products"]) \
-                        .map(lambda x: (x["productName"], x["files"]))) \
-                    .map(lambda x: (x[0], seq(x[1]).flatten())) \
-                    .join(
-                        seq(thumbs["products"]) \
-                        .map(lambda x: (x["productName"], x["files"]))) \
-                    .map(lambda x: {
-                        "productName": x[0],
-                        "files": seq(x[1]).flatten(),
-                        "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
-                        "tileId": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["tileId"],
-                        "satellite": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["satellite"]}) \
-                    .to_list()
+        productList = seq(outputs["products"]) \
+            .map(lambda x: (x["productName"], x["files"])) \
+            .join(
+                seq(meta["products"]) \
+                .map(lambda x: (x["productName"], x["files"]))) \
+            .map(lambda x: {
+                "productName": x[0],
+                "date": seq(outputs["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
+                "fileBaseName": seq(outputs["products"]).filter(lambda y: y["productName"] == x[0]).first()["fileBaseName"],
+                "files": seq(x[1]).flatten()}) \
+            .to_list()
 
-        # Rename Files
         # TODO: logic here: EODS ard project -> processing/workflow/process_s2_ard.py - line 228
         # Move products to output
         log.info("Moving products to output folder {}".format(self.paths["output"]))
@@ -75,7 +61,7 @@ class FinaliseOutputs(luigi.Task):
             outputProduct = {
                 "productName" : product["productName"],
                 "date" : product["date"],
-                "tileId" : product["tileId"],
+                "fileBaseName" : product["fileBaseName"],
                 "files" : []
             }
 
@@ -84,14 +70,11 @@ class FinaliseOutputs(luigi.Task):
                 str(pDate.year), 
                 "{:02d}".format(pDate.month), 
                 "{:02d}".format(pDate.day), 
-                product["productName"])
+                product["fileBaseName"])
             
             copyList = seq(product["files"]) \
-                .map(lambda f: (f, f.replace(cogs["outputDir"], outputPath)
-                    .replace("SEN2", product["satellite"]))) \
+                .map(lambda f: (f, f.replace(outputs["outputDir"], outputPath))) \
                 .to_list()
-
-
 
             for c in copyList:
                 targetPath = os.path.dirname(c[1])

@@ -6,10 +6,10 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
 from process_s2_swath.CheckArdProducts import CheckArdProducts
+from process_s2_swath.RenameOutputs import RenameOutputs
 from process_s2_swath.CheckFileExists import CheckFileExists
 
-#TODO: Requires CheckArdProducts instead
-@requires(CheckArdProducts)
+@requires(CheckArdProducts, RenameOutputs)
 class GenerateMetadata(luigi.Task):
     """
     Output will look like the following;
@@ -17,15 +17,15 @@ class GenerateMetadata(luigi.Task):
     {
         "products": [
             {
-                "productName": "SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
+                "productName": "S2A_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
                 "files": [
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta.xml"
+                    "/app/output/S2A_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/S2A_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_meta.xml"
                 ]
             },
             {
-                "productName": "SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
+                "productName": "S2A_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
                 "files": [
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta.xml"
+                    "/app/output/S2A_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/S2A_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_meta.xml"
                 ]                
             },
             ...
@@ -60,19 +60,30 @@ class GenerateMetadata(luigi.Task):
         yield getTemplateTask
 
         ardProducts = {}
-        with self.input().open("r") as CheckArdProductsFile:
+        with self.input()[0].open("r") as CheckArdProductsFile:
             ardProducts = json.load(CheckArdProductsFile)
+
+        renameOutputs = {}
+        with self.input()[1].open("r") as RenameOutputsFile:
+            renameOutputs = json.load(RenameOutputsFile)
 
         generateMetadataTasks = []
 
         # make metadata file/(s) per product?
         for product in ardProducts["products"]:
+            renamedOutput = seq(renameOutputs["products"]) \
+                .where(lambda x: x["productName"] == product["productName"]) \
+                .first()
+            
+            ardProductName = renamedOutput["ardProductName"]
+
             generateMetadataTasks.append(GenerateProductMetadata(paths=self.paths, 
-            inputProduct=product, 
+            inputProduct=product,
             metadataConfig=metadataConfig,
             buildConfig=buildConfig,
             metadataTemplate=self.metadataTemplate,
             outputDir = ardProducts["outputDir"],
+            ardProductName = ardProductName,
             testProcessing = self.testProcessing))
 
         yield generateMetadataTasks

@@ -7,7 +7,7 @@ To run the workflow, you need to have and be running in an existing Arcsi base
 container (or other environment with Arcsi installed), this process will be 
 wrapped up in a docker container, and will require the following inputs;
 
-PYTHONPATH='.' luigi --module process_s2_swath FinaliseOutputs --outwkt osgb.wkt --projabbv osgb --dem dem.kea --local-scheduler
+PYTHONPATH='.' luigi --module process_s2_swath FinaliseOutputs --outWkt osgb.wkt --projAbbv osgb --dem dem.kea --local-scheduler
 
 To test the workflow on your local dev machine without needing a container, you can also use the --testProcessing flag. This will skip most of the ARCSI/heavy processing commands, but you'll need to set up the venv yourself:
 

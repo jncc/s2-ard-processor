@@ -1,84 +1,9 @@
+S2 ARD Processor
+================
 
-# Runtime environment
+Docker container that runs the s2-processing-scripts.
 
-## static folder
-- wkt file
-- dem
-- metadata-config.json file
-
-{
-    "projection" : "OSGB",
-    "targetSrs" : "EPSG:27700",
-    "demTitle" : "dem title",
-    "placeName" : "United Kingdom",
-    "parentPlaceName" : "Europe"
-}
-
-# If running MPI jobs
-- jasmin-mpi-config.json file (in root of static folder)
-
-{
-    "container" : {
-        "location" : "/img/path/imag.simg",
-        "mounts" : [
-            ("/host/path","/container/path"),
-            ("/host/path2","/container/path2")
-        ]
-    }
-    "jobTemplate" : "s2_mpi_job_template.bsub"
-}
-
-- mpi-template.bsub
-
-
-Docker container that runs the s1-processing-scripts.
-
-S1 processing scripts subtree
---------------------
-The S1 processing scripts branch is required at build time
-
-### Add the remote
-Create a link to the proper remote repo
-
-    git remote add -f s1-processing-scripts https://github.com/jncc/s1-processing-scripts.git
-
-
-### Linking to the correct branch
-At development time you will need to link to a development branch for testing.
-Before building a production contain this branch should be merged into master and this project should be set to master.
-
-To change s1-processing-scripts to a different branch:
-
-    git rm -rf workflow/app/toolchain/scripts
-    git commit
-    git subtree add --prefix=workflow/app/toolchain/scripts s1-processing-scripts <branch> --squash
-
-Current:
-
-    git subtree add --prefix=workflow/app/toolchain/scripts s1-processing-scripts master --squash
-
-### Fetching changes from the subtree
-
-All changes to the current working tree need to be commited
-
-    git fetch s1-processing-scripts
-    git subtree add --prefix=workflow/app/toolchain/scripts s1-processing-scripts <branch> --squash
-
-### Pulling changes from the subtree
-
-    git subtree pull --prefix=workflow/app/toolchain/scripts s1-processing-scripts <branch> --squash
-
-Current:
-
-    git subtree pull --prefix=workflow/app/toolchain/scripts s1-processing-scripts master --squash
-
-### Pushing changes from the subtree back to the repo
-
-    git subtree push --prefix=workflow/app/toolchain/scripts s1-processing-scripts <branch> --squash
-
-Current:
-
-    git subtree push --prefix=workflow/app/toolchain/scripts s1-processing-scripts master --squash
+The mapped input folder contains a set of S2 granules that will be processed as a swath. The processing can take place sequentially or in parallel using MPI on the JASMIN cluster.
 
 Build and run instructions
 --------------------------
@@ -97,7 +22,7 @@ docker run -i --entrypoint /bin/bash
     -v /<hostPath>/state:/state 
     -v /<hostPath>/static:/static 
     -v /<hostPath>/working:/working 
-    -t jncc/test-s1-ard-processor 
+    -t jncc/test-s2-ard-processor 
 
 Where <hostpath> is the path on the host to the mounted fole
 
@@ -147,8 +72,47 @@ Run:
 --metadataConfigFile=metadata.config.json 
 --metadataTemplate=metadataTemplate.xml 
 --dem=The digital elevation model 
+--testProcessing=Only run through the workflow logic creating dummy files where needed. Do not process.
 
 ### Optional parameters
 --outWkt - the wkt file supplied to arcsi
 --projAbbv - The target projection abriviation
 
+### Jasmin specific parameters
+--arcsiCmdTemplate - A template file for the arcsi command
+
+
+# static folder
+- wkt file
+- dem
+- metadata-config.json file
+
+{
+    "projection" : "OSGB",
+    "targetSrs" : "EPSG:27700",
+    "demTitle" : "dem title",
+    "placeName" : "United Kingdom",
+    "parentPlaceName" : "Europe"
+}
+
+- Arcsi command template.
+
+
+# If running MPI jobs
+- jasmin-mpi-config.json file (in root of static folder)
+
+{
+    "container" : {
+        "location" : "/img/path/imag.simg",
+        "mounts" : [
+            ("/host/path","/container/path"),
+            ("/host/path2","/container/path2")
+        ]
+    }
+    "jobTemplate" : "s2_mpi_job_template.bsub"
+}
+
+- mpi-template.bsub
+
+# Input folder
+This contains a set of raw S2 granules that will be processed as a swath either in sequence or simultaneiously using MPI

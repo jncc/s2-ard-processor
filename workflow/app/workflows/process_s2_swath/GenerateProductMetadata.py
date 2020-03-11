@@ -87,6 +87,7 @@ class GenerateProductMetadata(luigi.Task):
         parentPlaceName = self.metadataConfig["parentPlaceName"]
         targetSrs = self.metadataConfig["targetSrs"]
         dockerImage = self.buildConfig["dockerImage"]
+        gdalVersion = self.buildConfig["gdalVersion"]
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,
@@ -116,7 +117,8 @@ class GenerateProductMetadata(luigi.Task):
             "parentPlaceName": parentPlaceName,
             "targetSrs": targetSrs,
             "projection": projection,
-            "dockerImage": dockerImage
+            "dockerImage": dockerImage,
+            "gdalVersion": gdalVersion
         }
 
 

@@ -6,6 +6,7 @@ import logging
 import glob
 from luigi import LocalTarget
 from luigi.util import requires
+from functional import seq
 from process_s2_swath.ProcessRawToArd import ProcessRawToArd
 
 
@@ -37,6 +38,25 @@ class CheckArdProducts(luigi.Task):
         else:
             return ""
 
+    def hasCloudcoverBug(self, product):
+        arcsiMetadataFile = seq(product["files"]) \
+            .where(lambda x: x.endswith("meta.json")) \
+            .head_option()
+
+        if arcsiMetadataFile is None:
+            return False
+        
+        arcsiMetadata = {}
+        with open(arcsiMetadataFile, "r") as mf:
+            arcsiMetadata = json.load(mf)
+
+        cloudCover = int(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
+
+        if cloudCover > 0.95:
+            return True
+        else:
+            return False
+
     def run(self):        
         expectedProducts = {}
         with self.input().open('r') as praFile:
@@ -45,22 +65,30 @@ class CheckArdProducts(luigi.Task):
         products = []
         fileCheck = True
         for expectedProduct in expectedProducts["products"]:
+            
             product = {
                 "productName" : expectedProduct["productName"],
                 "files" : []
             }
 
+            completeProduct = True
+
             for filePattern in expectedProduct["files"]:
                 filePath = self.checkFileExists(filePattern)
                 if len(filePath) == 0:
-                    fileCheck = False
+                    completeProduct = False
                 else: 
                     product["files"].append(filePath)
-                
-            products.append(product)
+            
+            if completeProduct:
+                products.append(product)
+            elif self.hasCloudcoverBug(product):
+                log.warning("Product {} has an ARCSI cloud cover bug, skipping".format(product["productName"]))
+            else:
+                fileCheck = False 
                     
-
         if not fileCheck:
+            # check arcsi medata for cloudcover > 95%
             raise Exception("Product Validation failed")
     
         output = {

@@ -50,7 +50,7 @@ class CheckArdProducts(luigi.Task):
         with open(arcsiMetadataFile, "r") as mf:
             arcsiMetadata = json.load(mf)
 
-        cloudCover = int(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
+        cloudCover = float(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
 
         if cloudCover > 0.95:
             return True

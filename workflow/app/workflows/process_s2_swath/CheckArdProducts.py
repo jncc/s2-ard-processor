@@ -8,7 +8,7 @@ from luigi import LocalTarget
 from luigi.util import requires
 from functional import seq
 from process_s2_swath.ProcessRawToArd import ProcessRawToArd
-
+from decimal import Decimal
 
 log = logging.getLogger('luigi-interface')
 
@@ -50,7 +50,7 @@ class CheckArdProducts(luigi.Task):
         with open(arcsiMetadataFile, "r") as mf:
             arcsiMetadata = json.load(mf)
 
-        cloudCover = float(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
+        cloudCover = Decimal(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
 
         if cloudCover > 0.95:
             return True

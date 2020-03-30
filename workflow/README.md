@@ -22,6 +22,7 @@ docker run -i --entrypoint /bin/bash
     -v /<hostPath>/state:/state 
     -v /<hostPath>/static:/static 
     -v /<hostPath>/working:/working 
+    -v /<hostPath>/report:/report 
     -t jncc/test-s2-ard-processor 
 
 Where <hostpath> is the path on the host to the mounted fole
@@ -57,14 +58,17 @@ Run:
         --bind /<hostPath>/state:/state 
         --bind /<hostPath>/static:/static 
         --bind /<hostPath>/working:/working
+        --bind /<hostPath>/report:/report
         
         s2-ard-processor.simg /app/exec.sh 
-            FinaliseOutputs 
+            GenerateReport
             --dem=dem.kea 
             --outWkt=outwkt.txt 
             --projAbbv=osgb
             --metadataConfigFile=metadata.config.json 
-            --metadataTemplate=metadataTemplate.xml 
+            --metadataTemplate=metadataTemplate.xml
+            --reportFileName=reportfile.csv
+            --dbFileName=s2ardProducts.db
             --local-scheduler
 
 ## Runtime parameters
@@ -73,6 +77,8 @@ Run:
 --metadataTemplate=metadataTemplate.xml 
 --dem=The digital elevation model 
 --testProcessing=Only run through the workflow logic creating dummy files where needed. Do not process.
+--reportFileName=A csv file that will be created in the report folder. This file contains an entry for each processed granule.
+--dbFileName=An sqlite database file to which the report data is also written. The data is written to the s2ArdProducts table.
 
 ### Optional parameters
 --outWkt - the wkt file supplied to arcsi

@@ -52,7 +52,7 @@ class CheckArdProducts(luigi.Task):
 
         cloudCover = Decimal(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
 
-        if cloudCover > 0.95:
+        if cloudCover > Decimal(0.95):
             return True
         else:
             return False

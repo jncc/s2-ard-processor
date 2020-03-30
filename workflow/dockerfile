@@ -16,8 +16,9 @@ RUN mkdir -p /input/ \
     && mkdir -p /static/ \
     && mkdir -p /state/ \
     && mkdir -p /working/ \
-    && mkdir -p /output/
-
+    && mkdir -p /output/ \
+    && mkdir -p /report/ 
+    
 # Create mount point for LOTUS LSF commands
 RUN mkdir -p /apps/lsf/
 

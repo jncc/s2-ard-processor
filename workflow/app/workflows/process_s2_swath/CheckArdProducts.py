@@ -53,6 +53,7 @@ class CheckArdProducts(luigi.Task):
         cloudCover = Decimal(arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'])
 
         if cloudCover > Decimal(0.95):
+            log.info("ARCSI cloud cover value {}".format(cloudCover))
             return True
         else:
             return False
@@ -83,6 +84,7 @@ class CheckArdProducts(luigi.Task):
             if completeProduct:
                 products.append(product)
             elif self.hasCloudcoverBug(product):
+                log.info("Product {} has an ARCSI cloud cover bug, skipping".format(product["productName"]))
                 log.warning("Product {} has an ARCSI cloud cover bug, skipping".format(product["productName"]))
             else:
                 fileCheck = False 

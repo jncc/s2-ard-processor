@@ -84,7 +84,6 @@ class CheckArdProducts(luigi.Task):
             if completeProduct:
                 products.append(product)
             elif self.hasCloudcoverBug(product):
-                log.info("Product {} has an ARCSI cloud cover bug, skipping".format(product["productName"]))
                 log.warning("Product {} has an ARCSI cloud cover bug, skipping".format(product["productName"]))
             else:
                 fileCheck = False 

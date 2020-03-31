@@ -19,7 +19,7 @@ class GenerateReport(luigi.Task):
     dbFileName = luigi.OptionalParameter(default=None)
 
     def parseInputName(self, productName):
-        pattern = re.compile("S2([AB])\_MSIL1C\_((20[0-9]{2})([0-9]{2})([0-9]{2})T([0-9]{2})([0-9]{2})([0-9]{2}))")
+        pattern = re.compile("S2([AB])_MSIL1C_((20[0-9]{2})([0-9]{2})([0-9]{2})T([0-9]{2})([0-9]{2})([0-9]{2}))_\w+_(R[0-9]{3})")
         
         m = pattern.search(productName)
 
@@ -27,7 +27,9 @@ class GenerateReport(luigi.Task):
         captureDate = "%s-%s-%s" % (m.group(3), m.group(4), m.group(5)) 
         captureTime = "%s:%s:%s" % (m.group(6), m.group(7), m.group(8)) 
 
-        return [productName, satellite, captureDate, captureTime]
+        relativeOrbit = m.group(9)
+
+        return [productName, satellite, relativeOrbit, captureDate, captureTime]
 
     def writeToCsv(self, reportLines, reportFilePath):
         exists = os.path.isfile(reportFilePath)
@@ -41,7 +43,7 @@ class GenerateReport(luigi.Task):
             writer = csv.writer(csvFile)
 
             if not exists:  
-                writer.writerow(["ProductId", "Platform", "Capture Date", "Capture Time", "ARD ProductId"])
+                writer.writerow(["ProductId", "Platform", "Relative Orbit", "Capture Date", "Capture Time", "ARD ProductId"])
 
             for line in reportLines:
                 writer.writerow(line) 
@@ -54,11 +56,11 @@ class GenerateReport(luigi.Task):
 
         if c.fetchone()[0] != 1: 
             c.execute('''CREATE TABLE s2ArdProducts
-                        (productId text, platform text, captureDate text, CaptureTime text, ardProductId text, recordTimestamp text)''')
+                        (productId text, platform text, relativeOrbit text, captureDate text, CaptureTime text, ardProductId text, recordTimestamp text)''')
             
             conn.commit()
 
-        sql = "INSERT INTO s2ArdProducts VALUES (?,?,?,?,?,?)"
+        sql = "INSERT INTO s2ArdProducts VALUES (?,?,?,?,?,?,?)"
 
         for line in reportLines:
             recordTimestamp = str(datetime.now())
@@ -86,7 +88,7 @@ class GenerateReport(luigi.Task):
         self.writeToCsv(reportLines, reportFilePath)
 
         if self.dbFileName:
-            dbPath = os.path.join(self.paths["report"], self.dbFileName)
+            dbPath = os.path.join(self.paths["database"], self.dbFileName)
             self.writeToDb(reportLines, dbPath)
 
         with self.output().open("w") as outFile:

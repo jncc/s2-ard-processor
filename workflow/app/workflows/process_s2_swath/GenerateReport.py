@@ -64,7 +64,7 @@ class GenerateReport(luigi.Task):
 
         for line in reportLines:
             recordTimestamp = str(datetime.now())
-            row = (line[0], line[1], line[2], line[3], line[4], recordTimestamp)
+            row = (line[0], line[1], line[2], line[3], line[4], line[5], recordTimestamp)
 
             c.execute(sql, row)
 

@@ -3,7 +3,9 @@ paths = {"input":"/workflow/input",
             "static":"/workflow/static",
             "state":"/workflow/state",
             "output":"/workflow/output", 
-            "working":"/workflow/working"}
+            "working":"/workflow/working",
+            "report":"/workflow/report",
+            "database":"/database/working"}
 buildConfigFile = build-config.json
 metadataConfigFile = metadata-config.json
 metadataTemplate = templates/s2_metadata_template.xml

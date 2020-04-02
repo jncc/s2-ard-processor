@@ -1,5 +1,5 @@
 import luigi
-import os
+import os, stat
 import csv
 import sqlite3
 import json
@@ -85,12 +85,18 @@ class GenerateReport(luigi.Task):
 
             reportLines.append(reportLine)
 
+        if self.dbFileName:
+            dbFilePath = os.path.join(self.paths["database"], self.dbFileName)
+            dbExists = os.path.exists(dbFilePath)
+
+            self.writeToDb(reportLine, dbFilePath)
+
+            #If the file has just been created make it user and group writable.
+            if not dbExists:
+                os.chmod(dbFilePath, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP)
+
         reportFilePath = os.path.join(self.paths["report"], self.reportFileName)
         self.writeToCsv(reportLines, reportFilePath)
-
-        if self.dbFileName:
-            dbPath = os.path.join(self.paths["database"], self.dbFileName)
-            self.writeToDb(reportLines, dbPath)
 
         with self.output().open("w") as outFile:
             outFile.write(json.dumps({

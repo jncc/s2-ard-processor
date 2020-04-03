@@ -89,7 +89,7 @@ class GenerateReport(luigi.Task):
             dbFilePath = os.path.join(self.paths["database"], self.dbFileName)
             dbExists = os.path.exists(dbFilePath)
 
-            self.writeToDb(reportLine, dbFilePath)
+            self.writeToDb(reportLines, dbFilePath)
 
             #If the file has just been created make it user and group writable.
             if not dbExists:

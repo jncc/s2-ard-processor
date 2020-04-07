@@ -17,6 +17,7 @@ class GenerateReport(luigi.Task):
     paths = luigi.DictParameter()
     reportFileName = luigi.Parameter()
     dbFileName = luigi.OptionalParameter(default=None)
+    dbConnectionTimeout = luigi.IntParameter(default=60000)
 
     def parseInputName(self, productName):
         pattern = re.compile("S2([AB])_MSIL1C_((20[0-9]{2})([0-9]{2})([0-9]{2})T([0-9]{2})([0-9]{2})([0-9]{2}))_\w+_(R[0-9]{3})_(T\w+)_")
@@ -50,7 +51,7 @@ class GenerateReport(luigi.Task):
                 writer.writerow(line) 
 
     def writeToDb(self, reportLines, dbPath):
-        conn = sqlite3.connect(dbPath, timeout=20)
+        conn = sqlite3.connect(dbPath, timeout=self.dbConnectionTimeout)
 
         c = conn.cursor()
         c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='s2ArdProducts' ''')

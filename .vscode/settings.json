@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "${workspaceFolder}/workflow.venv/bin/python"
+    "python.pythonPath": "workflow.venv/bin/python",
     "git.ignoreLimitWarning": true
 }

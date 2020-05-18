@@ -7,6 +7,8 @@ import glob
 from luigi import LocalTarget
 from luigi.util import requires
 from process_s2_swath.common import createDirectory
+from process_s2_swath.SplitGranuleHandler import SplitGranuleHandler
+
 class UnzipRaw(luigi.Task):
     """
     Unzips all zip files inside a given folder using the arcsiextractdata.py command,
@@ -53,6 +55,7 @@ class UnzipRaw(luigi.Task):
                 
                 os.rmdir(safeDir)
 
+
         # Move any folders to extracted
         for f in [dI for dI in os.listdir(self.paths["input"]) if os.path.isdir(os.path.join(self.paths["input"],dI))]:
             src = os.path.join(self.paths["input"], f)
@@ -60,6 +63,10 @@ class UnzipRaw(luigi.Task):
             shutil.copytree(src, dst)
 
         extractedProducts = glob.glob(os.path.join(extractPath, "*"))
+
+        spgHandler = SplitGranuleHandler()
+
+        extractedProducts = spgHandler.handleSplitGranules(extractedProducts)
 
         output = {
             "extractedProductRoot": extractPath,

@@ -70,6 +70,10 @@ class SplitGranuleHandler():
 
         pattern = "(S2[AB]_MSIL1C_\d{8}T\d{6}_[A-Z\d]+_[A-Z\d]+_[A-Z\d]+_)(\d{8}T\d{6})"
 
+        log.info("granules")
+        for g in granules:
+            log.info(g)
+
         splits = seq(granules) \
                     .map(lambda x: (x, re.match(pattern, os.path.basename(x)))) \
                     .select(lambda x: {

@@ -22,9 +22,6 @@ class GetGranuleInfo(luigi.Task):
 
     def run(self):
         productName = os.path.basename(self.productPath)
-        tileId = self.getTileId(productName)
-        date = self.getDate(productName)
-        satellite = self.getSatellite(productName)
 
         splits = productName.split("_")
 

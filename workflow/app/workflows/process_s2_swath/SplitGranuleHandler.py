@@ -3,6 +3,7 @@ import logging
 import re
 import shutil
 import glob
+import errno
 
 from functional import seq
 from xml.etree import ElementTree
@@ -22,7 +23,7 @@ class SplitGranuleHandler():
         except OSError as e:
             # If the error was caused because the source wasn't a directory
             if e.errno == errno.ENOTDIR:
-                shutil.copy(src, dest)
+                shutil.copy2(src, dest)
             else:
                 print('Directory not copied. Error: %s' % e)
 
@@ -103,19 +104,20 @@ class SplitGranuleHandler():
         output.extend(granules)
 
         for s in splits:
-            i = 1
+            i = 0
             for g in s:
-                self.MoveGranule(g, i)
-            
-                self.ModifyMetadata(g, i)
-                self.DeleteOldGranule(g)
+                #skip the first granule
+                if i > 0:
+                    self.MoveGranule(g, i)
+                
+                    self.ModifyMetadata(g, i)
+                    self.DeleteOldGranule(g)
 
-                output.remove(g["granulePath"])
-                output.append(g["newGranulePath"])
+                    output.remove(g["granulePath"])
+                    output.append(g["newGranulePath"])
 
                 i += 1
 
-        print ("output")
         return output
 
 

@@ -79,8 +79,8 @@ class SplitGranuleHandler():
                     .select(lambda x: {
                             "granulePath" : x[0],
                             "newGranulePath" : "",
-                            "gId": x[1].group(0), 
-                            "captureDate": x[1].group(1)
+                            "gId": x[1].group(1), 
+                            "captureDate": x[1].group(2)
                     }) \
                     .group_by(lambda x: x["gId"]) \
                     .filter(lambda x: len(x[1]) > 1) \

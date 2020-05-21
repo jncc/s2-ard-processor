@@ -4,9 +4,9 @@ import json
 import re
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.UnzipRaw import UnzipRaw
+from process_s2_swath.PrepareRawGranules import PrepareRawGranules
 
-@requires(UnzipRaw)
+@requires(PrepareRawGranules)
 class GetSatelliteAndOrbitNumber(luigi.Task):
     """
     Extracts the satellite and orbit number of the incomming products (only 
@@ -35,16 +35,16 @@ class GetSatelliteAndOrbitNumber(luigi.Task):
         return satelliteNo
 
     def run(self):
-        unzipRawInfo = {}
+        prepRawInfo = {}
         with self.input().open('r') as i:
-            unzipRawInfo = json.load(i)
+            prepRawInfo = json.load(i)
 
         output = {
             "metadata": []
         }
 
         # details should be the same for all granules so take the first one
-        manifestPath = os.path.join(unzipRawInfo["products"][0], "manifest.safe")
+        manifestPath = os.path.join(prepRawInfo["products"][0], "manifest.safe")
 
         with open(manifestPath, 'r') as m:
             manifestString = m.read()

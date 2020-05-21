@@ -8,11 +8,11 @@ from luigi.util import requires
 from process_s2_swath.common import createDirectory, checkFileExists
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.UnzipRaw import UnzipRaw
+from process_s2_swath.PrepareRawGranules import PrepareRawGranules
 
 log = logging.getLogger('luigi-interface')
 
-@requires(GetSwathInfo, GetSatelliteAndOrbitNumber, UnzipRaw)
+@requires(GetSwathInfo, GetSatelliteAndOrbitNumber, PrepareRawGranules)
 class BuildFileList(luigi.Task):
     """
     Builds files lists for arcsi to process using the arcsibuildmultifilelists.py command, it
@@ -37,15 +37,15 @@ class BuildFileList(luigi.Task):
         
         with self.input()[0].open('r') as swathInfoFile, \
             self.input()[1].open('r') as satelliteAndOrbitNoFile, \
-            self.input()[2].open('r') as unzipRawFile:
+            self.input()[2].open('r') as prepRawFile:
             swathInfo = json.load(swathInfoFile)
             satelliteAndOrbitNoInfo = json.load(satelliteAndOrbitNoFile)
-            unzipRawInfo = json.load(unzipRawFile)
+            prepRawInfo = json.load(prepRawFile)
 
         fileListPath = os.path.join(self.paths["working"], self.getOutputFileName(satelliteAndOrbitNoInfo, swathInfo))
 
         mtdPaths = []
-        for path in unzipRawInfo["products"]:
+        for path in prepRawInfo["products"]:
             mtdSearch = os.path.join(path, "*MTD*.xml")
             mtdPath = glob.glob(mtdSearch)[0]
             checkFileExists(mtdPath)

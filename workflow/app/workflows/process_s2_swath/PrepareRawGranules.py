@@ -9,7 +9,7 @@ from luigi.util import requires
 from process_s2_swath.common import createDirectory
 from process_s2_swath.SplitGranuleHandler import SplitGranuleHandler
 
-class UnzipRaw(luigi.Task):
+class PrepareRawGranules(luigi.Task):
     """
     Unzips all zip files inside a given folder using the arcsiextractdata.py command,
     creates a list of extracted products and outputs to the following standard;
@@ -77,6 +77,6 @@ class UnzipRaw(luigi.Task):
             json.dump(output, o, indent=4)
     
     def output(self):
-        outFile = os.path.join(self.paths['state'], 'UnzipRaw.json')
+        outFile = os.path.join(self.paths['state'], 'PrepareRawGranules.json')
         return LocalTarget(outFile)
     

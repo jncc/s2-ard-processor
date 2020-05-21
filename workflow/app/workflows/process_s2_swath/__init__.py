@@ -13,7 +13,7 @@ import process_s2_swath.GetGranuleInfo
 import process_s2_swath.GetSatelliteAndOrbitNumber
 import process_s2_swath.GetSwathInfo
 import process_s2_swath.ProcessRawToArd
-import process_s2_swath.UnzipRaw
+import process_s2_swath.PrepareRawGranules
 import process_s2_swath.CreateThumbnails
 import process_s2_swath.PrepareArdProcessing
 import process_s2_swath.RenameOutputs

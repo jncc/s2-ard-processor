@@ -3,10 +3,10 @@ import os
 import json
 from luigi import LocalTarget
 from luigi.util import requires
-from process_s2_swath.UnzipRaw import UnzipRaw
+from process_s2_swath.PrepareRawGranules import PrepareRawGranules
 from process_s2_swath.GetGranuleInfo import GetGranuleInfo
 
-@requires(UnzipRaw)
+@requires(PrepareRawGranules)
 class GetSwathInfo(luigi.Task):
     """
     Creates a list of the products that we will be processing and some basic infor extracted from the
@@ -35,11 +35,11 @@ class GetSwathInfo(luigi.Task):
     paths = luigi.DictParameter()
 
     def run(self):
-        with self.input().open('r') as unzipRawFile:
-            unzipRawOutput = json.loads(unzipRawFile.read())
+        with self.input().open('r') as prepRawFile:
+            prepRawInfo = json.loads(prepRawFile.read())
 
         tasks = []
-        for product in unzipRawOutput["products"]:
+        for product in prepRawInfo["products"]:
             tasks.append(GetGranuleInfo(paths=self.paths, productPath=product))
 
         yield tasks

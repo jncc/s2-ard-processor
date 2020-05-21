@@ -67,7 +67,7 @@ class CreateCOG(luigi.Task):
                 for cogFile in generateCogJobs.result():
                     tifFiles.append(cogFile)
             except ProcessExpired as error:
-                log.error("%s. Exit code: %d" % (error, error.exitcode))
+                log.error("%s. Exit code: %d", error, error.exitcode)
 
         output = {
             "productName" : self.product["productName"],

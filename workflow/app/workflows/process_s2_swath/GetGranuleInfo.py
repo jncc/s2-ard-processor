@@ -22,29 +22,19 @@ class GetGranuleInfo(luigi.Task):
 
     def run(self):
         productName = os.path.basename(self.productPath)
-        tileId = self.getTileId(productName)
-        date = self.getDate(productName)
-        satellite = self.getSatellite(productName)
+
+        splits = productName.split("_")
 
         output = {
             "productPath": self.productPath,
             "productName": productName,
-            "date": date,
-            "tileId": tileId,
-            "satellite": satellite
+            "date": splits[2].split("T")[0],
+            "tileId": splits[5],
+            "satellite": splits[0]
         }
 
         with self.output().open('w') as o:
             json.dump(output,o,indent=4)
-
-    def getTileId(self, productName):
-        return productName[38:44]
-
-    def getDate(self, productName):
-        return productName[11:19]
-
-    def getSatellite(self, productName):
-        return productName[0:3]
 
     def output(self):
         filename = "GetGranuleInfo_{}.json".format(os.path.basename(self.productPath))

@@ -12,7 +12,7 @@ RUN chmod +rx /opt/conda/bin/arcsimpi.py
 # RUN mkdir /opt/platform_mpi
 # ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/opt/platform_mpi/lib/linux_amd64
 
-RUN conda install --yes -c conda-forge mpi4py
+RUN conda install --yes -c anaconda mpi4py
 # 2 RUN conda install --yes -c anaconda mpi4py
 
 ENV MPI_WORKDIR /data

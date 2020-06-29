@@ -4,13 +4,16 @@ COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
 RUN chmod +rx /opt/conda/bin/arcsimpi.py
 
 # Copy in JASMIN-built mpi4py package
-RUN mkdir /app/local
-COPY site-packages /app/local/site-packages
-ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
+# RUN mkdir /app/local
+# COPY site-packages /app/local/site-packages
+# ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
 
 # Make dir to bind platform MPI files on JASMIN
-RUN mkdir /opt/platform_mpi
-ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/opt/platform_mpi/lib/linux_amd64
+# RUN mkdir /opt/platform_mpi
+# ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/opt/platform_mpi/lib/linux_amd64
+
+RUN conda install --yes -c conda-forge mpi4py
+# 2 RUN conda install --yes -c anaconda mpi4py
 
 ENV MPI_WORKDIR /data
 
@@ -20,5 +23,8 @@ RUN mkdir /input && \
     mkdir /working && \
     mkdir /state && \
     mkdir /static
+
+RUN echo "MPI4PY from conda-forge" > /mpi-source.txt
+
 
 

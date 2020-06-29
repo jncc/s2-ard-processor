@@ -1,0 +1,2 @@
+Bootstrap: docker-daemon
+From: s2-ard-processor:latest

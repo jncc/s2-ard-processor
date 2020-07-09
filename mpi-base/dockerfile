@@ -1,6 +1,6 @@
 FROM jncc/arcsi-base
 
-# Copy runscripts
+# Copy runscript
 COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
 RUN chmod +rx /opt/conda/bin/arcsimpi.py
 

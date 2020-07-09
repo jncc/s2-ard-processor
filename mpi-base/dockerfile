@@ -1,7 +1,11 @@
 FROM jncc/arcsi-base
 
+# Copy runscripts
 COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
 RUN chmod +rx /opt/conda/bin/arcsimpi.py
+
+COPY arcsimpi.sh /opt/conda/bin/arcsimpi.sh
+RUN chmod +rx /opt/conda/bin/arcsimpi.sh
 
 # Copy in JASMIN-built mpi4py package
 RUN mkdir /app/local

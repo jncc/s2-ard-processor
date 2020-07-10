@@ -1,18 +1,20 @@
 FROM jncc/arcsi-base
 
+# Copy runscript
 COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
 RUN chmod +rx /opt/conda/bin/arcsimpi.py
+
+COPY arcsimpi.sh /opt/conda/bin/arcsimpi.sh
+RUN chmod +rx /opt/conda/bin/arcsimpi.sh
 
 # Copy in JASMIN-built mpi4py package
 RUN mkdir /app/local
 COPY site-packages /app/local/site-packages
 ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
 
-# Make dir to bind platform MPI files on JASMIN
-RUN mkdir /opt/platform_mpi
-ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/opt/platform_mpi/lib/linux_amd64
-
-ENV MPI_WORKDIR /data
+# Make dir to bind OpenMPI files on JASMIN
+RUN mkdir -p /apps/eb/software
+ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/apps/eb/software/OpenMPI/4.0.0-GCC-8.2.0-2.31.1/lib
 
 # Make mount points
 RUN mkdir /input && \

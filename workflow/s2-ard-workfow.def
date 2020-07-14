@@ -1,0 +1,6 @@
+From: docker-daemon:jncc/s2-ard-processor-dev:latest
+
+%startscript
+    #!/bin/bash
+    echo Make files writable by other group members
+    umask 002

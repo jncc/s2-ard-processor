@@ -1,3 +1,4 @@
+Bootstrap: docker-daemon
 From: docker-daemon:jncc/s2-ard-processor-dev:latest
 
 %startscript

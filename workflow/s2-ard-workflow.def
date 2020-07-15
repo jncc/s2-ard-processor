@@ -1,6 +1,14 @@
 Bootstrap: docker-daemon
 From: jncc/s2-ard-processor-dev:latest
 
+%test
+    cd /app && ./test-luigi.sh
+    if [ $? -eq 0 ]; then
+        echo "Luigi runs as expected."
+    else
+        echo "Luigi does not run."
+    fi
+
 %startscript
     #!/bin/bash
     echo Make files writable by other group members

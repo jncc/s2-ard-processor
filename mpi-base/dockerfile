@@ -1,10 +1,10 @@
-FROM jncc/arcsi-base
+FROM petebunting/au-eoed:20200421
 
 COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
 RUN chmod +rx /opt/conda/bin/arcsimpi.py
 
 # Copy in JASMIN-built mpi4py package
-RUN mkdir /app/local
+RUN mkdir -p /app/local
 COPY site-packages /app/local/site-packages
 ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
 

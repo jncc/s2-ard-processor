@@ -1,11 +1,11 @@
 FROM petebunting/au-eoed:20200421
 
 # Copy runscript
-COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
-RUN chmod +rx /opt/conda/bin/arcsimpi.py
+COPY arcsimpi.py /opt/miniconda/bin/arcsimpi.py
+RUN chmod +rx /opt/miniconda/bin/arcsimpi.py
 
-COPY arcsimpi.sh /opt/conda/bin/arcsimpi.sh
-RUN chmod +rx /opt/conda/bin/arcsimpi.sh
+COPY arcsimpi.sh /opt/miniconda/bin/arcsimpi.sh
+RUN chmod +rx /opt/miniconda/bin/arcsimpi.sh
 
 # Copy in JASMIN-built mpi4py package
 RUN mkdir -p /app/local

@@ -78,7 +78,7 @@ class GenerateProductMetadata(luigi.Task):
         arcsiAotValue = arcsiMetadata['ProductsInfo']['ARCSI_AOT_VALUE']
         arcsiLutElevationMax = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MAX']
         arcsiLutElevationMin = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MIN']
-        arcsiVersion = self.buildConfig["arcsiVersion"]
+        arcsiVersion = arcsiMetadata['SoftwareInfo']['Version']
         projection = self.metadataConfig["projection"]
         referenceSystemCodeSpace = self.metadataConfig["targetSrs"].split(":")[0]
         referenceSystemCode = self.metadataConfig["targetSrs"].split(":")[1]

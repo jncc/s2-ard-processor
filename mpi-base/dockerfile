@@ -1,4 +1,5 @@
-FROM petebunting/au-eoed-dev:20191128
+#FROM petebunting/au-eoed-dev:20191128
+FROM jncc/arcsi-base
 
 # Copy runscript
 COPY arcsimpi.py /opt/miniconda/bin/arcsimpi.py

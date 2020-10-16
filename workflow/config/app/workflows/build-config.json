@@ -1,5 +1,4 @@
 {
-    "arcsiVersion": "$arcsiVersion",
     "gdalVersion": "$gdalVersion",
     "dockerImage" : "$dockerImage"
 }

@@ -74,8 +74,6 @@ from arcsilib import ARCSI_SENSORS_LIST
 from arcsilib import ARCSI_PRODUCTS_LIST
 # Import the list of gdal file formats arcsi supports
 from arcsilib import ARCSI_GDALFORMATS_LIST
-# Import the list of sentinel-2 and landsat cloud masking methods
-from arcsilib import ARCSI_CLOUD_METHODS_LIST
 # Import rsgislib library
 import rsgislib
 # Import the MPI library
@@ -299,8 +297,7 @@ if (__name__ == '__main__') and (mpiRank == 0):
                             choices=['near', 'bilinear', 'cubic', 'cubicspline', 'lanczos', 'average'],
                             help='''Specifies interpolation algorithm when resampling image bands to a new resolution (e.g., Sentinel-2)
                                     (Note. the options are those in gdalwarp).''')
-        parser.add_argument("--cloudmethods", type=str, nargs='+', default=None, choices=ARCSI_CLOUD_METHODS_LIST,
-                        help='''Specify the method(s) of cloud masking. Current only Sentinel-2 has options).''')
+
         parser.add_argument("--cs_initdist", type=int, default=3000,
                                          help='''When clear-sky regions are being defined this parameter
                                                    is the initial distance (m) from cloud objects to generate the initial
@@ -591,7 +588,7 @@ if (__name__ == '__main__') and (mpiRank == 0):
                 first = True
                 for inputHeader in inputHeadersLst:
                     paramsObj = None
-                    paramsObj = arcsilib.arcsirun.prepParametersObj(inputHeader, None, None, args.sensor, args.inwkt, args.format, args.outpath, args.outbasename, args.outwkt, args.outproj4, args.projabbv, args.ximgres, args.yimgres, args.prods, args.stats, args.aeropro, args.atmospro, args.aeroimg, args.atmosimg, args.grdrefl, args.surfacealtitude, args.atmosozone, args.atmoswater, atmosOZoneWaterSpecified, args.aerowater, args.aerodust, args.aerooceanic, args.aerosoot, aeroComponentsSpecified, args.aot, args.vis, args.tmpath, args.minaot, args.maxaot, args.lowaot, args.upaot, args.dem, args.demnodata, args.aotfile, (not args.localdos), args.dosout, args.simpledos, args.debug, args.scalefac, args.interp, args.interpresamp, args.cs_initdist, args.cs_initminsize, args.cs_finaldist, args.cs_morphop, args.fullimgouts, args.checkouts, args.classmlclouds, args.cloudtrainclouds, args.cloudtrainother, args.resample2lowres, args.keepfileends, args.cloudmethods)
+                    paramsObj = arcsilib.arcsirun.prepParametersObj(inputHeader, None, None, args.sensor, args.inwkt, args.format, args.outpath, args.outbasename, args.outwkt, args.outproj4, args.projabbv, args.ximgres, args.yimgres, args.prods, args.stats, args.aeropro, args.atmospro, args.aeroimg, args.atmosimg, args.grdrefl, args.surfacealtitude, args.atmosozone, args.atmoswater, atmosOZoneWaterSpecified, args.aerowater, args.aerodust, args.aerooceanic, args.aerosoot, aeroComponentsSpecified, args.aot, args.vis, args.tmpath, args.minaot, args.maxaot, args.lowaot, args.upaot, args.dem, args.demnodata, args.aotfile, (not args.localdos), args.dosout, args.simpledos, args.debug, args.scalefac, args.interp, args.interpresamp, args.cs_initdist, args.cs_initminsize, args.cs_finaldist, args.cs_morphop, args.fullimgouts, args.checkouts, args.classmlclouds, args.cloudtrainclouds, args.cloudtrainother, args.resample2lowres, args.keepfileends)
                     paramsLst.append(paramsObj)
                     if first:
                         if paramsObj.prodsToCalc["DDVAOT"] or paramsObj.prodsToCalc["DOSAOT"] or paramsObj.prodsToCalc["DOSAOTSGL"]:

@@ -216,18 +216,22 @@
       </gmd:extent>
       <gmd:supplementalInformation>
         <gco:CharacterString>
-        	Data Collection Time: $collectionTime
-		      ARCSI_CLOUD_COVER: $arcsiCloudCover
-		      ARCSI_AOT_RANGE_MAX: $arcsiAotRangeMax
-		      ARCSI_AOT_RANGE_MIN: $arcsiAotRangeMin
-		      ARCSI_AOT_VALUE: $arcsiAotValue
-		      ARCSI_LUT_ELEVATION_MAX: $arcsiLutElevationMax
-		      ARCSI_LUT_ELEVATION_MIN: $arcsiLutElevationMin
-		      Instrument: Sentinel-2  Multispectral Instrument (MSI)
-		      Spectral Bands: Sentinel2A (nm) 496.6, 560, 664.5, 703.9, 740.2, 782.5, 835.1, 864.8, 1613.7, 2202.4.   Sentinel2B (nm) 492.1, 559, 665, 703.8, 739.1, 779.7, 833, 864, 1610.4, 2185.7.
-		      Software Info: : ARCSI. URL: http://www.rsgislib.org/arcsi. Version: $arcsiVersion using a singularity image based on docker image $dockerImage produced by JNCC.
-		      Algorithms: Reprojection uses OSTN02 for datum transformation. Band sharpening uses local linear regression models (Dymon  Shepherd, 2004). Cloud masking uses FMASK algorithm (Zhu  Woodcock, 2012). Atmospheric Correction uses the 6S Radiative Transfer Model (Vermote et al., 2006). Topographic correction uses the algorithm stated in Sheperd  Dymond (2003). Atmospheric correction processes carried out in the Atmospheric and Radiometric Correction of Satellite Imagery (ARCSI) software and reprojection applied using GDAL v$gdalVersion.
-		      CEOS Analysis Ready Data for Land (CARD4L): http://ceos.org/ard/files/CARD4L_Product_Specification_Surface_Reflectance_v4.0.pdf
+          Data Collection Time: $collectionTime
+          ESA file name: $ESAfilename
+          ARCSI_CLOUD_COVER: $arcsiCloudCover
+          ARCSI_AOT_RANGE_MAX: $arcsiAotRangeMax
+          ARCSI_AOT_RANGE_MIN: $arcsiAotRangeMin
+          ARCSI_AOT_VALUE: $arcsiAotValue
+          ARCSI_LUT_ELEVATION_MAX: $arcsiLutElevationMax
+          ARCSI_LUT_ELEVATION_MIN: $arcsiLutElevationMin
+          Instrument: Sentinel-2  Multispectral Instrument (MSI)
+          Spectral Bands: Sentinel2A (nm) 496.6, 560, 664.5, 703.9, 740.2, 782.5, 835.1, 864.8, 1613.7, 2202.4.   Sentinel2B (nm) 492.1, 559, 665, 703.8, 739.1, 779.7, 833, 864, 1610.4, 2185.7.
+          Mean_Sun_Angle_Zenith (deg): $Mean_Sun_Angle_Zenith
+          Mean_Sun_Angle_Azimuth (deg): $Mean_Sun_Angle_Azimuth
+          Mean_Viewing_Incidence_Angles (deg): Band_01_Zenith $MVIA_B01_Zenith, Band_01_Azimith $MVIA_B01_Azimuth, Band_02_Zenith $MVIA_B02_Zenith, Band_02_Azimith $MVIA_B02_Azimuth, Band_03_Zenith $MVIA_B03_Zenith, Band_03_Azimith $MVIA_B03_Azimuth, Band_04_Zenith $MVIA_B04_Zenith, Band_04_Azimith $MVIA_B04_Azimuth, Band_05_Zenith $MVIA_B05_Zenith, Band_05_Azimith $MVIA_B05_Azimuth, Band_06_Zenith $MVIA_B06_Zenith, Band_06_Azimith $MVIA_B06_Azimuth, Band_07_Zenith $MVIA_B07_Zenith, Band_07_Azimith $MVIA_B07_Azimuth, Band_08_Zenith $MVIA_B08_Zenith, Band_08_Azimith $MVIA_B08_Azimuth, Band_09_Zenith $MVIA_B09_Zenith, Band_09_Azimith $MVIA_B09_Azimuth, Band_10_Zenith $MVIA_B10_Zenith, Band_10_Azimith $MVIA_B10_Azimuth
+          Software Info: : ARCSI. URL: http://www.rsgislib.org/arcsi. Version: $arcsiVersion using a singularity image based on docker image $dockerImage produced by JNCC.
+          Algorithms: Reprojection uses OSTN02 for datum transformation. Band sharpening uses local linear regression models (Dymon  Shepherd, 2004). Cloud masking uses FMASK algorithm (Zhu  Woodcock, 2012). Atmospheric Correction uses the 6S Radiative Transfer Model (Vermote et al., 2006). Topographic correction uses the algorithm stated in Sheperd  Dymond (2003). Atmospheric correction processes carried out in the Atmospheric and Radiometric Correction of Satellite Imagery (ARCSI) software and reprojection applied using GDAL v$gdalVersion.
+          CEOS Analysis Ready Data for Land (CARD4L): http://ceos.org/ard/files/CARD4L_Product_Specification_Surface_Reflectance_v4.0.pdf
         </gco:CharacterString>
       </gmd:supplementalInformation>
     </gmd:MD_DataIdentification>
@@ -260,4 +264,4 @@
       </gmd:lineage>
     </gmd:DQ_DataQuality>
   </gmd:dataQualityInfo>
-</gmd:MD_Metadata>
+</gmd:MD_Metadata> 

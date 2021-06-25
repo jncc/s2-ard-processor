@@ -17,6 +17,7 @@ class GenerateProductMetadata(luigi.Task):
     metadataTemplate = luigi.Parameter()
     outputDir = luigi.Parameter()
     ardProductName = luigi.Parameter()
+    granuleInfo = luigi.DictParameter()
     testProcessing = luigi.BoolParameter(default = False)
 
     def enforce_dd(self, in_data):
@@ -72,6 +73,7 @@ class GenerateProductMetadata(luigi.Task):
         aquisitionDate = self.getAquisitionDate(arcsiMetadata)
         publishedDate = self.getAquisitionDate(arcsiMetadata)
         collectionTime = aquisitionDate.split("T")[1].split("Z")[0]
+        esaFilename = self.inputProduct["productName"]
         arcsiCloudCover = arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER']
         arcsiAotRangeMax = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MAX']
         arcsiAotRangeMin = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MIN']
@@ -101,12 +103,35 @@ class GenerateProductMetadata(luigi.Task):
             "collectionTime": collectionTime,
             "extentStartDate": aquisitionDate,
             "extentEndDate": aquisitionDate,
+            "ESAfilename": esaFilename,
             "arcsiCloudCover": arcsiCloudCover,
             "arcsiAotRangeMax": arcsiAotRangeMax,
             "arcsiAotRangeMin": arcsiAotRangeMin,
             "arcsiAotValue" : arcsiAotValue,
             "arcsiLutElevationMax" : arcsiLutElevationMax,
             "arcsiLutElevationMin" : arcsiLutElevationMin,
+            "Mean_Sun_Angle_Zenith": self.granuleInfo["angles"]["sunAngles"]["zenith"],
+            "Mean_Sun_Angle_Azimuth": self.granuleInfo["angles"]["sunAngles"]["azimuth"],
+            "MVIA_B01_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band1"]["zenith"],
+            "MVIA_B01_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band1"]["azimuth"],
+            "MVIA_B02_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band2"]["zenith"],
+            "MVIA_B02_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band2"]["azimuth"],
+            "MVIA_B03_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band3"]["zenith"],
+            "MVIA_B03_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band3"]["azimuth"],
+            "MVIA_B04_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band4"]["zenith"],
+            "MVIA_B04_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band4"]["azimuth"],
+            "MVIA_B05_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band5"]["zenith"],
+            "MVIA_B05_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band5"]["azimuth"],
+            "MVIA_B06_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band6"]["zenith"],
+            "MVIA_B06_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band6"]["azimuth"],
+            "MVIA_B07_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band7"]["zenith"],
+            "MVIA_B07_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band7"]["azimuth"],
+            "MVIA_B08_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band8"]["zenith"],
+            "MVIA_B08_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band8"]["azimuth"],
+            "MVIA_B09_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band9"]["zenith"],
+            "MVIA_B09_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band9"]["azimuth"],
+            "MVIA_B10_Zenith": self.granuleInfo["angles"]["viewingAngles"]["band10"]["zenith"],
+            "MVIA_B10_Azimuth": self.granuleInfo["angles"]["viewingAngles"]["band10"]["azimuth"],
             "arcsiVersion" : arcsiVersion,
             "datasetVersion": "v1.0",
             "projection": projection,

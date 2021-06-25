@@ -6,10 +6,11 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
 from process_s2_swath.CheckArdProducts import CheckArdProducts
+from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.RenameOutputs import RenameOutputs
 from process_s2_swath.CheckFileExists import CheckFileExists
 
-@requires(CheckArdProducts, RenameOutputs)
+@requires(CheckArdProducts, RenameOutputs, GetSwathInfo)
 class GenerateMetadata(luigi.Task):
     """
     Output will look like the following;
@@ -67,6 +68,10 @@ class GenerateMetadata(luigi.Task):
         with self.input()[1].open("r") as RenameOutputsFile:
             renameOutputs = json.load(RenameOutputsFile)
 
+        getSwathInfo = {}
+        with self.input()[2].open("r") as GetSwatchInfoFile:
+            getSwathInfo = json.load(GetSwatchInfoFile)
+
         generateMetadataTasks = []
 
         # make metadata file/(s) per product?
@@ -74,17 +79,23 @@ class GenerateMetadata(luigi.Task):
             renamedOutput = seq(renameOutputs["products"]) \
                 .where(lambda x: x["productName"] == product["productName"]) \
                 .first()
-            
+
             ardProductName = renamedOutput["ardProductName"]
 
+            granuleInfo = seq(getSwathInfo["products"]) \
+                .where(lambda x: x["productName"] == product["productName"]) \
+                .first()
+        
             generateMetadataTasks.append(GenerateProductMetadata(paths=self.paths, 
-            inputProduct=product,
-            metadataConfig=metadataConfig,
-            buildConfig=buildConfig,
-            metadataTemplate=self.metadataTemplate,
-            outputDir = ardProducts["outputDir"],
-            ardProductName = ardProductName,
-            testProcessing = self.testProcessing))
+                inputProduct=product,
+                metadataConfig=metadataConfig,
+                buildConfig=buildConfig,
+                metadataTemplate=self.metadataTemplate,
+                outputDir = ardProducts["outputDir"],
+                ardProductName = ardProductName,
+                granuleInfo = granuleInfo,
+                testProcessing = self.testProcessing)
+            )
 
         yield generateMetadataTasks
 

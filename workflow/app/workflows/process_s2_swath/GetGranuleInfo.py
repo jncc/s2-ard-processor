@@ -70,7 +70,7 @@ class GetGranuleInfo(luigi.Task):
         viewingAngles = {}
         for viewingAngle in root.findall('''.//Mean_Viewing_Incidence_Angle'''):
             bandId = int(viewingAngle.get('bandId')) + 1 # it's 0 offset in the metadata
-            bandName = f'band{bandId}'
+            bandName = 'band{0}'.format(bandId)
             zenith = viewingAngle.find('ZENITH_ANGLE').text
             azimuth = viewingAngle.find('AZIMUTH_ANGLE').text
             viewingAngles[bandName] = {

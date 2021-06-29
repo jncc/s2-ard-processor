@@ -19,3 +19,4 @@ import process_s2_swath.PrepareArdProcessing
 import process_s2_swath.RenameOutputs
 import process_s2_swath.GenerateReport
 import process_s2_swath.SplitGranuleHandler
+import process_s2_swath.Defaults

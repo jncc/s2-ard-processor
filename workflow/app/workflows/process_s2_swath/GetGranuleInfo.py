@@ -22,15 +22,15 @@ class GetGranuleInfo(luigi.Task):
                 "azimuth": "173.186498411533"
             },
             "viewingAngles": {
-                "band1": {
+                "0": {
                     "zenith": "",
                     "azimuth": ""
                 },
-                "band2": {
+                "1": {
                     "zenith": "",
                     "azimuth": ""
                 },
-                "band3": {
+                "2": {
                     "zenith": "",
                     "azimuth": ""
                 },
@@ -69,11 +69,10 @@ class GetGranuleInfo(luigi.Task):
     def getViewingAngles(self, root):
         viewingAngles = {}
         for viewingAngle in root.findall('''.//Mean_Viewing_Incidence_Angle'''):
-            bandId = int(viewingAngle.get('bandId')) + 1 # it's 0 offset in the metadata
-            bandName = 'band{0}'.format(bandId)
+            bandId = viewingAngle.get('bandId') # 0 indexed, ESA band ID
             zenith = viewingAngle.find('ZENITH_ANGLE').text
             azimuth = viewingAngle.find('AZIMUTH_ANGLE').text
-            viewingAngles[bandName] = {
+            viewingAngles[bandId] = {
                 "zenith": zenith,
                 "azimuth": azimuth
             }

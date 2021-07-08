@@ -76,15 +76,25 @@ class GenerateProductMetadata(luigi.Task):
             metadataParams["MVIA_B{0}_Zenith".format(bandId)] = self.granuleInfo["angles"]["viewingAngles"][str(band["esaBandId"])]["zenith"]
             metadataParams["MVIA_B{0}_Azimuth".format(bandId)] = self.granuleInfo["angles"]["viewingAngles"][str(band["esaBandId"])]["azimuth"]
 
+    def getEsaFilename(self, productName):
+        esaFilename = ""
+        if "SPLIT" in productName:
+            # remove the SPLIT1 substring to get the original ESA filename
+            splitIndex = productName.find("SPLIT")
+            esaFilename = productName[:splitIndex] + productName[splitIndex+6:]
+        else:
+            esaFilename = productName
+
+        return esaFilename
+
     def GenerateMetadata(self, arcsiMetadata):
         fileIdentifier = self.ardProductName
-        dateToday = str(datetime.date.today())
         boundingBox = self.getBoundingBox(arcsiMetadata)
         processingDate = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
         aquisitionDate = self.getAquisitionDate(arcsiMetadata)
         publishedDate = self.getAquisitionDate(arcsiMetadata)
         collectionTime = aquisitionDate.split("T")[1].split("Z")[0]
-        esaFilename = self.inputProduct["productName"]
+        esaFilename = self.getEsaFilename(self.inputProduct["productName"])
         arcsiCloudCover = arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER']
         arcsiAotRangeMax = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MAX']
         arcsiAotRangeMin = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MIN']

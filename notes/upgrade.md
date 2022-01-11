@@ -25,6 +25,7 @@ workflow
 EO team tasks
 =============
 
+* Coordinate update of process with EODS.
 * Deterimine appropriate versions of arcsi and gdal to use - This will probably require input from devs to build vms for testing.
 * EO need to verify that the ard works with the versions indicated - manually process a scene.
 * If we are using pete buntings container then it would ideal if we could test the process manually with that. 
@@ -32,3 +33,4 @@ EO team tasks
 * QA / QC outputs from new containers. 
     * western edge effect
     * flipped lat / lng.
+

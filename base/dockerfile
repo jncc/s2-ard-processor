@@ -35,4 +35,5 @@ ENV GDAL_DATA /opt/conda/share/gdal
 # Create processing paths
 RUN mkdir -p /data
 
-
+# patch arcsi
+COPY arcsi-patch/*  /opt/conda/lib/python3.5/site-packages/arcsilib/

@@ -10,7 +10,7 @@ Build and run instructions
 
 Build to image:
 
-    docker build -t s1-ard-processor .
+    docker build -t s2-ard-processor .
 
 Use --no-cache to build from scratch
 

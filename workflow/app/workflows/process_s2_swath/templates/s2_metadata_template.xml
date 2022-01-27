@@ -217,9 +217,9 @@
       <gmd:supplementalInformation>
         <gco:CharacterString>
           Data Collection Time: $collectionTime
-          ESA file name: $ESAfilename
-          ESA_processing_baseline: $PROCESSING_BASELINE
-          ESA_Level_1C_product_DOI: $PRODUCT_DOI
+          ESA file name: $esaFilename
+          ESA_processing_baseline: $processingBaseline
+          ESA_Level_1C_product_DOI: $productDoi
           ARCSI_CLOUD_COVER: $arcsiCloudCover
           ARCSI_AOT_RANGE_MAX: $arcsiAotRangeMax
           ARCSI_AOT_RANGE_MIN: $arcsiAotRangeMin

@@ -95,6 +95,8 @@ class GenerateProductMetadata(luigi.Task):
         publishedDate = self.getAquisitionDate(arcsiMetadata)
         collectionTime = aquisitionDate.split("T")[1].split("Z")[0]
         esaFilename = self.getEsaFilename(self.inputProduct["productName"])
+        processingBaseline = self.granuleInfo["processingBaseline"]
+        productDOI = self.granuleInfo["productDOI"]
         arcsiCloudCover = arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER']
         arcsiAotRangeMax = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MAX']
         arcsiAotRangeMin = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MIN']
@@ -124,7 +126,9 @@ class GenerateProductMetadata(luigi.Task):
             "collectionTime": collectionTime,
             "extentStartDate": aquisitionDate,
             "extentEndDate": aquisitionDate,
-            "ESAfilename": esaFilename,
+            "esaFilename": esaFilename,
+            "processingBaseline": processingBaseline,
+            "productDoi": productDOI,
             "arcsiCloudCover": arcsiCloudCover,
             "arcsiAotRangeMax": arcsiAotRangeMax,
             "arcsiAotRangeMin": arcsiAotRangeMin,

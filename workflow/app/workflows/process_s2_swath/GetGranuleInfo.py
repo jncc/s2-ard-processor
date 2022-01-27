@@ -51,11 +51,22 @@ class GetGranuleInfo(luigi.Task):
 
         return tileMetadataPath
 
-    def getTileMetadataXmlRoot(self, path):
-        tileMetadataTree = ET.parse(path)
-        tileMetadataRoot = tileMetadataTree.getroot()
+    def getXmlRoot(self, path):
+        tree = ET.parse(path)
+        root = tree.getroot()
 
-        return tileMetadataRoot
+        return root
+
+    def getProcessingBaseline(self, root):
+        return root.find('.//Product_Info/PROCESSING_BASELINE').text
+
+    def getProductDOI(self, root):
+        doiElement = root.find('.//Product_Info/PRODUCT_DOI')
+
+        if doiElement is None:
+            return 'n/a'
+        else:
+            return doiElement.text
 
     def getSunAngles(self, root):
         zenith = root.find('''.//Mean_Sun_Angle/ZENITH_ANGLE''').text
@@ -80,15 +91,22 @@ class GetGranuleInfo(luigi.Task):
         return viewingAngles
 
     def run(self):
+        mtdPath = os.path.join(self.productPath, "MTD_MSIL1C.xml")
+        yield CheckFileExists(filePath=mtdPath)
+
+        mtdXmlRoot = self.getXmlRoot(mtdPath)
+        processingBaseline = self.getProcessingBaseline(mtdXmlRoot)
+        productDOI = self.getProductDOI(mtdXmlRoot)
+
         manifestPath = os.path.join(self.productPath, "manifest.safe")
         yield CheckFileExists(filePath=manifestPath)
 
         tileMetadataPath = self.getTileMetadataPath(manifestPath)
         yield CheckFileExists(filePath=tileMetadataPath)
 
-        root = self.getTileMetadataXmlRoot(tileMetadataPath)
-        sunAngles = self.getSunAngles(root)
-        viewingAngles = self.getViewingAngles(root)
+        mtdXmlRoot = self.getXmlRoot(tileMetadataPath)
+        sunAngles = self.getSunAngles(mtdXmlRoot)
+        viewingAngles = self.getViewingAngles(mtdXmlRoot)
 
         productName = os.path.basename(self.productPath)
 
@@ -100,6 +118,8 @@ class GetGranuleInfo(luigi.Task):
             "date": splits[2].split("T")[0],
             "tileId": splits[5],
             "satellite": splits[0],
+            "processingBaseline": processingBaseline,
+            "productDOI": productDOI,
             "angles": {
                 "sunAngles": sunAngles,
                 "viewingAngles": viewingAngles

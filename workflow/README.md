@@ -30,6 +30,13 @@ Where <hostpath> is the path on the host to the mounted fole
 Convert Docker image to Singularity image
 -----------------------------------------
 
+Create a Singularity container without having Singularity installed:
+
+    docker save s2-ard-processor:latest -o s2-ard-processor-dev.tar
+    docker run -v .:/working -v --privileged -t --rm quay.io/singularity/singularity:v3.7.0 build /working/s2-ard-processor-dev.sif docker-archive:///working/s2-ard-processor-dev.tar
+
+Alternatively if you have Singularity:
+
 Create a Singularity file
 
     Bootstrap: docker

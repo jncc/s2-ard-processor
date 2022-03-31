@@ -2,15 +2,15 @@
 FROM jncc/arcsi-base:latest
 
 # Copy runscript
-COPY arcsimpi.py /opt/conda/bin/arcsimpi.py
+COPY local_files/arcsimpi.py /opt/conda/bin/arcsimpi.py
 RUN chmod +rx /opt/conda/bin/arcsimpi.py
 
-COPY arcsimpi.sh /opt/conda/bin/arcsimpi.sh
+COPY local_files/arcsimpi.sh /opt/conda/bin/arcsimpi.sh
 RUN chmod +rx /opt/conda/bin/arcsimpi.sh
 
 # Copy in JASMIN-built mpi4py package
 RUN mkdir -p /app/local
-COPY site-packages /app/local/site-packages
+ADD local_files/site-packages.tar.gz /app/local/site-packages
 ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
 
 # Make dir to bind OpenMPI files on JASMIN

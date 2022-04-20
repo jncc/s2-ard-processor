@@ -10,7 +10,8 @@ RUN chmod +rx /opt/conda/bin/arcsimpi.sh
 
 # Copy in JASMIN-built mpi4py package
 RUN mkdir -p /app/local
-ADD local_files/site-packages.tar.gz /app/local/site-packages
+ADD local_files/site-packages.tar.gz /app/local
+RUN chmod -R +rx /app/local/site-packages
 ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
 
 # Make dir to bind OpenMPI files on JASMIN

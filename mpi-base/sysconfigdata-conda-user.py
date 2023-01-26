@@ -7,7 +7,7 @@ from distutils.util import split_quoted
 
 _key = '_PYTHON_SYSCONFIGDATA_NAME'
 _val = os.environ.pop(_key, None)
-_name = sysconfig._get_sysconfigdata_name(True)
+_name = sysconfig._get_sysconfigdata_name()
 
 _data = __import__(_name, globals(), locals(), ['build_time_vars'], 0)
 build_time_vars = _data.build_time_vars

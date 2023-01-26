@@ -10,11 +10,12 @@ Build and run instructions
 
 Build to image:
 
+    cd workflow
     docker build -t s2-ard-processor .
 
 Use --no-cache to build from scratch
 
-Run Interactivly:
+Run Interactively:
 
 docker run -i --entrypoint /bin/bash 
     -v /<hostPath>/input:/input 
@@ -23,39 +24,16 @@ docker run -i --entrypoint /bin/bash
     -v /<hostPath>/static:/static 
     -v /<hostPath>/working:/working 
     -v /<hostPath>/report:/report 
-    -t jncc/test-s2-ard-processor 
+    -t s2-ard-processor
 
-Where <hostpath> is the path on the host to the mounted fole
+Where <hostpath> is the path on the host to the mounted folder
 
-Convert Docker image to Singularity image
+Convert Docker image to apptainer image
 -----------------------------------------
 
-Create a Singularity container without having Singularity installed:
+Build an apptainer image using your Docker image
 
-    docker save s2-ard-processor:latest -o s2-ard-processor-dev.tar
-    docker run -v .:/working -v --privileged -t --rm quay.io/singularity/singularity:v3.7.0 build /working/s2-ard-processor-dev.sif docker-archive:///working/s2-ard-processor-dev.tar
-
-Alternatively if you have Singularity:
-
-Create a Singularity file
-
-    Bootstrap: docker
-    Registry: http://localhost:5000
-    Namespace:
-    From: s2-ard-processor:latest
-
-Run a local docker registry
-	
-    docker run -d -p 5000:5000 --restart=always --name registry registry:2
-
-Tag and push your docker image to the registry
-
-    docker tag s2-ard-processor localhost:5000/s2-ard-processor
-    docker push localhost:5000/s2-ard-processor
-
-Build a Singularity image using your Docker image
-
-    sudo SINGULARITY_NOHTTPS=1 singularity build s2-ard-processor.simg Singularity
+    sudo apptainer build s2-ard-processor.sif docker-daemon://s2-ard-processor:latest
 
 Run:
 

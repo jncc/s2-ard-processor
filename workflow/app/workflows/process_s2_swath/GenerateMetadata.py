@@ -7,10 +7,11 @@ from functional import seq
 from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
 from process_s2_swath.CheckArdProducts import CheckArdProducts
 from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.GetArcsiMetadata import GetArcsiMetadata
 from process_s2_swath.RenameOutputs import RenameOutputs
 from process_s2_swath.CheckFileExists import CheckFileExists
 
-@requires(CheckArdProducts, RenameOutputs, GetSwathInfo)
+@requires(CheckArdProducts, RenameOutputs, GetSwathInfo, GetArcsiMetadata)
 class GenerateMetadata(luigi.Task):
     """
     Output will look like the following;
@@ -72,6 +73,10 @@ class GenerateMetadata(luigi.Task):
         with self.input()[2].open("r") as GetSwatchInfoFile:
             getSwathInfo = json.load(GetSwatchInfoFile)
 
+        getArcsiMetadata = {}
+        with self.input()[3].open("r") as GetArcsiMetadataFile:
+            getArcsiMetadata = json.load(GetArcsiMetadataFile)
+
         generateMetadataTasks = []
 
         # make metadata file/(s) per product?
@@ -85,6 +90,10 @@ class GenerateMetadata(luigi.Task):
             granuleInfo = seq(getSwathInfo["products"]) \
                 .where(lambda x: x["productName"] == product["productName"]) \
                 .first()
+
+            arcsiInfo = seq(getArcsiMetadata["products"]) \
+                .where(lambda x: x["productName"] == product["productName"]) \
+                .first()
         
             generateMetadataTasks.append(GenerateProductMetadata(paths=self.paths, 
                 inputProduct=product,
@@ -94,6 +103,7 @@ class GenerateMetadata(luigi.Task):
                 outputDir = ardProducts["outputDir"],
                 ardProductName = ardProductName,
                 granuleInfo = granuleInfo,
+                arcsiInfo = arcsiInfo,
                 testProcessing = self.testProcessing)
             )
 

@@ -11,31 +11,36 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.GetArcsiMetadata import GetArcsiMetadata
 from process_s2_swath.CreateThumbnails import CreateThumbnails
-from process_s2_swath.common import clearFolder
+from process_s2_swath.SplitGranuleHandler import SplitGranuleHandler
 
 log = logging.getLogger('luigi-interface')
 
 pp = pprint.PrettyPrinter(indent=4)
 
-@requires(CreateCOGs, CreateThumbnails, GetSwathInfo)
+@requires(CreateCOGs, CreateThumbnails, GetSwathInfo, GetArcsiMetadata)
 class RenameOutputs(luigi.Task):
     paths = luigi.DictParameter()
+    splitGranuleThresholdDate = luigi.DateParameter()
 
     def run(self):
         cogs = {}
         thumbs = {}
         info = {}
+        arcsi = {}
 
         with self.input()[0].open('r') as c, \
             self.input()[1].open('r') as t, \
-            self.input()[2].open('r') as i:
+            self.input()[2].open('r') as i, \
+            self.input()[3].open('r') as a:
 
             cogs = json.load(c)
             thumbs = json.load(t)
             info = json.load(i)
+            arcsi = json.load(a)
 
-
+        # todo combine arcsi info into productList
         # Combine metadata and products 
         productList = seq(cogs["products"]) \
             .map(lambda x: (x["productName"], x["files"])) \
@@ -56,6 +61,10 @@ class RenameOutputs(luigi.Task):
             ardProductName = ""
             fileBaseName = ""
             renamedFiles = []
+
+            if acquisitionDate < self.splitGranuleThresholdDate:
+                SplitGranuleHandler.handleSplitGranules()
+
             for filepath in product["files"]:
                 newFilepath = filepath.replace("SEN2", product["satellite"])
                 if os.path.exists(filepath):

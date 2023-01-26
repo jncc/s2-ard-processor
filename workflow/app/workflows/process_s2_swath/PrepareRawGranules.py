@@ -5,9 +5,7 @@ import subprocess
 import json
 import glob
 from luigi import LocalTarget
-from luigi.util import requires
 from process_s2_swath.common import createDirectory
-from process_s2_swath.SplitGranuleHandler import SplitGranuleHandler
 
 class PrepareRawGranules(luigi.Task):
     """
@@ -63,10 +61,6 @@ class PrepareRawGranules(luigi.Task):
             shutil.copytree(src, dst)
 
         extractedProducts = glob.glob(os.path.join(extractPath, "*"))
-
-        spgHandler = SplitGranuleHandler()
-
-        extractedProducts = spgHandler.handleSplitGranules(extractedProducts)
 
         output = {
             "extractedProductRoot": extractPath,

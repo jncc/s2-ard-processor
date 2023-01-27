@@ -1,6 +1,5 @@
 import luigi
 import os
-import shutil
 import json
 import logging
 import pprint
@@ -22,7 +21,13 @@ pp = pprint.PrettyPrinter(indent=4)
 @requires(CreateCOGs, CreateThumbnails, GetSwathInfo, GetArcsiMetadata)
 class RenameOutputs(luigi.Task):
     paths = luigi.DictParameter()
-    splitGranuleThresholdDate = luigi.DateParameter()
+    oldFilenameDateThreshold = luigi.DateParameter()
+
+    def useOldNamingConvention(self, products):
+        # they should all be the same day so just use the first one
+        acquisitionDate = products[0]["arcsiMetadataInfo"]["acquisitionDate"]
+
+        return datetime.strptime(acquisitionDate, "%Y-%m-%dT%H:%M:%SZ").date() < self.oldFilenameDateThreshold
 
     def run(self):
         cogs = {}
@@ -40,7 +45,6 @@ class RenameOutputs(luigi.Task):
             info = json.load(i)
             arcsi = json.load(a)
 
-        # todo combine arcsi info into productList
         # Combine metadata and products 
         productList = seq(cogs["products"]) \
             .map(lambda x: (x["productName"], x["files"])) \
@@ -51,22 +55,35 @@ class RenameOutputs(luigi.Task):
                 "productName": x[0],
                 "files": seq(x[1]).flatten(),
                 "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
-                "satellite": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["satellite"]}) \
+                "satellite": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["satellite"],
+                "arcsiMetadataInfo": seq(arcsi["products"]).filter(lambda y: y["productName"] == x[0]).first()["arcsiMetadataInfo"]}) \
             .to_list()
 
         # Rename Files
         outputList = []
+
+        if self.useOldNamingConvention(productList):
+            spgHandler = SplitGranuleHandler()
+            splitNames = spgHandler.getSplitGranuleNames(productList)
 
         for product in productList:
             ardProductName = ""
             fileBaseName = ""
             renamedFiles = []
 
-            if acquisitionDate < self.splitGranuleThresholdDate:
-                SplitGranuleHandler.handleSplitGranules()
+            oldProductName = product["productName"]
+
+            newProductName = ""
+            if oldProductName in splitNames:
+                newProductName = splitNames[oldProductName]
+            else:
+                newProductName = oldProductName
+            newProductName = newProductName.replace("SEN2", product["satellite"])
 
             for filepath in product["files"]:
-                newFilepath = filepath.replace("SEN2", product["satellite"])
+                filename = os.path.basename(filepath)
+                newFilename = filename.replace(oldProductName, newProductName)
+                newFilepath = filepath.replace(filename, newFilename)
                 if os.path.exists(filepath):
                     os.rename(filepath, newFilepath)
                 renamedFiles.append(newFilepath)

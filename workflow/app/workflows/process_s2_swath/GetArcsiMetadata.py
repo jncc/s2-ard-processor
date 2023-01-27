@@ -61,7 +61,7 @@ class GetArcsiMetadata(luigi.Task):
     def getArcsiMetadataInfo(self, arcsiMetadata):
         arcsiMetadataInfo = {
             "boundingBox": self.getBoundingBox(arcsiMetadata),
-            "aquisitionDate": self.getAquisitionDate(arcsiMetadata),
+            "acquisitionDate": self.getAquisitionDate(arcsiMetadata),
             "publishedDate": self.getAquisitionDate(arcsiMetadata),
             "arcsiCloudCover": arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER'],
             "arcsiAotRangeMax": arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MAX'],
@@ -79,9 +79,11 @@ class GetArcsiMetadata(luigi.Task):
         with self.input().open('r') as checkArdProducts:
             ardProducts = json.load(checkArdProducts)
 
-        output = {}
-        for product in ardProducts:
-            arcsiMetadataFile = filter(lambda f: f.endswith("meta.json"), product["files"]).first()
+        output = {
+            "products": []
+        }
+        for product in ardProducts["products"]:
+            arcsiMetadataFile = filter(lambda f: f.endswith("meta.json"), product["files"])
 
             arcsiMetadataFileContents = {}
             if self.testProcessing:
@@ -97,7 +99,7 @@ class GetArcsiMetadata(luigi.Task):
                 "arcsiMetadataInfo": self.getArcsiMetadataInfo(arcsiMetadataFileContents)
             }
 
-            output.append(productInfo)
+            output["products"].append(productInfo)
 
         with self.output().open('w') as o:
             json.dump(output, o, indent=4)

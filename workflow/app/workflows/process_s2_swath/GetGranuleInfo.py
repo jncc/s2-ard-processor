@@ -14,8 +14,11 @@ class GetGranuleInfo(luigi.Task):
         "productPath": "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
         "productName": "S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
         "date": "20190226",
+        "datetime": "20190226T163538"
         "tileId": "T30UXD",
         "satellite": "S2B",
+        "processingBaseline": "03.01",
+        "productDOI": "n/a",
         "angles": {
             "sunAngles": {
                 "zenith": "64.074871646887",
@@ -23,16 +26,16 @@ class GetGranuleInfo(luigi.Task):
             },
             "viewingAngles": {
                 "0": {
-                    "zenith": "",
-                    "azimuth": ""
+                    "zenith": "3.10603184811342",
+                    "azimuth": "167.123809953701"
                 },
                 "1": {
-                    "zenith": "",
-                    "azimuth": ""
+                    "zenith": "2.45782752383328",
+                    "azimuth": "172.418266414506"
                 },
                 "2": {
-                    "zenith": "",
-                    "azimuth": ""
+                    "zenith": "2.56705199332649",
+                    "azimuth": "170.157831055565"
                 },
                 ...
             }
@@ -115,7 +118,8 @@ class GetGranuleInfo(luigi.Task):
         output = {
             "productPath": self.productPath,
             "productName": productName,
-            "date": splits[2].split("T")[0],
+            "date": splits[6].split("T")[0],
+            "datetime": splits[6],
             "tileId": splits[5],
             "satellite": splits[0],
             "processingBaseline": processingBaseline,

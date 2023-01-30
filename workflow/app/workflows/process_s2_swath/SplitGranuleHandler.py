@@ -1,5 +1,6 @@
 import logging
 import re
+import os
 
 from functional import seq
 
@@ -20,20 +21,20 @@ class SplitGranuleHandler():
         # Take only those groupings where there is more then one object for the gid
         # Create a list of objects in each split and order it by captureDate to create a list of these ordered groupled lists
 
-        # Expecting names like SEN2_20220127_latn572lonw0037_T30VVJ_ORB080_20220127121733_utm30n_osgb
-        pattern = "(SEN2_\d{8}_[a-z0-9]+_([A-Z\d]+)_[A-Z\d]+_)(\d{14}_)[a-zA-Z\d]+_[a-zA-Z\d]+"
+        # Expecting names like SEN2_20220127_latn572lonw0037_T30VVJ_ORB080_20220127121733_utm30_osgb
+        pattern = "((SEN2_\d{8}_[a-zA-Z0-9]+_([A-Z\d]+)_[A-Z\d]+_)(\d{14}_)[a-zA-Z\d]+[_]?[a-zA-Z\d]+)"
 
         log.info("granules")
         for g in granules:
             log.info(g)
 
         splits = seq(granules) \
-                    .map(lambda x: (x["productName"], re.match(pattern, x["productName"]))) \
+                    .map(lambda x: (x["productName"], re.match(pattern, x["ardProductName"]))) \
                     .select(lambda x: {
-                            "granuleName" : x[0],
-                            "gId": x[1].group(1),
-                            "tileId": x[1].group(2),
-                            "captureDate": x[1].group(3)
+                            "granuleName" : x[1].group(1),
+                            "gId": x[1].group(2),
+                            "tileId": x[1].group(3),
+                            "captureDate": x[1].group(4)
                     }) \
                     .group_by(lambda x: x["gId"]) \
                     .filter(lambda x: len(x[1]) > 1) \

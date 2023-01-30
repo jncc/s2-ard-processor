@@ -25,9 +25,25 @@ class RenameOutputs(luigi.Task):
 
     def useOldNamingConvention(self, products):
         # they should all be the same day so just use the first one
-        acquisitionDate = products[0]["arcsiMetadataInfo"]["acquisitionDate"]
+        acquisitionDateString = products[0]["arcsiMetadataInfo"]["acquisitionDate"]
+        acquisitionDate = datetime.strptime(acquisitionDateString, "%Y-%m-%dT%H:%M:%SZ").date()
 
-        return datetime.strptime(acquisitionDate, "%Y-%m-%dT%H:%M:%SZ").date() < self.oldFilenameDateThreshold
+        log.info(f"acquisitionDate: {acquisitionDate}")
+        log.info(f"oldFilenameDateThreshold: {self.oldFilenameDateThreshold}")
+
+        return acquisitionDate < self.oldFilenameDateThreshold
+
+    def getProductNameFromFiles(self, files):
+        vmskFileSuffix = "_vmsk_sharp_rad_srefdem_stdsref.tif"
+        vmskFiles = [f for f in files if f.endswith(vmskFileSuffix)]
+        
+        if len(vmskFiles) > 1:
+            raise Exception(f"Error, found more than one vmsk file: {vmskFiles}")
+
+        basename = os.path.basename(vmskFiles[0])
+        productName = basename.replace(vmskFileSuffix, "")
+
+        return productName
 
     def run(self):
         cogs = {}
@@ -56,49 +72,44 @@ class RenameOutputs(luigi.Task):
                 "files": seq(x[1]).flatten(),
                 "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
                 "satellite": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["satellite"],
+                "ardProductName": self.getProductNameFromFiles(seq(x[1]).flatten()),
                 "arcsiMetadataInfo": seq(arcsi["products"]).filter(lambda y: y["productName"] == x[0]).first()["arcsiMetadataInfo"]}) \
             .to_list()
 
         # Rename Files
         outputList = []
 
+        splitNames = {}
         if self.useOldNamingConvention(productList):
             spgHandler = SplitGranuleHandler()
             splitNames = spgHandler.getSplitGranuleNames(productList)
 
         for product in productList:
-            ardProductName = ""
-            fileBaseName = ""
             renamedFiles = []
 
-            oldProductName = product["productName"]
+            oldArdName = product["ardProductName"]
 
-            newProductName = ""
-            if oldProductName in splitNames:
-                newProductName = splitNames[oldProductName]
+            newArdName = ""
+            if oldArdName in splitNames:
+                newArdName = splitNames[oldArdName]
             else:
-                newProductName = oldProductName
-            newProductName = newProductName.replace("SEN2", product["satellite"])
+                newArdName = oldArdName
+            newArdName = newArdName.replace("SEN2", product["satellite"])
 
             for filepath in product["files"]:
                 filename = os.path.basename(filepath)
-                newFilename = filename.replace(oldProductName, newProductName)
+                newFilename = filename.replace(oldArdName, newArdName)
                 newFilepath = filepath.replace(filename, newFilename)
                 if os.path.exists(filepath):
                     os.rename(filepath, newFilepath)
                 renamedFiles.append(newFilepath)
 
-                vmskFileSuffix = "_vmsk_sharp_rad_srefdem_stdsref.tif"
-                if filepath.endswith(vmskFileSuffix):
-                    filename = os.path.basename(newFilepath)
-                    ardProductName = os.path.splitext(filename)[0]
-                    fileBaseName = filename.replace(vmskFileSuffix, "")
+            fileBaseName = self.getProductNameFromFiles(renamedFiles)
 
             outputProduct = {
                 "productName" : product["productName"],
                 "date" : product["date"],
                 "files" : renamedFiles,
-                "ardProductName": ardProductName,
                 "fileBaseName": fileBaseName
             }
 

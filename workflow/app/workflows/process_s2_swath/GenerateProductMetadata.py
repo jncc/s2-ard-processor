@@ -44,22 +44,24 @@ class GenerateProductMetadata(luigi.Task):
         return esaFilename
 
     def run(self):
+        arcsiMetadata = self.arcsiInfo["arcsiMetadataInfo"]
+
         fileIdentifier = self.ardProductName
-        boundingBox = self.arcsiInfo["boundingBox"]
+        boundingBox = arcsiMetadata["boundingBox"]
         processingDate = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-        aquisitionDate = self.arcsiInfo["aquisitionDate"]
-        publishedDate = self.arcsiInfo["aquisitionDate"]
+        aquisitionDate = arcsiMetadata["acquisitionDate"]
+        publishedDate = arcsiMetadata["acquisitionDate"]
         collectionTime = aquisitionDate.split("T")[1].split("Z")[0]
         esaFilename = self.getEsaFilename(self.inputProduct["productName"])
         processingBaseline = self.granuleInfo["processingBaseline"]
         productDOI = self.granuleInfo["productDOI"]
-        arcsiCloudCover = self.arcsiInfo["arcsiCloudCover"]
-        arcsiAotRangeMax = self.arcsiInfo["arcsiAotRangeMax"]
-        arcsiAotRangeMin = self.arcsiInfo["arcsiAotRangeMin"]
-        arcsiAotValue = self.arcsiInfo["arcsiAotValue"]
-        arcsiLutElevationMax = self.arcsiInfo["arcsiLutElevationMax"]
-        arcsiLutElevationMin = self.arcsiInfo["arcsiLutElevationMin"]
-        arcsiVersion = self.arcsiInfo["arcsiVersion"]
+        arcsiCloudCover = arcsiMetadata["arcsiCloudCover"]
+        arcsiAotRangeMax = arcsiMetadata["arcsiAotRangeMax"]
+        arcsiAotRangeMin = arcsiMetadata["arcsiAotRangeMin"]
+        arcsiAotValue = arcsiMetadata["arcsiAotValue"]
+        arcsiLutElevationMax = arcsiMetadata["arcsiLutElevationMax"]
+        arcsiLutElevationMin = arcsiMetadata["arcsiLutElevationMin"]
+        arcsiVersion = arcsiMetadata["arcsiVersion"]
         projection = self.metadataConfig["projection"]
         referenceSystemCodeSpace = self.metadataConfig["targetSrs"].split(":")[0]
         referenceSystemCode = self.metadataConfig["targetSrs"].split(":")[1]

@@ -85,7 +85,8 @@ class GenerateMetadata(luigi.Task):
                 .where(lambda x: x["productName"] == product["productName"]) \
                 .first()
 
-            ardProductName = renamedOutput["ardProductName"]
+            vmskFile = [f for f in renamedOutput["files"] if f.endswith("_vmsk_sharp_rad_srefdem_stdsref.tif")][0]
+            ardProductName = os.path.splitext(os.path.basename(vmskFile))[0]
 
             granuleInfo = seq(getSwathInfo["products"]) \
                 .where(lambda x: x["productName"] == product["productName"]) \

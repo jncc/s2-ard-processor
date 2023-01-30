@@ -23,25 +23,23 @@ class CreateCOGs(luigi.Task):
     {
         "products": [
             {
-                "productName": "SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
+                "productName": "S2B_MSIL1C_20220127T113309_N0400_R080_T30VVK_20220127T121733",
                 "files": [
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_clouds.tif",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_sat.tif",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_toposhad.tif",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_valid.tif",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif",
-                    "/app/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif"                    
+                    "/working/output/SEN2_20220127_latn581lonw0038_T30VVK_ORB080_20220127121733_utm30n_osgb_clouds.tif",
+                    "/working/output/SEN2_20220127_latn581lonw0038_T30VVK_ORB080_20220127121733_utm30n_osgb_sat.tif",
+                    "/working/output/SEN2_20220127_latn581lonw0038_T30VVK_ORB080_20220127121733_utm30n_osgb_toposhad.tif",
+                    "/working/output/SEN2_20220127_latn581lonw0038_T30VVK_ORB080_20220127121733_utm30n_osgb_valid.tif",
+                    "/working/output/SEN2_20220127_latn581lonw0038_T30VVK_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif"                   
                 ]
             },
             {
-                "productName": "SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
+                "productName": "S2B_MSIL1C_20220127T113309_N0400_R080_T30VVL_20220127T120842",
                 "files": [
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_clouds.tif",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_sat.tif",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_toposhad.tif",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_valid.tif",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.tif",
-                    "/app/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif"
+                    "/working/output/SEN2_20220127_latn590lonw0038_T30VVL_ORB080_20220127120842_utm30n_osgb_clouds.tif",
+                    "/working/output/SEN2_20220127_latn590lonw0038_T30VVL_ORB080_20220127120842_utm30n_osgb_sat.tif",
+                    "/working/output/SEN2_20220127_latn590lonw0038_T30VVL_ORB080_20220127120842_utm30n_osgb_toposhad.tif",
+                    "/working/output/SEN2_20220127_latn590lonw0038_T30VVL_ORB080_20220127120842_utm30n_osgb_valid.tif",
+                    "/working/output/SEN2_20220127_latn590lonw0038_T30VVL_ORB080_20220127120842_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif"
                 ]                
             },
             ...

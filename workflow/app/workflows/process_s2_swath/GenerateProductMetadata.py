@@ -21,6 +21,7 @@ class GenerateProductMetadata(luigi.Task):
     granuleInfo = luigi.DictParameter()
     arcsiInfo = luigi.DictParameter()
     bandConfig = luigi.DictParameter(default = defaults.BandConfig)
+    oldFilenameDateThreshold = luigi.DateParameter()
     testProcessing = luigi.BoolParameter(default = False)
 
     def addAngleParams(self, metadataParams):
@@ -65,6 +66,7 @@ class GenerateProductMetadata(luigi.Task):
         projection = self.metadataConfig["projection"]
         referenceSystemCodeSpace = self.metadataConfig["targetSrs"].split(":")[0]
         referenceSystemCode = self.metadataConfig["targetSrs"].split(":")[1]
+        filenameDate = self.oldFilenameDateThreshold
         demTitle = self.metadataConfig["demTitle"]
         placeName = self.metadataConfig["placeName"]
         parentPlaceName = self.metadataConfig["parentPlaceName"]
@@ -98,6 +100,7 @@ class GenerateProductMetadata(luigi.Task):
             "projection": projection,
             "referenceSystemCodeSpace": referenceSystemCodeSpace,
             "referenceSystemCode": referenceSystemCode,
+            "filenamedate": filenameDate,
             "demTitle": demTitle,
             "placeName": placeName,
             "parentPlaceName": parentPlaceName,

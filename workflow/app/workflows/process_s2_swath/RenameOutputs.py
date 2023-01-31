@@ -12,7 +12,7 @@ from process_s2_swath.CreateCOGs import CreateCOGs
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetArcsiMetadata import GetArcsiMetadata
 from process_s2_swath.CreateThumbnails import CreateThumbnails
-from process_s2_swath.SplitGranuleHandler import SplitGranuleHandler
+from process_s2_swath.OldFilenameHandler import OldFilenameHandler
 
 log = logging.getLogger('luigi-interface')
 
@@ -79,10 +79,10 @@ class RenameOutputs(luigi.Task):
         # Rename Files
         outputList = []
 
-        splitNames = {}
+        oldNames = {}
         if self.useOldNamingConvention(productList):
-            spgHandler = SplitGranuleHandler()
-            splitNames = spgHandler.getSplitGranuleNames(productList)
+            nameHandler = OldFilenameHandler()
+            oldNames = nameHandler.getFilenamesUsingOldConvention(productList)
 
         for product in productList:
             renamedFiles = []
@@ -90,8 +90,8 @@ class RenameOutputs(luigi.Task):
             oldArdName = product["ardProductName"]
 
             newArdName = ""
-            if oldArdName in splitNames:
-                newArdName = splitNames[oldArdName]
+            if oldArdName in oldNames:
+                newArdName = oldNames[oldArdName]
             else:
                 newArdName = oldArdName
             newArdName = newArdName.replace("SEN2", product["satellite"])

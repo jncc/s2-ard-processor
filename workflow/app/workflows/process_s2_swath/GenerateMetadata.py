@@ -38,6 +38,7 @@ class GenerateMetadata(luigi.Task):
     metadataTemplate = luigi.Parameter()
     metadataConfigFile = luigi.Parameter()
     buildConfigFile = luigi.Parameter()
+    oldFilenameDateThreshold = luigi.DateParameter()
     testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
@@ -105,6 +106,7 @@ class GenerateMetadata(luigi.Task):
                 ardProductName = ardProductName,
                 granuleInfo = granuleInfo,
                 arcsiInfo = arcsiInfo,
+                oldFilenameDateThreshold = self.oldFilenameDateThreshold,
                 testProcessing = self.testProcessing)
             )
 

@@ -1,4 +1,5 @@
-FROM jncc/arcsi-mpi-base:latest
+# FROM jncc/arcsi-mpi-base:latest
+FROM arcsi-mpi-base-dev
 
 # Setup app folder
 WORKDIR /app

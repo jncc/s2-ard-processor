@@ -83,7 +83,7 @@ class GetArcsiMetadata(luigi.Task):
             "products": []
         }
         for product in ardProducts["products"]:
-            arcsiMetadataFile = filter(lambda f: f.endswith("meta.json"), product["files"])
+            arcsiMetadataFile = list(filter(lambda f: f.endswith("meta.json"), product["files"]))[0]
 
             arcsiMetadataFileContents = {}
             if self.testProcessing:

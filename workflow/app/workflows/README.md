@@ -1,68 +1,78 @@
-# eo-s2-workflow
-Sentinel 2 ARD workflow
+# Sentinel 2 ARD workflow
 
-# Running
+## Prerequisites
 
-To run the workflow, you need to have and be running in an existing Arcsi base 
-container (or other environment with Arcsi installed), this process will be 
-wrapped up in a docker container, and will require the following inputs;
+* An ARCSI v4 installation/container
+* Python 3.6+ (we use 3.10)
+* A Digital Elevation Model in kea format, and output projection in wkt format (as required by ARCSI)
+* A working area with folder setup like so:
+  * `/input` containing your inputs, e.g. S2B_MSIL1C_20220620T110629_N0400_R137_T30UXD_20220620T115229
+  * `/output`
+  * `/working`
+  * `/static` containing your DEM, WKT, and metadata config file
+  * `/state`
 
-PYTHONPATH='.' luigi --module process_s2_swath FinaliseOutputs --outWkt osgb.wkt --projAbbv osgb --dem dem.kea --local-scheduler
-
-To test the workflow on your local dev machine without needing a container, you can also use the --testProcessing flag. This will skip most of the ARCSI/heavy processing commands, but you'll need to set up the venv yourself:
+## Setup your virtual env
 
 Create virtual env
-```
-virtualenv -p python3 /<project path>/eo-s2-workflow-venv
-```
+
+    python3 -m venv .venv
+
 Activate the virtual env
-```
-source ./eo-s2-workflow-venv/bin/activate
-```
+
+    source .venv/bin/activate
+
 Install Requirements
-```
-pip install -r requirements.txt
-```
 
-## PathRoots and input folders
+    pip install -r requirements.txt
 
-The `luigi.cfg` file contains the default parameters for the processing chain, currently it only contains the `pathRoots` json object that defines the following variables;
 
-```json
-{
-    "input": "/workflow/input",
-    "static": "/workflow/static",
-    "state": "/workflow/state",
-    "output": "/workflow/output"
-}
-```
+## Create a luigi.cfg
+
+You can create your own config file by using `luigi.cfg.template` as a guide. Replace the filepaths as necessary to match your local setup. Note that the `dem`, `outWkt`, and `metadata-config.json` files are expected to found be in the `static` directory.
+
+## Run the workflow
+
+    PYTHONPATH='.' LUIGI_CONFIG_PATH='luigi.cfg' luigi --module process_s2_swath FinaliseOutputs --local-scheduler
+
+Where PYTHONPATH is the path to the process_s2_swath directory and LUIGI_CONFIG_PATH is the path to your luigi.cfg file. 
+
+## Local dev
+
+You can test the workflow logic without actually needing to install ARCSI by using the `--testProcessing` flag. This will skip most of the ARCSI/heavy processing commands and create dummy output files.
+
+There's quite a lot of setup needed for all the folders/inputs/configs. To get started quickly, you can copy the contents of the `local_dev` directory out to a test area and update the \<test_path> and \<code_path> values in the `test-luigi.cfg` and `run_local_test.sh` files. You should be able to just run the script after that with `./run_local_test.sh`.
+
+## Luigi parameters
 
 ### input
 
-`/workflow/input`
+`/input`
 
-A folder containing the input granule files as zip files directly downloaded from a Copernicus data source such as SciHub
+A folder containing the input granule files as zip files directly downloaded from a Copernicus data source such as SciHub. If running with `--testProcessing`, these will need to be in the unzipped Mundi format (without '.SAFE' at the end of the folder name).
 
 ### static
 
-`/workflow/static`
+`/static`
 
-A folder containing the static input files for this processing chain, two files will exist here;
+A folder containing the static input files for this processing chain, two files need to exist here;
 
  - DEM file - a digital elevation model converted and stored as a KEA file in the required output projection format
  - Projection WKT - a WKT representation of the request output projection as OGC WKT
 
+The `metadata-config.json`, `arcsi_cmd_template.txt`, and `s2_metadata_template.xml` files can also be stored here for convenience, though a full filepaths are used for these files so it's not required.
+
 ### state
 
-`/workflow/state`
+`/state`
 
 A folder that will contain the state files for this job, this can be output at the end of the process 
 
-### ouptut
+### output
 
-`/workflow/output`
+`/output`
 
-A folder that will contain the requested output files, converted to tif with thumbnails, metdata, etc...
+A folder that will contain the requested output files, converted to tif with thumbnails, metadata, etc...
 
 ## Task Dependencies
 

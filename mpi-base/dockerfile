@@ -2,25 +2,3 @@ FROM petebunting/au-eoed:latest
 
 # Copy runscript
 COPY local_files/arcsisensorsentinel2.py /opt/miniconda/lib/python3.10/site-packages/arcsilib/arcsisensorsentinel2.py
-
-COPY local_files/arcsimpi.sh /opt/miniconda/bin/arcsimpi.sh
-RUN chmod +rx /opt/miniconda/bin/arcsimpi.sh
-
-# Copy in JASMIN-built mpi4py package
-RUN mkdir -p /app/local
-ADD local_files/site-packages.tar.gz /app/local
-RUN chmod -R +rx /app/local/site-packages
-ENV PYTHONPATH ${PYTHONPATH}:/app/local/site-packages
-
-# Make dir to bind OpenMPI files on JASMIN
-RUN mkdir -p /apps/sw/eb/software
-ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/apps/sw/eb/software/OpenMPI/4.0.0-GCC-8.2.0-2.31.1/bin/
-
-# Make mount points
-RUN mkdir /input && \
-    mkdir /output && \
-    mkdir /working && \
-    mkdir /state && \
-    mkdir /static
-
-

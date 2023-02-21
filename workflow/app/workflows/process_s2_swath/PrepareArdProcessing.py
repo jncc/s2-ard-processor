@@ -49,6 +49,7 @@ class PrepareArdProcessing(luigi.Task):
             basename = os.path.join(outDir, basename)
 
             expected["files"].append(basename + "clouds.kea")
+            expected["files"].append(basename + "clouds_prob.kea")
             expected["files"].append(basename + "meta.json")
             expected["files"].append(basename + "sat.kea")
             expected["files"].append(basename + "toposhad.kea")

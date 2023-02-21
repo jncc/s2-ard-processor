@@ -14,8 +14,8 @@ class PrepareRawGranules(luigi.Task):
 
     {
         "products": [
-            "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
-            "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
+            "/working/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
+            "/working/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T31UCT_20190226T163538",
             "..."
         ]
     }

@@ -11,7 +11,7 @@ class GetGranuleInfo(luigi.Task):
     name and metadata files
 
     {
-        "productPath": "/app/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
+        "productPath": "/working/extracted/S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
         "productName": "S2B_MSIL1C_20190226T111049_N0207_R137_T30UXD_20190226T163538",
         "date": "20190226",
         "datetime": "20190226T163538"

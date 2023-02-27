@@ -7,18 +7,18 @@ from luigi.util import requires
 from functional import seq
 from process_s2_swath.CreateCOG import CreateCOG
 from process_s2_swath.ValidateCOG import ValidateCOG
-from process_s2_swath.CheckArdProducts import CheckArdProducts
+from process_s2_swath.RescaleCloudProbabilities import RescaleCloudProbabilities
 
 log = logging.getLogger('luigi-interface')
 
-@requires(CheckArdProducts)
+@requires(RescaleCloudProbabilities)
 class CreateCOGs(luigi.Task):
     """
     Converts all KEA files into GeoTIFF's, extracts a list of files to convert,
     and then create a task for each of those files, the scheduler then decides
     when to run the conversions (upto a limit of workers in this case)
 
-    Outputs for this will be similar to the previous ProcessToArd outputs;
+    Outputs for this will be like so;
 
     {
         "products": [
@@ -26,6 +26,7 @@ class CreateCOGs(luigi.Task):
                 "productName": "SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb",
                 "files": [
                     "/working/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_clouds.tif",
+                    "/working/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_clouds_prob_rescaled.tif",
                     "/working/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_sat.tif",
                     "/working/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_toposhad.tif",
                     "/working/output/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb/SEN2_20190226_lat53lon071_T30UXD_ORB137_utm30n_osgb_valid.tif",
@@ -37,6 +38,7 @@ class CreateCOGs(luigi.Task):
                 "productName": "SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb",
                 "files": [
                     "/working/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_clouds.tif",
+                    "/working/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_clouds_prob_rescaled.tif",
                     "/working/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_sat.tif",
                     "/working/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_toposhad.tif",
                     "/working/output/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb/SEN2_20190226_lat52lon089_T31UCT_ORB137_utm31n_osgb_valid.tif",
@@ -58,10 +60,8 @@ class CreateCOGs(luigi.Task):
 
         ardProducts = {}
 
-        with self.input().open('r') as CheckArdProductsFile:
-            ardProducts = json.load(CheckArdProductsFile)
-    
-        # filesToConvert = list(filter(lambda x: os.path.splitext(x)[1] == '.kea', processRawToArdInfo['files']))
+        with self.input().open('r') as RescaleCloudProbabilitiesFile:
+            ardProducts = json.load(RescaleCloudProbabilitiesFile)
 
         cogTasks = []
         for p in ardProducts["products"]:

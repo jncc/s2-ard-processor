@@ -99,7 +99,10 @@ class RenameOutputs(luigi.Task):
             for filepath in product["files"]:
                 filename = os.path.basename(filepath)
                 newFilename = filename.replace(oldArdName, newArdName)
+                newFilename = newFilename.replace("clouds_prob_rescaled.tif", "clouds_prob.tif")
+
                 newFilepath = filepath.replace(filename, newFilename)
+                
                 if os.path.exists(filepath):
                     os.rename(filepath, newFilepath)
                 renamedFiles.append(newFilepath)

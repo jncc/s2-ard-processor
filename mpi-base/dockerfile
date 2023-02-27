@@ -1,4 +1,0 @@
-FROM petebunting/au-eoed:latest
-
-# Copy runscript
-COPY local_files/arcsisensorsentinel2.py /opt/miniconda/lib/python3.10/site-packages/arcsilib/arcsisensorsentinel2.py

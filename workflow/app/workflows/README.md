@@ -45,34 +45,22 @@ There's quite a lot of setup needed for all the folders/inputs/configs. To get s
 
 ## Luigi parameters
 
-### input
+* `paths`
+    * `/input` - A folder containing the input granule files as zip files directly downloaded from a Copernicus data source such as SciHub. If running with `--testProcessing`, these will need to be in the unzipped Mundi format (without '.SAFE' at the end of the folder name).
+    * `/static` - A folder containing the static input files for this processing chain, two files need to exist here;
+        - DEM file - a digital elevation model converted and stored as a KEA file in the required output projection format.
+        - Projection WKT - a WKT representation of the request output projection as OGC WKT.
+        The `metadata-config.json`, `arcsi_cmd_template.txt`, and `s2_metadata_template.xml` files can also be stored here for convenience, though full filepaths are used to reference these files so it's not required.
+    * `/state` - A folder that will contain the state files for this job, this can be output at the end of the process.
+    * `/output` - A folder that will contain the requested output files, converted to tif with thumbnails, metadata, etc...
+* `dem` - Used by ARCSI.
+* `outWkt` - Used by ARCSI (optional).
+* `projAbbv` - Used by ARCSI (optional).
+* `metadataConfigFile` - Contains info such as place name and DEM title to be used to populate the metadata template.
+* `metadataTemplate` - Template populated with values from the metadataConfigFile, buildConfigFile, and other run specific values.
+* `arcsiCmdTemplate` - The templated ARCSI cmd.
+* `buildConfigFile` - Contains build information such as GDAL and docker image versions which are referenced in the metadata. For uncontainerised runs of the workflow you'll need to create this manually.
 
-`/input`
-
-A folder containing the input granule files as zip files directly downloaded from a Copernicus data source such as SciHub. If running with `--testProcessing`, these will need to be in the unzipped Mundi format (without '.SAFE' at the end of the folder name).
-
-### static
-
-`/static`
-
-A folder containing the static input files for this processing chain, two files need to exist here;
-
- - DEM file - a digital elevation model converted and stored as a KEA file in the required output projection format
- - Projection WKT - a WKT representation of the request output projection as OGC WKT
-
-The `metadata-config.json`, `arcsi_cmd_template.txt`, and `s2_metadata_template.xml` files can also be stored here for convenience, though a full filepaths are used for these files so it's not required.
-
-### state
-
-`/state`
-
-A folder that will contain the state files for this job, this can be output at the end of the process 
-
-### output
-
-`/output`
-
-A folder that will contain the requested output files, converted to tif with thumbnails, metadata, etc...
 
 ## Task Dependencies
 

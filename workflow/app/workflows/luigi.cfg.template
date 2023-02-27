@@ -3,15 +3,14 @@ paths = {"input":"/workflow/input",
             "static":"/workflow/static",
             "state":"/workflow/state",
             "output":"/workflow/output", 
-            "working":"/workflow/working",
-            "report":"/workflow/report",
-            "database":"/database/working"}
+            "working":"/workflow/working"}
 dem = dem.kea
 outWkt = BritishNationalGrid.wkt
-buildConfigFile = build-config.json
+projAbbv = osgb
 metadataConfigFile = metadata-config.json
 metadataTemplate = templates/s2_metadata_template.xml
 arcsiCmdTemplate = templates/arcsi_cmd_template.txt
+buildConfigFile = build-config.json
 maxCogProcesses = 4
 validateCogs = False
 removeInputFiles = False

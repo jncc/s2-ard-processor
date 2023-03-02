@@ -8,6 +8,7 @@ import process_s2_swath.CreateCOGs
 import process_s2_swath.ValidateCOG
 import process_s2_swath.FinaliseOutputs
 import process_s2_swath.GetArcsiMetadata
+import process_s2_swath.GetGDALVersion
 import process_s2_swath.GenerateMetadata
 import process_s2_swath.GenerateProductMetadata
 import process_s2_swath.GetGranuleInfo

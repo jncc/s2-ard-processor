@@ -9,9 +9,10 @@ from process_s2_swath.CheckArdProducts import CheckArdProducts
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetArcsiMetadata import GetArcsiMetadata
 from process_s2_swath.RenameOutputs import RenameOutputs
+from process_s2_swath.GetGDALVersion import GetGDALVersion
 from process_s2_swath.CheckFileExists import CheckFileExists
 
-@requires(CheckArdProducts, RenameOutputs, GetSwathInfo, GetArcsiMetadata)
+@requires(CheckArdProducts, RenameOutputs, GetSwathInfo, GetArcsiMetadata, GetGDALVersion)
 class GenerateMetadata(luigi.Task):
     """
     Output will look like the following;
@@ -78,6 +79,10 @@ class GenerateMetadata(luigi.Task):
         with self.input()[3].open("r") as GetArcsiMetadataFile:
             getArcsiMetadata = json.load(GetArcsiMetadataFile)
 
+        gdalVersion = {}
+        with self.input()[4].open("r") as GetGDALVersionFile:
+            gdalVersion = json.load(GetGDALVersionFile)
+
         generateMetadataTasks = []
 
         # make metadata file/(s) per product?
@@ -106,6 +111,7 @@ class GenerateMetadata(luigi.Task):
                 ardProductName = ardProductName,
                 granuleInfo = granuleInfo,
                 arcsiInfo = arcsiInfo,
+                gdalVersion = gdalVersion["gdalVersion"],
                 oldFilenameDateThreshold = self.oldFilenameDateThreshold,
                 testProcessing = self.testProcessing)
             )

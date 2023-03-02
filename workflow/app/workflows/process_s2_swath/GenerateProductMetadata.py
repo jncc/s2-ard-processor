@@ -20,6 +20,7 @@ class GenerateProductMetadata(luigi.Task):
     ardProductName = luigi.Parameter()
     granuleInfo = luigi.DictParameter()
     arcsiInfo = luigi.DictParameter()
+    gdalVersion = luigi.DictParameter()
     bandConfig = luigi.DictParameter(default = defaults.BandConfig)
     oldFilenameDateThreshold = luigi.DateParameter()
     testProcessing = luigi.BoolParameter(default = False)
@@ -72,7 +73,7 @@ class GenerateProductMetadata(luigi.Task):
         parentPlaceName = self.metadataConfig["parentPlaceName"]
         targetSrs = self.metadataConfig["targetSrs"]
         dockerImage = self.buildConfig["dockerImage"]
-        gdalVersion = self.buildConfig["gdalVersion"]
+        gdalVersion = self.gdalVersion
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,

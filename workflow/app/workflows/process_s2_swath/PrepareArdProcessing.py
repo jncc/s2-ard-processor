@@ -11,7 +11,6 @@ from process_s2_swath.common import createDirectory
 from process_s2_swath.BuildFileList import BuildFileList
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
 from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger("luigi-interface")

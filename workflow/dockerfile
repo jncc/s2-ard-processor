@@ -19,14 +19,11 @@ RUN mkdir -p /input/ \
     && mkdir -p /report/ \
     && mkdir -p /database/
 
-# Copy workflow requirements
-COPY /app/workflows/requirements.txt ./workflows/
+# Copy workflows
+COPY /app/workflows ./workflows
 
 # Install workflow dependencies
 RUN pip install -r /app/workflows/requirements.txt
-
-# Copy workflows
-COPY /app/workflows ./workflows
 
 # Copy workflow config
 COPY config/app/workflows/luigi.cfg ./workflows
@@ -41,11 +38,11 @@ COPY /app/BritishNationalGrid.wkt ./
 # Copy cog validation script
 COPY /app/validate_cloud_optimized_geotiff.py ./
 
-# Copy the singularity test script
+# Copy the luigi test script
 COPY app/test-luigi.sh ./
 RUN chmod +rx /app/test-luigi.sh
 
-#Initialise startup script
+# Initialise startup script
 COPY app/exec.sh ./
 RUN chmod +rx /app/exec.sh
 

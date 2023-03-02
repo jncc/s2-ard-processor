@@ -64,7 +64,7 @@ There's quite a lot of setup needed for all the folders/inputs/configs. **To get
 * **metadataConfigFile** - JSON file containing info such as place name and DEM title to be used to populate the metadata template, e.g. `metadata-config.json`. (See the example in the `process_s2_swath/templates` folder.)
 * **metadataTemplate** - TXT file with a template to be populated with values from the metadataConfigFile, buildConfigFile, and other run specific values. E.g. `s2_metadata_template.xml`.
 * **arcsiCmdTemplate** - TXT file with the templated ARCSI cmd, e.g. `arcsi_cmd_template.txt`.
-* **buildConfigFile** - JSON file containing build information such as GDAL and docker image versions which are referenced in the metadata. (See `s2-ard-processor/workflow/config/app/worksflows/build-config.json` for an example.) For uncontainerised runs of the workflow you'll need to create this manually.
+* **buildConfigFile** - JSON file containing build information such as the docker image version which is referenced in the metadata. (See `s2-ard-processor/workflow/config/app/worksflows/build-config.json` for an example.) For uncontainerised runs of the workflow you'll need to create this manually.
 * **oldFilenameDateThreshold** - Date in format YYYY-MM-DD. All products with an acquisition date on or after this date will use the new filename convention with the generation time included.
 * **maxCogProcesses** - Specify the number of parallel processes to be used to process the outputs to COGs.
 * **removeInputFiles** (optional) - Cleans up the files in the `/input` folder on successful completion.
@@ -81,40 +81,31 @@ Each section (seperated by ------------) is a functional step or (set of steps t
 
 | Task                           | Spawns (one or more*)           |
 |--------------------------------|---------------------------------|
-| UnzipRaw                       |                                 |
+| PrepareRawGranules             |                                 |
+| GetGDALVersion                 |                                 |
 |--------------------------------|---------------------------------|
-| GetInputFileInfos              | GetInfputFileInfo*              |
+| GetSwathInfo                   | GetGranuleInfo   *              |
 | GetSatelliteAndOrbitNumber     |                                 |
 |--------------------------------|---------------------------------|
 | BuildFileList                  |                                 |
 |--------------------------------|---------------------------------|
-| ProcessRawToArd                | CheckFileExistsWithPattern*     |
+| PrepareArdProcessing           | CheckFileExists*                |
 |--------------------------------|---------------------------------|
-| ConvertToTif                   | GdalTranslateKeaToTif*          |
+| ProcessRawToArd                |                                 |
 |--------------------------------|---------------------------------|
-| OptimiseOutputs                | BuildPyramidsAndCalculateStats* |
-| GenerateMetadata               | GenerateProductMetadata*        |
+| CheckArdProducts               |                                 |
 |--------------------------------|---------------------------------|
-| GenerateThumbnails             | GenerateThumbnail*?             |
+| RescaleCloudProbabilities      |                                 |
+| GetArcsiMetadata               |                                 |
+|--------------------------------|---------------------------------|
+| CreateCOGs                     | CreateCOG*                      |
+|--------------------------------|---------------------------------|
+| CreateThumbnails               |                                 |
+|--------------------------------|---------------------------------|
+| RenameOutputs                  |                                 |
+|--------------------------------|---------------------------------|
+| GenerateMetadata               | GenerateProductMetadata*?       |
 |--------------------------------|---------------------------------|
 | FinaliseOutputs                |                                 |
-
-## Calling the workflow (job-specs) - subject to change
-
-Given a 'complete' swath we should be able to start up multiple jobs at the same time with little effort, so assuming a complete swath we can generate a job-spec to run this in a production environment
-
-```json
-{
-    "product": "name-of-product [can just be a process time name or id for the job]",
-    "processor": "name-of-processor [i.e. jncc/s2-ard-process@0.0.1]",
-    "input-path": [
-        "a list of paths for each of the raw data files that are needed for this process to run",
-        "may be already local to a machine, but the instigator of the job should move these files",
-        "so that they are accessible as a folder mount to a docker container",
-        "x",
-        "y",
-        "z"
-    ],
-    "attempted": "0 # Count of the number of attempts have been made to process this product"
-}
-```
+|--------------------------------|---------------------------------|
+| GenerateReport                 |                                 |

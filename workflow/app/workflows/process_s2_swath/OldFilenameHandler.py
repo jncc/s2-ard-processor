@@ -24,10 +24,6 @@ class OldFilenameHandler():
         # Expecting names like SEN2_20220127_latn572lonw0037_T30VVJ_ORB080_20220127121733_utm30_osgb
         pattern = "((SEN2_\d{8}_[a-zA-Z0-9]+_([A-Z\d]+)_[A-Z\d]+_)(\d{14}_)[a-zA-Z\d]+[_]?[a-zA-Z\d]+)"
 
-        log.info("products")
-        for p in products:
-            log.info(p)
-
         splits = seq(products) \
                     .map(lambda x: (x["productName"], re.match(pattern, x["ardProductName"]))) \
                     .select(lambda x: {

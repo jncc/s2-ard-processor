@@ -28,9 +28,6 @@ class RenameOutputs(luigi.Task):
         acquisitionDateString = products[0]["arcsiMetadataInfo"]["acquisitionDate"]
         acquisitionDate = datetime.strptime(acquisitionDateString, "%Y-%m-%dT%H:%M:%SZ").date()
 
-        log.info(f"acquisitionDate: {acquisitionDate}")
-        log.info(f"oldFilenameDateThreshold: {self.oldFilenameDateThreshold}")
-
         return acquisitionDate < self.oldFilenameDateThreshold
 
     def getProductNameFromFiles(self, files):

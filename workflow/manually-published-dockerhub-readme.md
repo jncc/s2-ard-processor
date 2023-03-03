@@ -19,8 +19,8 @@ This ARD processor consumes and generates large amounts of data and this may req
 * Input - This mount point should contain the raw data you will be processing.
 * Static - This should contain the DEM you will be using for terrain adjustment, metadata config file and a template for the ARCSI command that is run. An optional wkt file if the products require reprojection.
 * Working - Temporary files / paths created during processing. This folder is cleared at the end of each run unless you specify the --noClean switch.  The working data is written to a subfolder of the format <productId> where the date components are derived from the capture date of the source product. The product Id is also derived from the source product.
-* Output - This folder wlll contain the output. The output is written to a subfolder of the format <Year>/<Month>/<Day>/<ARD product name> where the date components are derived from the capture date of the source product. The ARD product name is also derived from the input product data.
-* State - The state files generated for each task in the luigi workflow. This is an optional mount generally for debugging. State files are copied into a subfolder of output with the structure ../state/<Year>/<Month>/<Day>/<productId> unless the --noStateCopy flag is specified
+* Output - This folder wlll contain the output. The output is written to a subfolder of the format \<Year>/\<Month>/\<Day>/\<ARD product name> where the date components are derived from the capture date of the source product. The ARD product name is also derived from the input product data.
+* State - The state files generated for each task in the luigi workflow. This is an optional mount generally used for debugging. State files are copied into a subfolder of output with the structure ../state/\<Year>/\<Month>/\<Day>/<productId> unless the --noStateCopy flag is specified
 
 ## Command line
 

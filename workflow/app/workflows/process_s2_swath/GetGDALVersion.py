@@ -14,13 +14,14 @@ class GetGDALVersion(luigi.Task):
     def run(self):
         gdalVersion = ""
 
-        cmd = "gdalinfo --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+'"
+        cmd = "ogrinfo --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+'"
         if self.testProcessing:
             gdalVersion = 'X.X.X'
         else:
             try:
                 log.info("Running cmd: " + cmd)
-                gdalVersion = subprocess.run(cmd, check=True, stderr=subprocess.STDOUT, shell=True)
+                cmdOutput = subprocess.run(cmd, check=True, shell=True, capture_output=True, text=True).stdout
+                gdalVersion = cmdOutput.strip()
             except subprocess.CalledProcessError as e:
                 errStr = "command '{}' returned with error (code {}): {}".format(e.cmd, e.returncode, e.output)
                 raise RuntimeError(errStr)

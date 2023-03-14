@@ -43,7 +43,7 @@ class PrepareArdProcessing(luigi.Task):
 
             acquisitionDatetime = product["datetime"].replace("T", "")
             
-            basename = f'SEN2_{product["date"]}_*_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{acquisitionDatetime}_*_{abv}'
+            basename = f'SEN2_{product["date"]}_latn000lonw0000_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{acquisitionDatetime}_*_{abv}'
 
             basename = os.path.join(outDir, basename)
 

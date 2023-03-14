@@ -1,7 +1,7 @@
 import logging
 import re
-import os
 
+from decimal import Decimal, ROUND_HALF_UP
 from functional import seq
 
 log = logging.getLogger("luigi-interface")
@@ -50,11 +50,42 @@ class OldFilenameHandler():
         splitName = splitName.replace(product["captureDate"], "")
 
         return splitName
+    
+    def getLatLonString(self, product):
+        lat = Decimal(product["arcsiMetadataInfo"]["arcsiCentreLat"])
+        lon = Decimal(product["arcsiMetadataInfo"]["arcsiCentreLon"])
+
+        # some disgusting wrangling of lat/lon to get it to look like the old format again
+        # featuring a hack to get lat to 2 significant figures and lon to 3 significant figures
+        absLat = abs(lat)
+        absLon = abs(lon)
+
+        roundedLat = 0
+        if absLat < 10:
+            roundedLat = absLat.quantize(Decimal('0.1'), ROUND_HALF_UP)
+        else:
+            roundedLat = absLat.quantize(Decimal('0'), ROUND_HALF_UP)
+
+        roundedLon = 0
+        if absLon < 10:
+            roundedLon = absLon.quantize(Decimal('0.01'), ROUND_HALF_UP)
+        elif absLon < 100:
+            roundedLon = absLon.quantize(Decimal('0.1'), ROUND_HALF_UP)
+        else:
+            roundedLon = absLon.quantize(Decimal('0'), ROUND_HALF_UP)
+
+        roundedLatString = str(roundedLat).replace('.', '')
+        roundedLonString = str(roundedLon).replace('.', '')
+
+        latLonString = f"lat{roundedLatString}lon{roundedLonString}"
+
+        return latLonString
 
     def getFilenamesUsingOldConvention(self, products):
         output = {}
 
         splits = self.identifySplitGranules(products)
+        splitNameMappings = {}
         if len(splits) == 0:
             log.info("No split granules detected")
         else:
@@ -64,18 +95,30 @@ class OldFilenameHandler():
                     #skip the first granule
                     if i > 0:
                         splitName = self.getSplitName(g, i)
-                        output[g["ardProductName"]] = splitName
+                        splitNameMappings[g["ardProductName"]] = splitName
 
                     i += 1
 
-        # handle all the ones that aren't splits
+        
         for product in products:
-            if product["ardProductName"] not in output:
-                oldName = product["ardProductName"]
+            ardProductName = product["ardProductName"]
+            newName = ''
+            
+            if ardProductName not in splitNameMappings:
+                # handle all the ones that aren't splits
+                oldName = ardProductName
                 captureDate = oldName.split("_")[5]
                 newName = oldName.replace(captureDate + "_", "")
+            else:
+                newName = splitNameMappings[ardProductName]
 
-                output[oldName] = newName
+            # handle lat/lon format
+            pattern = "_(lat[a-zA-Z0-9]+lon[a-zA-Z0-9]+)_"
+            currentLatLon = re.search(pattern, ardProductName).group(1)
+            newLatLon = self.getLatLonString(product)
+            newName = newName.replace(currentLatLon, newLatLon)
+
+            output[ardProductName] = newName
 
         return output
 

@@ -69,7 +69,9 @@ class GetArcsiMetadata(luigi.Task):
             "arcsiAotValue": arcsiMetadata['ProductsInfo']['ARCSI_AOT_VALUE'],
             "arcsiLutElevationMax": arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MAX'],
             "arcsiLutElevationMin": arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MIN'],
-            "arcsiVersion": arcsiMetadata['SoftwareInfo']['Version']
+            "arcsiVersion": arcsiMetadata['SoftwareInfo']['Version'],
+            "arcsiCentreLat": arcsiMetadata['LocationInfo']['Geographical']['CentreLat'],
+            "arcsiCentreLon": arcsiMetadata['LocationInfo']['Geographical']['CentreLon']
         }
 
         return arcsiMetadataInfo

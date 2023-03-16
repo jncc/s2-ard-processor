@@ -22,6 +22,7 @@ class PrepareArdProcessing(luigi.Task):
     outWkt = luigi.OptionalParameter(default = None)
     projAbbv = luigi.OptionalParameter(default = None)
     arcsiCmdTemplate = luigi.Parameter()
+    testProcessing = luigi.BoolParameter(default = False)
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -42,8 +43,13 @@ class PrepareArdProcessing(luigi.Task):
                 abv = ""
 
             acquisitionDatetime = product["datetime"].replace("T", "")
-            
-            basename = f'SEN2_{product["date"]}_latn000lonw0000_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{acquisitionDatetime}_*_{abv}'
+
+            if self.testProcessing:
+                latlon = "latn000lonw0000"
+            else:
+                latlon = "*"
+
+            basename = f'SEN2_{product["date"]}_{latlon}_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{acquisitionDatetime}_*_{abv}'
 
             basename = os.path.join(outDir, basename)
 

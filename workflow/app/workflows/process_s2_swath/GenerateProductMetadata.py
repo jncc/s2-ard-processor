@@ -19,54 +19,12 @@ class GenerateProductMetadata(luigi.Task):
     outputDir = luigi.Parameter()
     ardProductName = luigi.Parameter()
     granuleInfo = luigi.DictParameter()
+    arcsiInfo = luigi.DictParameter()
+    gdalVersion = luigi.DictParameter()
     bandConfig = luigi.DictParameter(default = defaults.BandConfig)
+    oldFilenameDateThreshold = luigi.DateParameter()
     testProcessing = luigi.BoolParameter(default = False)
 
-    def enforce_dd(self, in_data):
-        in_data = str(in_data)
-        if len(in_data) == 1:
-            return "0" + in_data
-        return in_data
-
-    def getAquisitionDate(self, arcsiMetadata):
-        data = arcsiMetadata["AcquasitionInfo"]
-
-        aquisition_date = ""
-
-        aquisition_date += self.enforce_dd(data["Date"]["Year"]) + "-"
-        aquisition_date += self.enforce_dd(data["Date"]["Month"]) + "-"
-        aquisition_date += self.enforce_dd(data["Date"]["Day"]) + "T"
-        aquisition_date += self.enforce_dd(data["Time"]["Hour"]) + ":"
-        aquisition_date += self.enforce_dd(data["Time"]["Minute"]) + ":"
-        aquisition_date += self.enforce_dd(data["Time"]["Second"]) + "Z"
-
-        return aquisition_date
-
-    def getBoundingBox(self, arcsiMetadata):
-
-        bboxSrc = arcsiMetadata["LocationInfo"]["Geographical"]["BBOX"]
-
-        latValues = []
-        latValues.append(bboxSrc["BLLat"])
-        latValues.append(bboxSrc["BRLat"])
-        latValues.append(bboxSrc["TLLat"])
-        latValues.append(bboxSrc["TRLat"])       
-
-        lonValues = []
-        lonValues.append(bboxSrc["BLLon"])
-        lonValues.append(bboxSrc["BRLon"])
-        lonValues.append(bboxSrc["TLLon"])
-        lonValues.append(bboxSrc["TRLon"]) 
-
-        boundingBox = {
-            "north": max(latValues),
-            "south": min(latValues),
-            "east": max(lonValues),
-            "west": min(lonValues)
-        }
-
-        return boundingBox
-        
     def addAngleParams(self, metadataParams):
         metadataParams["Mean_Sun_Angle_Zenith"] = self.granuleInfo["angles"]["sunAngles"]["zenith"]
         metadataParams["Mean_Sun_Angle_Azimuth"] = self.granuleInfo["angles"]["sunAngles"]["azimuth"]
@@ -87,32 +45,35 @@ class GenerateProductMetadata(luigi.Task):
 
         return esaFilename
 
-    def GenerateMetadata(self, arcsiMetadata):
+    def run(self):
+        arcsiMetadata = self.arcsiInfo["arcsiMetadataInfo"]
+
         fileIdentifier = self.ardProductName
-        boundingBox = self.getBoundingBox(arcsiMetadata)
+        boundingBox = arcsiMetadata["boundingBox"]
         processingDate = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-        aquisitionDate = self.getAquisitionDate(arcsiMetadata)
-        publishedDate = self.getAquisitionDate(arcsiMetadata)
+        aquisitionDate = arcsiMetadata["acquisitionDate"]
+        publishedDate = arcsiMetadata["acquisitionDate"]
         collectionTime = aquisitionDate.split("T")[1].split("Z")[0]
         esaFilename = self.getEsaFilename(self.inputProduct["productName"])
         processingBaseline = self.granuleInfo["processingBaseline"]
         productDOI = self.granuleInfo["productDOI"]
-        arcsiCloudCover = arcsiMetadata['ProductsInfo']['ARCSI_CLOUD_COVER']
-        arcsiAotRangeMax = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MAX']
-        arcsiAotRangeMin = arcsiMetadata['ProductsInfo']['ARCSI_AOT_RANGE_MIN']
-        arcsiAotValue = arcsiMetadata['ProductsInfo']['ARCSI_AOT_VALUE']
-        arcsiLutElevationMax = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MAX']
-        arcsiLutElevationMin = arcsiMetadata['ProductsInfo']['ARCSI_LUT_ELEVATION_MIN']
-        arcsiVersion = arcsiMetadata['SoftwareInfo']['Version']
+        arcsiCloudCover = arcsiMetadata["arcsiCloudCover"]
+        arcsiAotRangeMax = arcsiMetadata["arcsiAotRangeMax"]
+        arcsiAotRangeMin = arcsiMetadata["arcsiAotRangeMin"]
+        arcsiAotValue = arcsiMetadata["arcsiAotValue"]
+        arcsiLutElevationMax = arcsiMetadata["arcsiLutElevationMax"]
+        arcsiLutElevationMin = arcsiMetadata["arcsiLutElevationMin"]
+        arcsiVersion = arcsiMetadata["arcsiVersion"]
         projection = self.metadataConfig["projection"]
         referenceSystemCodeSpace = self.metadataConfig["targetSrs"].split(":")[0]
         referenceSystemCode = self.metadataConfig["targetSrs"].split(":")[1]
+        filenameDate = self.oldFilenameDateThreshold
         demTitle = self.metadataConfig["demTitle"]
         placeName = self.metadataConfig["placeName"]
         parentPlaceName = self.metadataConfig["parentPlaceName"]
         targetSrs = self.metadataConfig["targetSrs"]
         dockerImage = self.buildConfig["dockerImage"]
-        gdalVersion = self.buildConfig["gdalVersion"]
+        gdalVersion = self.gdalVersion
 
         metadataParams = {
             "fileIdentifier": fileIdentifier,
@@ -140,6 +101,7 @@ class GenerateProductMetadata(luigi.Task):
             "projection": projection,
             "referenceSystemCodeSpace": referenceSystemCodeSpace,
             "referenceSystemCode": referenceSystemCode,
+            "filenamedate": filenameDate,
             "demTitle": demTitle,
             "placeName": placeName,
             "parentPlaceName": parentPlaceName,
@@ -158,33 +120,14 @@ class GenerateProductMetadata(luigi.Task):
         
         metadataFileName = "%s_meta.xml" % fileIdentifier
 
-        target = os.path.join(self.outputDir, metadataFileName)
+        metadataFilepath = os.path.join(self.outputDir, metadataFileName)
 
-        with open(target, 'w') as out:
+        with open(metadataFilepath, 'w') as out:
             out.write(ardMetadata)
-            
-        return target
-
-    def run(self):
-        arcsiMetadataFile = seq(self.inputProduct["files"]) \
-            .where(lambda x: x.endswith("meta.json")) \
-            .first()
-
-        arcsiMetadata = {}
-
-        if self.testProcessing:
-            log.debug("Test Mode, Would load: {}".format(arcsiMetadataFile))
-            with open("process_s2_swath/test/dummy-arcsi-metadata.json", "r") as mf:
-                arcsiMetadata = json.load(mf)
-        else:
-            with open(arcsiMetadataFile, "r") as mf:
-                arcsiMetadata = json.load(mf)
-
-        metadataFile = self.GenerateMetadata(arcsiMetadata)
 
         output = {
             "productName": self.inputProduct["productName"],
-            "files": [metadataFile]
+            "files": [metadataFilepath]
         }
 
         with self.output().open('w') as o:

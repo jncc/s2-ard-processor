@@ -11,7 +11,6 @@ from process_s2_swath.common import createDirectory
 from process_s2_swath.BuildFileList import BuildFileList
 from process_s2_swath.GetSwathInfo import GetSwathInfo
 from process_s2_swath.GetSatelliteAndOrbitNumber import GetSatelliteAndOrbitNumber
-from process_s2_swath.CheckFileExistsWithPattern import CheckFileExistsWithPattern
 from process_s2_swath.CheckFileExists import CheckFileExists
 
 log = logging.getLogger("luigi-interface")
@@ -23,6 +22,7 @@ class PrepareArdProcessing(luigi.Task):
     outWkt = luigi.OptionalParameter(default = None)
     projAbbv = luigi.OptionalParameter(default = None)
     arcsiCmdTemplate = luigi.Parameter()
+    testProcessing = luigi.BoolParameter(default = False)
 
     def getExpectedProductFilePatterns(self, outDir, satelliteAndOrbitNoOutput, swathInfo):
         expectedProducts = {
@@ -41,18 +41,20 @@ class PrepareArdProcessing(luigi.Task):
                 abv = self.projAbbv + "_"
             else:
                 abv = ""
-            
-            basename = "SEN2_%s_*_%s_ORB%s_*_%s" % \
-                (
-                    product["date"],
-                    product["tileId"],
-                    satelliteAndOrbitNoOutput["orbitNumber"],
-                    abv
-                )
+
+            acquisitionDatetime = product["datetime"].replace("T", "")
+
+            if self.testProcessing:
+                latlon = "latn000lonw0000"
+            else:
+                latlon = "*"
+
+            basename = f'SEN2_{product["date"]}_{latlon}_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{acquisitionDatetime}_*_{abv}'
 
             basename = os.path.join(outDir, basename)
 
             expected["files"].append(basename + "clouds.kea")
+            expected["files"].append(basename + "clouds_prob.kea")
             expected["files"].append(basename + "meta.json")
             expected["files"].append(basename + "sat.kea")
             expected["files"].append(basename + "toposhad.kea")

@@ -1,68 +1,79 @@
-# eo-s2-workflow
-Sentinel 2 ARD workflow
+# Sentinel 2 ARD workflow
 
-# Running
+## Requirements
 
-To run the workflow, you need to have and be running in an existing Arcsi base 
-container (or other environment with Arcsi installed), this process will be 
-wrapped up in a docker container, and will require the following inputs;
+* An ARCSI v4 installation/container
+* Python 3.6+ (we use 3.10)
+* A Digital Elevation Model in kea format, and output projection in wkt format (as required by ARCSI)
+* A working area with folder setup like so:
+  * `/input` containing your Sentinel-2 L1C inputs, e.g. S2B_MSIL1C_20220620T110629_N0400_R137_T30UXD_20220620T115229
+  * `/output`
+  * `/working`
+  * `/static` containing your DEM, WKT, and metadata config file
+  * `/state`
+  * `/report` (only if reporting is needed)
+  * `/database` (only if reporting is needed)
 
-PYTHONPATH='.' luigi --module process_s2_swath FinaliseOutputs --outWkt osgb.wkt --projAbbv osgb --dem dem.kea --local-scheduler
-
-To test the workflow on your local dev machine without needing a container, you can also use the --testProcessing flag. This will skip most of the ARCSI/heavy processing commands, but you'll need to set up the venv yourself:
+## Setup your virtual env
 
 Create virtual env
-```
-virtualenv -p python3 /<project path>/eo-s2-workflow-venv
-```
+
+    python3 -m venv .venv
+
 Activate the virtual env
-```
-source ./eo-s2-workflow-venv/bin/activate
-```
+
+    source .venv/bin/activate
+
 Install Requirements
-```
-pip install -r requirements.txt
-```
 
-## PathRoots and input folders
+    pip install -r requirements.txt
 
-The `luigi.cfg` file contains the default parameters for the processing chain, currently it only contains the `pathRoots` json object that defines the following variables;
 
-```json
-{
-    "input": "/workflow/input",
-    "static": "/workflow/static",
-    "state": "/workflow/state",
-    "output": "/workflow/output"
-}
-```
+## Create a luigi.cfg
 
-### input
+You can create your own config file by using `luigi.cfg.template` as a guide. Replace the filepaths as necessary to match your local setup. Note that the `dem`, `outWkt`, and `metadata-config.json` files are expected to found be in the `static` directory.
 
-`/workflow/input`
+## Run the workflow
 
-A folder containing the input granule files as zip files directly downloaded from a Copernicus data source such as SciHub
+    PYTHONPATH='.' LUIGI_CONFIG_PATH='luigi.cfg' luigi --module process_s2_swath FinaliseOutputs --local-scheduler
 
-### static
+Where PYTHONPATH is the path to the process_s2_swath directory and LUIGI_CONFIG_PATH is the path to your luigi.cfg file. The FinaliseOutputs target task will run all the steps to produce the ARD.
 
-`/workflow/static`
+We also have a target task for producing the ARD plus creating an SQLite database and csv files for reporting. Note that this will require some extra params as shown in the `luigi.cfg.template` file.
 
-A folder containing the static input files for this processing chain, two files will exist here;
+    PYTHONPATH='.' LUIGI_CONFIG_PATH='luigi.cfg' luigi --module process_s2_swath GenerateReport --local-scheduler
 
- - DEM file - a digital elevation model converted and stored as a KEA file in the required output projection format
- - Projection WKT - a WKT representation of the request output projection as OGC WKT
+## Local dev
 
-### state
+You can test the workflow logic without actually needing to install ARCSI by using the `--testProcessing` flag. This will skip most of the ARCSI/heavy processing commands and create dummy output files.
 
-`/workflow/state`
+There's quite a lot of setup needed for all the folders/inputs/configs. **To get started quickly** you can copy the contents of the `local_dev` directory out to a test area and update the \<test_path> and \<code_path> values in the `test-luigi.cfg` and `run_local_test.sh` files. You should be able to just run the script after that with `./run_local_test.sh`.
 
-A folder that will contain the state files for this job, this can be output at the end of the process 
+## Luigi parameters
 
-### ouptut
+* **paths**
+    * **/input** - Path to a folder containing the input granule files as zip files directly downloaded from a Copernicus data source such as SciHub. If running with `--testProcessing`, these will need to be in the unzipped Mundi format (without '.SAFE' at the end of the folder name).
+    * **/static** - Path to a folder containing the static input files for this processing chain (mainly for convenience when running in a container). The following files need to exist here: the DEM, the projection WKT, and the metadata config JSON. The arcsi_cmd_template.txt and s2_metadata_template.xml files can also be stored here if custom ones are used.
+    * **/state** - Path to a folder that will contain the state files for this job, this can be output at the end of the process.
+    * **/output** - Path to a folder that will contain the requested output files, converted to tif with thumbnails, metadata, etc...
+    * **/report** - Path to a folder that will contain the output csv reports.
+    * **/database** - Path to a folder that will container the output database file for reporting.
+* **dem** - A digital elevation model in the required output projection format, to be provided as a KEA filename, e.g. `dem.kea`. Used by ARCSI.
+* **outWkt** (optional) - Output projection to be provided as a WKT file, e.g. `BritishNationalGrid.wkt`. Used by ARCSI.
+* **projAbbv** (optional) - Abbreviation for the output projection which is appended to the output filenames, e.g. `osgb`. Used by ARCSI.
+* **metadataConfigFile** - JSON file containing info such as place name and DEM title to be used to populate the metadata template, e.g. `metadata-config.json`. (See the example in the `process_s2_swath/templates` folder.)
+* **metadataTemplate** - TXT file with a template to be populated with values from the metadataConfigFile, buildConfigFile, and other run specific values. E.g. `s2_metadata_template.xml`.
+* **arcsiCmdTemplate** - TXT file with the templated ARCSI cmd, e.g. `arcsi_cmd_template.txt`.
+* **buildConfigFile** - JSON file containing build information such as the docker image version which is referenced in the metadata. (See `s2-ard-processor/workflow/config/app/worksflows/build-config.json` for an example.) For uncontainerised runs of the workflow you'll need to create this manually.
+* **oldFilenameDateThreshold** - Date in format YYYY-MM-DD. All products with an acquisition date on or after this date will use the new filename convention with the generation time included.
+* **maxCogProcesses** - Specify the number of parallel processes to be used to process the outputs to COGs.
+* **removeInputFiles** (optional) - Cleans up the files in the `/input` folder on successful completion.
+* **validateCogs** (optional) - Include a step to validate the output files are valid Cloud Optimised Geotiffs.
+* **reportFileName** - A csv filename for the report output, e.g. `report.csv`. Used for the GenerateReport task only.
+* **dbFilename** - A db filename for the SQLite database output, e.g. `s2ardproducts.db`. Used for the GenerateReport task only.
+* **dbConnectionTimeout** (optional) - Specifies how many seconds to wait for the database file to be unlocked (if the file already exists). If you have a large swath with multiple processes writing to the same database file, it may be useful to adjust this. Used for the GenerateReport task only.
+* **testProcessing** (optional) - Used for local development to run a lightweight version of the workflow which doesn't require GDAL or ARCSI and produces dummy outputs.
 
-`/workflow/output`
-
-A folder that will contain the requested output files, converted to tif with thumbnails, metdata, etc...
 
 ## Task Dependencies
 
@@ -70,40 +81,31 @@ Each section (seperated by ------------) is a functional step or (set of steps t
 
 | Task                           | Spawns (one or more*)           |
 |--------------------------------|---------------------------------|
-| UnzipRaw                       |                                 |
+| PrepareRawGranules             |                                 |
+| GetGDALVersion                 |                                 |
 |--------------------------------|---------------------------------|
-| GetInputFileInfos              | GetInfputFileInfo*              |
+| GetSwathInfo                   | GetGranuleInfo   *              |
 | GetSatelliteAndOrbitNumber     |                                 |
 |--------------------------------|---------------------------------|
 | BuildFileList                  |                                 |
 |--------------------------------|---------------------------------|
-| ProcessRawToArd                | CheckFileExistsWithPattern*     |
+| PrepareArdProcessing           | CheckFileExists*                |
 |--------------------------------|---------------------------------|
-| ConvertToTif                   | GdalTranslateKeaToTif*          |
+| ProcessRawToArd                |                                 |
 |--------------------------------|---------------------------------|
-| OptimiseOutputs                | BuildPyramidsAndCalculateStats* |
-| GenerateMetadata               | GenerateProductMetadata*        |
+| CheckArdProducts               |                                 |
 |--------------------------------|---------------------------------|
-| GenerateThumbnails             | GenerateThumbnail*?             |
+| RescaleCloudProbabilities      |                                 |
+| GetArcsiMetadata               |                                 |
+|--------------------------------|---------------------------------|
+| CreateCOGs                     | CreateCOG*                      |
+|--------------------------------|---------------------------------|
+| CreateThumbnails               |                                 |
+|--------------------------------|---------------------------------|
+| RenameOutputs                  |                                 |
+|--------------------------------|---------------------------------|
+| GenerateMetadata               | GenerateProductMetadata*?       |
 |--------------------------------|---------------------------------|
 | FinaliseOutputs                |                                 |
-
-## Calling the workflow (job-specs) - subject to change
-
-Given a 'complete' swath we should be able to start up multiple jobs at the same time with little effort, so assuming a complete swath we can generate a job-spec to run this in a production environment
-
-```json
-{
-    "product": "name-of-product [can just be a process time name or id for the job]",
-    "processor": "name-of-processor [i.e. jncc/s2-ard-process@0.0.1]",
-    "input-path": [
-        "a list of paths for each of the raw data files that are needed for this process to run",
-        "may be already local to a machine, but the instigator of the job should move these files",
-        "so that they are accessible as a folder mount to a docker container",
-        "x",
-        "y",
-        "z"
-    ],
-    "attempted": "0 # Count of the number of attempts have been made to process this product"
-}
-```
+|--------------------------------|---------------------------------|
+| GenerateReport                 |                                 |

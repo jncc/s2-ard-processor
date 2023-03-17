@@ -7,6 +7,8 @@ import process_s2_swath.CreateCOG
 import process_s2_swath.CreateCOGs
 import process_s2_swath.ValidateCOG
 import process_s2_swath.FinaliseOutputs
+import process_s2_swath.GetArcsiMetadata
+import process_s2_swath.GetGDALVersion
 import process_s2_swath.GenerateMetadata
 import process_s2_swath.GenerateProductMetadata
 import process_s2_swath.GetGranuleInfo
@@ -18,5 +20,5 @@ import process_s2_swath.CreateThumbnails
 import process_s2_swath.PrepareArdProcessing
 import process_s2_swath.RenameOutputs
 import process_s2_swath.GenerateReport
-import process_s2_swath.SplitGranuleHandler
+import process_s2_swath.OldFilenameHandler
 import process_s2_swath.Defaults

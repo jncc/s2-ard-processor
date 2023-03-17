@@ -7,10 +7,12 @@ from functional import seq
 from process_s2_swath.GenerateProductMetadata import GenerateProductMetadata
 from process_s2_swath.CheckArdProducts import CheckArdProducts
 from process_s2_swath.GetSwathInfo import GetSwathInfo
+from process_s2_swath.GetArcsiMetadata import GetArcsiMetadata
 from process_s2_swath.RenameOutputs import RenameOutputs
+from process_s2_swath.GetGDALVersion import GetGDALVersion
 from process_s2_swath.CheckFileExists import CheckFileExists
 
-@requires(CheckArdProducts, RenameOutputs, GetSwathInfo)
+@requires(CheckArdProducts, RenameOutputs, GetSwathInfo, GetArcsiMetadata, GetGDALVersion)
 class GenerateMetadata(luigi.Task):
     """
     Output will look like the following;
@@ -37,6 +39,7 @@ class GenerateMetadata(luigi.Task):
     metadataTemplate = luigi.Parameter()
     metadataConfigFile = luigi.Parameter()
     buildConfigFile = luigi.Parameter()
+    oldFilenameDateThreshold = luigi.DateParameter()
     testProcessing = luigi.BoolParameter(default = False)
 
     def run(self):
@@ -72,6 +75,14 @@ class GenerateMetadata(luigi.Task):
         with self.input()[2].open("r") as GetSwatchInfoFile:
             getSwathInfo = json.load(GetSwatchInfoFile)
 
+        getArcsiMetadata = {}
+        with self.input()[3].open("r") as GetArcsiMetadataFile:
+            getArcsiMetadata = json.load(GetArcsiMetadataFile)
+
+        gdalVersion = {}
+        with self.input()[4].open("r") as GetGDALVersionFile:
+            gdalVersion = json.load(GetGDALVersionFile)
+
         generateMetadataTasks = []
 
         # make metadata file/(s) per product?
@@ -80,9 +91,14 @@ class GenerateMetadata(luigi.Task):
                 .where(lambda x: x["productName"] == product["productName"]) \
                 .first()
 
-            ardProductName = renamedOutput["ardProductName"]
+            vmskFile = [f for f in renamedOutput["files"] if f.endswith("_vmsk_sharp_rad_srefdem_stdsref.tif")][0]
+            ardProductName = os.path.splitext(os.path.basename(vmskFile))[0]
 
             granuleInfo = seq(getSwathInfo["products"]) \
+                .where(lambda x: x["productName"] == product["productName"]) \
+                .first()
+
+            arcsiInfo = seq(getArcsiMetadata["products"]) \
                 .where(lambda x: x["productName"] == product["productName"]) \
                 .first()
         
@@ -94,6 +110,9 @@ class GenerateMetadata(luigi.Task):
                 outputDir = ardProducts["outputDir"],
                 ardProductName = ardProductName,
                 granuleInfo = granuleInfo,
+                arcsiInfo = arcsiInfo,
+                gdalVersion = gdalVersion["gdalVersion"],
+                oldFilenameDateThreshold = self.oldFilenameDateThreshold,
                 testProcessing = self.testProcessing)
             )
 

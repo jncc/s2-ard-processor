@@ -1,0 +1,7 @@
+{
+    "projection" : "OSGB",
+    "targetSrs" : "EPSG:27700",
+    "demTitle" : "Aerial Photography Great Britain (APGB) 10m resolution DEM",
+    "placeName" : "United Kingdom",
+    "parentPlaceName" : "Europe"
+}

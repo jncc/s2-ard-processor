@@ -1,4 +1,3 @@
 {
-    "gdalVersion": "$gdalVersion",
     "dockerImage" : "$dockerImage"
 }

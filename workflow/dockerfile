@@ -1,4 +1,4 @@
-FROM jncc/arcsi-mpi-base:latest
+FROM petebunting/au-eoed:latest
 
 # Setup app folder
 WORKDIR /app
@@ -7,7 +7,6 @@ WORKDIR /app
 RUN apt-get update && apt-get -y install \ 
     apt-utils \
     unzip
-
 
 # --------- Place machine build layers before this line ---------
 
@@ -19,20 +18,12 @@ RUN mkdir -p /input/ \
     && mkdir -p /output/ \
     && mkdir -p /report/ \
     && mkdir -p /database/
-    
-# Create mount point for LOTUS LSF commands
-RUN mkdir -p /apps/lsf/
-
-#todo create mount point for mpirun.lotus script location
-
-# Copy workflow requirements
-COPY /app/workflows/requirements.txt ./workflows/
-
-# Install workflow dependencies
-RUN pip install -r /app/workflows/requirements.txt
 
 # Copy workflows
 COPY /app/workflows ./workflows
+
+# Install workflow dependencies
+RUN pip install -r /app/workflows/requirements.txt
 
 # Copy workflow config
 COPY config/app/workflows/luigi.cfg ./workflows
@@ -47,11 +38,11 @@ COPY /app/BritishNationalGrid.wkt ./
 # Copy cog validation script
 COPY /app/validate_cloud_optimized_geotiff.py ./
 
-# Copy the singularity test script
+# Copy the luigi test script
 COPY app/test-luigi.sh ./
 RUN chmod +rx /app/test-luigi.sh
 
-#Initialise startup script
+# Initialise startup script
 COPY app/exec.sh ./
 RUN chmod +rx /app/exec.sh
 

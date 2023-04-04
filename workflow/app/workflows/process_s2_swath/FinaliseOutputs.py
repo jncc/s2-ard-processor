@@ -47,7 +47,7 @@ class FinaliseOutputs(luigi.Task):
                 .map(lambda x: (x["productName"], x["files"]))) \
             .map(lambda x: {
                 "productName": x[0],
-                "date": seq(outputs["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
+                "acquisitionDate": seq(outputs["products"]).filter(lambda y: y["productName"] == x[0]).first()["acquisitionDate"],
                 "fileBaseName": seq(outputs["products"]).filter(lambda y: y["productName"] == x[0]).first()["fileBaseName"],
                 "files": seq(x[1]).flatten()}) \
             .to_list()
@@ -60,12 +60,12 @@ class FinaliseOutputs(luigi.Task):
         for product in productList:
             outputProduct = {
                 "productName" : product["productName"],
-                "date" : product["date"],
+                "acquisitionDate" : product["acquisitionDate"],
                 "fileBaseName" : product["fileBaseName"],
                 "files" : []
             }
 
-            pDate =  datetime.strptime(product["date"],"%Y%m%d").date()
+            pDate =  datetime.strptime(product["acquisitionDate"],"%Y%m%d").date()
             outputPath = os.path.join(self.paths["output"], 
                 str(pDate.year), 
                 "{:02d}".format(pDate.month), 

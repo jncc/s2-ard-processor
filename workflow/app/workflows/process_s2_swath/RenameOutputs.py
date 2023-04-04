@@ -67,7 +67,7 @@ class RenameOutputs(luigi.Task):
             .map(lambda x: {
                 "productName": x[0],
                 "files": seq(x[1]).flatten(),
-                "date": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["date"],
+                "acquisitionDate": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["acquisitionDate"],
                 "satellite": seq(info["products"]).filter(lambda y: y["productName"] == x[0]).first()["satellite"],
                 "ardProductName": self.getProductNameFromFiles(seq(x[1]).flatten()),
                 "arcsiMetadataInfo": seq(arcsi["products"]).filter(lambda y: y["productName"] == x[0]).first()["arcsiMetadataInfo"]}) \
@@ -77,7 +77,7 @@ class RenameOutputs(luigi.Task):
         outputList = []
 
         oldNames = {}
-        if self.useOldNamingConvention(productList):
+        if productList and self.useOldNamingConvention(productList):
             nameHandler = OldFilenameHandler()
             oldNames = nameHandler.getFilenamesUsingOldConvention(productList)
 
@@ -108,7 +108,7 @@ class RenameOutputs(luigi.Task):
 
             outputProduct = {
                 "productName" : product["productName"],
-                "date" : product["date"],
+                "acquisitionDate" : product["acquisitionDate"],
                 "files" : renamedFiles,
                 "fileBaseName": fileBaseName
             }

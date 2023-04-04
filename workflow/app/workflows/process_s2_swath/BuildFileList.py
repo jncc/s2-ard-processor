@@ -29,7 +29,7 @@ class BuildFileList(luigi.Task):
     def getOutputFileName(self, satelliteAndOrbitNoInfo, swathInfo):
         basename = "File_Sentinel"
         satelliteLetter = satelliteAndOrbitNoInfo["satelliteNumber"]
-        date = swathInfo["products"][0]["date"] # date should be the same for all
+        date = swathInfo["products"][0]["acquisitionDate"] # date should be the same for all
 
         return basename + satelliteLetter + "_" + date + ".txt"
 

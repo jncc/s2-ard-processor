@@ -118,8 +118,8 @@ class GetGranuleInfo(luigi.Task):
         output = {
             "productPath": self.productPath,
             "productName": productName,
-            "date": splits[6].split("T")[0],
-            "datetime": splits[6],
+            "acquisitionDate": splits[2].split("T")[0],
+            "generationDatetime": splits[6],
             "tileId": splits[5],
             "satellite": splits[0],
             "processingBaseline": processingBaseline,

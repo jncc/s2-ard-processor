@@ -1,9 +1,7 @@
 import luigi
 import os
 import json
-import subprocess
 import logging
-import glob
 from string import Template
 from luigi import LocalTarget
 from luigi.util import requires
@@ -30,9 +28,12 @@ class PrepareArdProcessing(luigi.Task):
         }
 
         for product in swathInfo["products"]:
+            generationDatetime = product["generationDatetime"].replace("T", "")
+
             expected = {
                 "productName": product["productName"],
-                "date" : product["date"],
+                "acquisitionDate" : product["acquisitionDate"],
+                "generationDatetime" : generationDatetime,
                 "tileId" : product["tileId"],
                 "files": []
             }
@@ -42,14 +43,12 @@ class PrepareArdProcessing(luigi.Task):
             else:
                 abv = ""
 
-            acquisitionDatetime = product["datetime"].replace("T", "")
-
             if self.testProcessing:
                 latlon = "latn000lonw0000"
             else:
                 latlon = "*"
 
-            basename = f'SEN2_{product["date"]}_{latlon}_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{acquisitionDatetime}_*_{abv}'
+            basename = f'SEN2_{product["acquisitionDate"]}_{latlon}_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{generationDatetime}_*_{abv}'
 
             basename = os.path.join(outDir, basename)
 

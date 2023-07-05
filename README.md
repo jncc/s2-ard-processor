@@ -1,46 +1,72 @@
-# S2 ARD Processor
+S2 ARD Processor
+================
 
-Docker based sentinel 2 Analysis ready production system.
+Docker container that runs the s2-ard-processor workflow.
 
-## Base
+The mapped input folder contains a set of S2 granules that will be processed as a swath. The processing can take place sequentially or in parallel using MPI on the JASMIN cluster.
 
-A base docker image packaging Dr Pete Buntings Python Atmospheric and Radiometric Correction of Satellite Imagery (ARCSI) software (https://www.arcsi.remotesensing.info/).
+Build and run instructions
+--------------------------
 
-Based on the official ContinuumIO Miniconda3 release with python 3.5, base package contains a minimal installaition of ARCSI and its dependencies using the conda package manger, correct as of version 3.1.6 (conda reporting 3.6.1).
+Build to image:
 
-### Build or Pull arcsi-base
+    cd workflow
+    docker build -t s2-ard-processor .
 
-#### Build image
+Use `--no-cache` to build from scratch
 
-`docker build -t jncc/arcsi-base ./base/`
+Run Interactively:
 
-**OR**
+    docker run -i --entrypoint /bin/bash 
+        -v /<hostPath>/input:/input 
+        -v /<hostPath>/output:/output 
+        -v /<hostPath>/state:/state 
+        -v /<hostPath>/static:/static 
+        -v /<hostPath>/working:/working 
+        -v /<hostPath>/report:/report
+        -v /<hostPath>/database:/database 
+        -t s2-ard-processor
 
-#### Pull Image direction from docker hub
+Where \<hostpath> is the path on the host to the mounted folder
 
-`docker pull jncc/arcsi-base`
+Convert Docker image to apptainer image
+---------------------------------------
 
-### Usage
+Build an apptainer image using your Docker image
 
-#### Run image interactively
+    sudo apptainer build s2-ard-processor.sif docker-daemon://s2-ard-processor:latest
 
-`docker run -i -v <local mount point>:/data -t jncc/arcsi-base /bin/bash`
+Run:
 
-To run a container and get help on ARCSI commandline options do:
+    apptainer exec 
+        --bind /<hostPath>/input:/input 
+        --bind /<hostPath>/output:/output 
+        --bind /<hostPath>/state:/state 
+        --bind /<hostPath>/static:/static 
+        --bind /<hostPath>/working:/working
+        --bind /<hostPath>/report:/report
+        --bind /<hostPath>/database:/database
+        
+        s2-ard-processor.sif /app/exec.sh 
+            GenerateReport
+            --dem=dem.kea 
+            --outWkt=outwkt.txt 
+            --projAbbv=osgb
+            --metadataConfigFile=metadata.config.json 
+            --metadataTemplate=metadataTemplate.xml
+            --reportFileName=reportfile.csv
+            --dbFileName=s2ardProducts.db
+            --local-scheduler
 
-`docker run -t jncc/arcsi-base arcsi.py -h`
 
-See below under "Docker example" for a more detailed Sentinel-2 example.
+For the full list of parameters and more details on the folder setups, see the workflow readme at `workflow/app/workflows/README.md`.
 
-### Docker example
+Code change and deployment process
+----------------------------------
 
-``` bash
-docker run -i -t -v ${local_data}:/data jncc/arcsi-base \
-    arcsi.py -s sen2 --stats -f KEA --fullimgouts -p RAD SHARP SATURATE CLOUDS TOPOSHADOW STDSREF DOSAOTSGL METADATA FOOTPRINT \
-    --interp near --outwkt /data/${PATH_TO_OUTPUT_PROJ_WKT} --projabbv ${PROJ_ABBREVIATION} -t /data/tmp/ -o /data/output/ \
-    --dem /data/${PATH_TO_DEM} -i /data/inputs/${SINGLE_INPUT_FILE}
-```
+The code in this repo will be jointly maintained by JNCC and DEFRA/CGI. Use the steps below as a guideline for making new changes:
 
-### See also
-
-Thanks to Markus Neteler (https://github.com/mundialis/docker-arcsi), Edward P. Morris and Angelos Tzotsos for their work on the orignal ARCSI Dockerfile.
+1. Create a new `feature` branch from `main` and commit your changes there until you're ready to merge
+2. Open a pull request to merge back into `main` and add a reviewer from both JNCC and CGI to notify them
+3. JNCC then uses the `feature` branch to build a [jncc/s2-ard-processor-dev](https://hub.docker.com/r/jncc/s2-ard-processor-dev) docker image which both parties can use for testing and QA
+4. Once it passes QA, JNCC will approve the PR, merge it into `main`, and build a live [jncc/s2-ard-processor](https://hub.docker.com/r/jncc/s2-ard-processor) docker image which can be deployed to production

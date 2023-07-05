@@ -66,9 +66,9 @@ Following a successful run the output folder will contain the following file str
    └── 06
         └── 20
             └── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb
-                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds.tif
+            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds.tif
             ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds_prob.tif
-                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_sat.tif
+            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_sat.tif
             ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_toposhad.tif
             ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_valid.tif
             ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif

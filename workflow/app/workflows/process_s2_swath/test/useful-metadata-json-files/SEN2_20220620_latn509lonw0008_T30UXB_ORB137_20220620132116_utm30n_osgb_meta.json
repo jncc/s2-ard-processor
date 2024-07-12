@@ -1,0 +1,114 @@
+{
+    "AcquasitionInfo": {
+        "Date": {
+            "Day": 27,
+            "Month": 1,
+            "Year": 2022
+        },
+        "SolarAzimuth": 167.273174669652,
+        "SolarZenith": 74.6588125781441,
+        "Time": {
+            "Hour": 11,
+            "Minute": 33,
+            "Second": 9
+        },
+        "sensorAzimuth": 196.9638094558563,
+        "sensorZenith": 2.8344177205166807
+    },
+    "FileInfo": {
+        "CLOUD_MASK": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_clouds.kea",
+        "FileBaseName": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n",
+        "IMAGE_DEM": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_dem.kea",
+        "METADATA": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_meta.json",
+        "ProviderMetadata": "MTD_MSIL1C.xml",
+        "RADIANCE": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_mclds_rad.kea",
+        "RADIANCE_WHOLE": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_rad.kea",
+        "SREF_6S_IMG": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem.kea",
+        "SREF_6S_WHOLE_IMG": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_rad_srefdem.kea",
+        "SREF_DOS_IMG_WHOLE": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_rad_srefdem.kea",
+        "STD_SREF_IMG": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_mclds_topshad_rad_srefdem_stdsref.kea",
+        "STD_SREF_WHOLE_IMG": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.kea",
+        "TOA": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_mclds_rad_toa.kea",
+        "TOA_WHOLE": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_vmsk_sharp_rad_toa.kea",
+        "TOPO_SHADOW_MASK": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_toposhad.kea",
+        "VALID_MASK": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_valid.kea",
+        "VIEW_ANGLE": "SEN2_20220127_latn555lonw0037_T30UVG_ORB080_20220127121733_utm30n_osgb_viewangle.kea"
+    },
+    "LocationInfo": {
+        "Geographical": {
+            "BBOX": {
+                "BLLat": 54.94906599009572,
+                "BLLon": -4.561981726975494,
+                "BRLat": 54.959003358478256,
+                "BRLon": -2.8475802889841417,
+                "TLLat": 55.93532706093329,
+                "TLLon": -4.6014369143364435,
+                "TRLat": 55.94563532105239,
+                "TRLon": -2.8437282507299404
+            },
+            "CentreLat": 55.45035593784562,
+            "CentreLon": -3.713681905950225
+        },
+        "Projected": {
+            "BBOX": {
+                "BLX": 236020.0,
+                "BLY": 563040.0,
+                "BRX": 347400.0,
+                "BRY": 563040.0,
+                "TLX": 236020.0,
+                "TLY": 674420.0,
+                "TRX": 347400.0,
+                "TRY": 674420.0
+            },
+            "CentreX": 291710.0,
+            "CentreY": 618730.0,
+            "VPOLY": {
+                "MaxXX": 347400.0,
+                "MaxXY": 672820.0,
+                "MaxYX": 237610.0,
+                "MaxYY": 674420.0,
+                "MinXX": 236020.0,
+                "MinXY": 565100.0,
+                "MinYX": 345210.0,
+                "MinYY": 563040.0
+            }
+        }
+    },
+    "ProductsInfo": {
+        "ARCSIProducts": [
+            "RAD",
+            "SHARP",
+            "SATURATE",
+            "CLOUDS",
+            "TOPOSHADOW",
+            "STDSREF",
+            "DOSAOTSGL",
+            "METADATA"
+        ],
+        "ARCSI_AOT_RANGE_MAX": 0.5,
+        "ARCSI_AOT_RANGE_MIN": 0.05,
+        "ARCSI_AOT_VALUE": 0.05,
+        "ARCSI_CLOUD_COVER": 0.639990508556366,
+        "ARCSI_LUT_ELEVATION_MAX": 900,
+        "ARCSI_LUT_ELEVATION_MIN": 0,
+        "ProcessDate": {
+            "Day": 14,
+            "Month": 1,
+            "Year": 2023
+        },
+        "ProcessTime": {
+            "Hour": 1,
+            "Minute": 33,
+            "Second": 33
+        },
+        "REPROJECT": "PROJCS[\"OSGB 1936 / British National Grid\",GEOGCS[\"OSGB 1936\",DATUM[\"OSGB_1936\",SPHEROID[\"Airy 1830\",6377563.396,299.3249646,AUTHORITY[\"EPSG\",\"7001\"]],AUTHORITY[\"EPSG\",\"6277\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4277\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",49],PARAMETER[\"central_meridian\",-2],PARAMETER[\"scale_factor\",0.9996012717],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",-100000],AUTHORITY[\"EPSG\",\"27700\"],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]"
+    },
+    "SensorInfo": {
+        "ARCSISensorName": "SEN2"
+    },
+    "SoftwareInfo": {
+        "Name": "ARCSI",
+        "URL": "https://github.com/remotesensinginfo/arcsi",
+        "Version": "4.0.2"
+    }
+}

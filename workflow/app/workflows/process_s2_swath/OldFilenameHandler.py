@@ -77,6 +77,13 @@ class OldFilenameHandler():
         roundedLatString = str(roundedLat).replace('.', '')
         roundedLonString = str(roundedLon).replace('.', '')
 
+        # Workaround for version 1 arcsi naming convnetion.
+        # Need to handle specific cases where 3 significant figure longitudes that end with a trailing zero,
+        # need to be trimmed to 2 Significant figures.
+        # this is align filenames with an older version of arcsi.
+        if len(roundedLonString) == 3 and roundedLonString.endswith('0'):
+            roundedLonString = roundedLonString[0:2]
+
         latLonString = f"lat{roundedLatString}lon{roundedLonString}"
 
         return latLonString

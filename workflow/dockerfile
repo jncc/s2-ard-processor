@@ -46,4 +46,7 @@ RUN chmod +rx /app/test-luigi.sh
 COPY app/exec.sh ./
 RUN chmod +rx /app/exec.sh
 
+# Copy container readme
+COPY app/readme.md ./
+
 ENTRYPOINT ["/app/exec.sh"]

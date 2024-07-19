@@ -32,9 +32,7 @@ FinaliseOutputs is the luigi task that requires all processing steps to be run a
 
 ## Example:
 
-```
-docker run -i -v /data/input:/input -v /data/output:/output -v /data/state:/state -v /data/static:/static -v data/working:/working jncc/s2-ard-processor FinaliseOutputs --dem=dem.kea --outWkt=outwkt.txt --projAbbv=osgb --metadataConfigFile=metadata.config.json --metadataTemplate=metadataTemplate.xml  --oldFilenameDateThreshold=2023-01-01 --noStateCopy --local-scheduler
-```
+    docker run -i -v /data/input:/input -v /data/output:/output -v /data/state:/state -v /data/static:/static -v data/working:/working jncc/s2-ard-processor FinaliseOutputs --dem=dem.kea --outWkt=outwkt.txt --projAbbv=osgb --metadataConfigFile=metadata.config.json --metadataTemplate=metadataTemplate.xml  --oldFilenameDateThreshold=2023-01-01 --noStateCopy --local-scheduler
 
 ## Workflow options
 
@@ -60,18 +58,17 @@ By default the workflow will run ARCSI in non-MPI mode but MPI is also supported
 
 Following a successful run the output folder will contain the following file structure:
 
-```
-../output
-2022
-   └── 06
-        └── 20
-            └── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds.tif
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds_prob.tif
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_sat.tif
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_toposhad.tif
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_valid.tif
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif
-            ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref_meta.xml
-            └── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref_thumbnail.jpg
-```
+    ../output
+    2022
+       └── 06
+            └── 20
+                └── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds.tif
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_clouds_prob.tif
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_sat.tif
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_toposhad.tif
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_valid.tif
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref.tif
+                ├── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref_meta.xml
+                └── S2B_20220620_latn527lonw0007_T30UXD_ORB137_20220620115229_utm30n_osgb_vmsk_sharp_rad_srefdem_stdsref_thumbnail.jpg
+

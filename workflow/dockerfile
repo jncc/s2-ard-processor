@@ -1,4 +1,4 @@
-FROM petebunting/au-eoed:20240729
+FROM petebunting/au-eoed:20240730
 
 # Setup app folder
 WORKDIR /app

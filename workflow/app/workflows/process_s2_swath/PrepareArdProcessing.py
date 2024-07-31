@@ -50,7 +50,7 @@ class PrepareArdProcessing(luigi.Task):
 
             basename = f'SEN2_{product["acquisitionDate"]}_{latlon}_{product["tileId"]}_ORB{satelliteAndOrbitNoOutput["orbitNumber"]}_{generationDatetime}_*_{abv}'
 
-            basename = os.path.join(outDir, basename)
+            basename = os.path.join(outDir, "*", basename)
 
             expected["files"].append(basename + "clouds.kea")
             expected["files"].append(basename + "clouds_prob.kea")

@@ -111,7 +111,7 @@ class GetGranuleInfo(luigi.Task):
         sunAngles = self.getSunAngles(mtdXmlRoot)
         viewingAngles = self.getViewingAngles(mtdXmlRoot)
 
-        productName = os.path.basename(self.productPath)
+        productName = os.path.basename(self.productPath).removesuffix(".SAFE")
 
         splits = productName.split("_")
 

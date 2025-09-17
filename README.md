@@ -8,10 +8,16 @@ The mapped input folder contains a set of S2 granules that will be processed as 
 Build and run instructions
 --------------------------
 
-Build to image:
+Build default OpenMPI image:
 
     cd workflow
     docker build -t s2-ard-processor .
+
+Build IntelMPI image:
+
+    cd workflow
+    docker build -t s2-ard-processor -f intelmpi.dockerfile .
+
 
 Use `--no-cache` to build from scratch
 

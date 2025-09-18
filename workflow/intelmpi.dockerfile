@@ -1,0 +1,56 @@
+FROM petebunting/au-eoed:20240730
+
+# Setup app folder
+WORKDIR /app
+
+# Configure apt
+RUN apt-get update && apt-get -y install \ 
+    apt-utils \
+    unzip
+
+# Intel MPI
+RUN conda remove openmpi 
+RUN conda install --yes -c conda-forge mpi4py=4.0.3 impi_rt=2021.15.0
+
+# --------- Place machine build layers before this line ---------
+
+# Create processing paths
+RUN mkdir -p /input/ \
+    && mkdir -p /static/ \
+    && mkdir -p /state/ \
+    && mkdir -p /working/ \
+    && mkdir -p /output/ \
+    && mkdir -p /report/ \
+    && mkdir -p /database/
+
+# Copy workflows
+COPY /app/workflows ./workflows
+
+# Install workflow dependencies
+RUN pip install -r /app/workflows/requirements.txt
+
+# Copy workflow config
+COPY config/app/workflows/luigi.cfg ./workflows
+RUN chmod +r ./workflows/luigi.cfg
+
+# Copy build config
+COPY config/app/workflows/build-config.json ./
+
+# Copy wkt file
+COPY /app/BritishNationalGrid.wkt ./
+
+# Copy cog validation script
+COPY /app/validate_cloud_optimized_geotiff.py ./
+
+# Copy the luigi test script
+COPY app/test-luigi.sh ./
+RUN chmod +rx /app/test-luigi.sh
+
+# Initialise startup script
+COPY app/exec.sh ./
+RUN chmod +rx /app/exec.sh
+
+# Copy container readme
+COPY app/readme.md ./
+
+ENTRYPOINT ["/app/exec.sh"]

@@ -6,7 +6,12 @@ WORKDIR /app
 # Configure apt
 RUN apt-get update && apt-get -y install \ 
     apt-utils \
-    unzip
+    unzip \
+    libgfortran5
+
+# Patch for sixs
+COPY app/sixsV1.1_AltToFix760nmBug /opt/miniconda/bin/sixs
+RUN chmod 755 /opt/miniconda/bin/sixs
 
 # --------- Place machine build layers before this line ---------
 

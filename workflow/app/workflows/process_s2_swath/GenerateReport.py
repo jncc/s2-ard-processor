@@ -20,7 +20,7 @@ class GenerateReport(luigi.Task):
     dbConnectionTimeout = luigi.IntParameter(default=60000)
 
     def parseInputName(self, productName):
-        pattern = re.compile("S2([AB])_MSIL1C_((20[0-9]{2})([0-9]{2})([0-9]{2})T([0-9]{2})([0-9]{2})([0-9]{2}))_\w+_(R[0-9]{3})_(T\w+?)_")
+        pattern = re.compile("S2([ABC])_MSIL1C_((20[0-9]{2})([0-9]{2})([0-9]{2})T([0-9]{2})([0-9]{2})([0-9]{2}))_\w+_(R[0-9]{3})_(T\w+?)_")
         
         m = pattern.search(productName)
 

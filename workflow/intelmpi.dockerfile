@@ -6,11 +6,16 @@ WORKDIR /app
 # Configure apt
 RUN apt-get update && apt-get -y install \ 
     apt-utils \
-    unzip
+    unzip \
+    libgfortran5
 
 # Intel MPI
 RUN conda remove openmpi 
 RUN conda install --yes -c conda-forge mpi4py=4.0.3 impi_rt=2021.15.0
+
+# Patch for sixs
+COPY app/sixsV1.1_AltToFix760nmBug /opt/miniconda/bin/sixs
+RUN chmod 755 /opt/miniconda/bin/sixs
 
 # --------- Place machine build layers before this line ---------
 

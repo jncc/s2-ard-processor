@@ -17,6 +17,9 @@ RUN conda install --yes -c conda-forge mpi4py=4.0.3 impi_rt=2021.15.0
 COPY app/sixsV1.1_AltToFix760nmBug /opt/miniconda/bin/sixs
 RUN chmod 755 /opt/miniconda/bin/sixs
 
+# Patch for file collision issue: https://github.com/remotesensinginfo/arcsi/pull/16
+COPY app/arcsisensorsentinel2_filecollisionfix.py /opt/miniconda/lib/python3.11/site-packages/arcsilib/arcsisensorsentinel2.py
+
 # --------- Place machine build layers before this line ---------
 
 # Create processing paths
